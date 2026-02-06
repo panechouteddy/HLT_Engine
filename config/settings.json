@@ -1,0 +1,136 @@
+{
+    "projects": {
+        "059B3354-5FE8-45E2-6A06-6FD46A6E6E80": {
+            "config-debug": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "config-release": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "dependencies": [
+                "062840BA-1887-0FC5-2E8C-0365753902CF"
+            ],
+            "dependents": [],
+            "name": "sandbox",
+            "property-lib": false,
+            "property-pch": true,
+            "property-vcpkg": false,
+            "property-window": true
+        },
+        "062840BA-1887-0FC5-2E8C-0365753902CF": {
+            "config-debug": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "config-release": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "dependencies": [
+                "063F66A1-0100-21C0-4896-6EC44A5432C4"
+            ],
+            "dependents": [
+                "0652628B-23B1-55BC-3A56-4ACD13476E29",
+                "6AE91035-28EA-39F2-5695-2DE80AEC4AD3",
+                "059B3354-5FE8-45E2-6A06-6FD46A6E6E80"
+            ],
+            "name": "hlt_engine",
+            "property-lib": true,
+            "property-pch": true,
+            "property-vcpkg": false,
+            "property-window": false
+        },
+        "063F66A1-0100-21C0-4896-6EC44A5432C4": {
+            "config-debug": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "config-release": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "dependencies": [],
+            "dependents": [
+                "062840BA-1887-0FC5-2E8C-0365753902CF",
+                "0652628B-23B1-55BC-3A56-4ACD13476E29"
+            ],
+            "name": "hlt_core",
+            "property-lib": true,
+            "property-pch": true,
+            "property-vcpkg": false,
+            "property-window": false
+        },
+        "0652628B-23B1-55BC-3A56-4ACD13476E29": {
+            "config-debug": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "config-release": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "dependencies": [
+                "063F66A1-0100-21C0-4896-6EC44A5432C4",
+                "062840BA-1887-0FC5-2E8C-0365753902CF"
+            ],
+            "dependents": [],
+            "name": "hlt_render",
+            "property-lib": true,
+            "property-pch": true,
+            "property-vcpkg": false,
+            "property-window": false
+        },
+        "6AE91035-28EA-39F2-5695-2DE80AEC4AD3": {
+            "config-debug": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "config-release": {
+                "additionalDependencies": [],
+                "additionalIncludeDirectories": [],
+                "additionalLibraryDirectories": [],
+                "preprocessorDefinitions": []
+            },
+            "dependencies": [
+                "062840BA-1887-0FC5-2E8C-0365753902CF"
+            ],
+            "dependents": [],
+            "name": "game",
+            "property-lib": false,
+            "property-pch": true,
+            "property-vcpkg": false,
+            "property-window": true
+        }
+    },
+    "projects_name_to_guid": {
+        "game": "6AE91035-28EA-39F2-5695-2DE80AEC4AD3",
+        "hlt_core": "063F66A1-0100-21C0-4896-6EC44A5432C4",
+        "hlt_engine": "062840BA-1887-0FC5-2E8C-0365753902CF",
+        "hlt_render": "0652628B-23B1-55BC-3A56-4ACD13476E29",
+        "sandbox": "059B3354-5FE8-45E2-6A06-6FD46A6E6E80"
+    },
+    "solution_guid": "051923E4-78A1-15FD-1E5F-0A47041C37E3",
+    "solution_name": "HLT_Engine",
+    "startup_project": "",
+    "version": "2.0"
+}
