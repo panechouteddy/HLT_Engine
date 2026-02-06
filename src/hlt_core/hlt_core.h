@@ -23,5 +23,7 @@
 #include <crtdbg.h>
 #endif
 
+
+#include <DirectXColors.h>
 #include <DirectXMath.h>
 using namespace DirectX;

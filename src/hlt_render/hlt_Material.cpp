@@ -1,2 +1,6 @@
 #include "pch.h"
-#include "hlt_Material.h"
+
+hlt_Material::hlt_Material()
+{
+	color = 
+}
