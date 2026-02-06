@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "hlt_Camera.h"
 
 hlt_Camera::hlt_Camera()
 {
