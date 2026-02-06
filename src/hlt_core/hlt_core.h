@@ -22,3 +22,6 @@
 #ifdef _DEBUG
 #include <crtdbg.h>
 #endif
+
+#include <DirectXMath.h>
+using namespace DirectX;
