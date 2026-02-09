@@ -27,3 +27,5 @@
 #include <DirectXColors.h>
 #include <DirectXMath.h>
 using namespace DirectX;
+
+const float PI = 3.1415926535f;
