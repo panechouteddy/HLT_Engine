@@ -9,8 +9,8 @@ public:
 	std::string name;
 	std::wstring file;
 	
-	Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> Resource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap;
 
 	hlt_Texture();
 };

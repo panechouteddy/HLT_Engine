@@ -3,6 +3,6 @@
 
 hlt_Texture::hlt_Texture()
 {
-	name = nullptr;
-	file = nullptr;
-}
+	Resource = nullptr;
+	UploadHeap = nullptr;
+}	
