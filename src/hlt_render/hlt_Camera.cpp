@@ -16,15 +16,9 @@ void hlt_Camera::Update()
 	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
 	XMStoreFloat4x4(&m_View, view);
 
-	XMMATRIX proj = XMMatrixPerspectiveFovLH(0.25f * PI, AspectRatio(), 1.0f, 1000.0f);
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(0.25f * PI, /* Remplacer par AspectRatio() dans d3dApp après merge*/static_cast<float>(mClientWidth) / mClientHeight, 1.0f, 1000.0f);
 	XMStoreFloat4x4(&m_Proj, proj);
 
 	XMMATRIX viewProj = proj * view;
-
 	XMStoreFloat4x4(&m_ViewProj,viewProj);
-}
-
-void hlt_Camera::UpdateProj()
-{
-
 }
