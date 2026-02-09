@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <Ws2tcpip.h>
+#include <wrl.h>
 
 #include <stdlib.h>
 #include <malloc.h>
@@ -23,9 +24,10 @@
 #include <crtdbg.h>
 #endif
 
-
 #include <DirectXColors.h>
 #include <DirectXMath.h>
 using namespace DirectX;
+
+#include <d3d12.h>
 
 const float PI = 3.1415926535f;
