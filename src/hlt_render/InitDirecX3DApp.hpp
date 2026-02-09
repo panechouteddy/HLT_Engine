@@ -59,9 +59,8 @@ void InitDirect3DApp::Draw(const GameTimer& gt)
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
 	// Indicate a state transition on the resource usage.
-	CD3DX12_RESOURCE_BARRIER* barrier1 = new CD3DX12_RESOURCE_BARRIER;
-	barrier1->Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-	m_CommandList->ResourceBarrier(1,barrier1);
+	auto barrierToRT = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	m_CommandList->ResourceBarrier(1, &barrierToRT);
 
 	// Set the viewport and scissor rect.  This needs to be reset whenever the command list is reset.
 	m_CommandList->RSSetViewports(1, &m_ScreenViewport);
@@ -79,9 +78,8 @@ void InitDirect3DApp::Draw(const GameTimer& gt)
 	m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
 
 	// Indicate a state transition on the resource usage.
-	CD3DX12_RESOURCE_BARRIER* barrier2 = new CD3DX12_RESOURCE_BARRIER;
-	barrier2->Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-	m_CommandList->ResourceBarrier(1, barrier2);
+	auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	m_CommandList->ResourceBarrier(1, &barrierToPresent);
 
 	// Done recording commands.
 	ThrowIfFailed(m_CommandList->Close());
