@@ -8,7 +8,7 @@ namespace hlt_System
 	public:
 		ConstantMove(hlt_ECS* ecs) : hlt_SystemClass(ecs) { ; }
 
-		void Update(float dt) override;
+		void Update() override;
 	};
 }
 

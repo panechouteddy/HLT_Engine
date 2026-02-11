@@ -4,13 +4,15 @@
 #include "hlt_ConstantMoveComponent.h"
 #include "hlt_Transform3DComponent.h"
 
-void hlt_System::ConstantMove::Update(float dt)
+void hlt_System::ConstantMove::Update()
 {
     {
         hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_pECS->GetComponent<hlt_Component::Transform3D>();
         hlt_ECS::ComponentPool<hlt_Component::ConstantMove>* cMoves = m_pECS->GetComponent<hlt_Component::ConstantMove>();
 
         std::vector<int>& cMovesOwners = cMoves->GetComponentOwnersID();
+        
+        // dt à implémenter
 
         for (int i = 0; i < cMovesOwners.size(); i++)
         {

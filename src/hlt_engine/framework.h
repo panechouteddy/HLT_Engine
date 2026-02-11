@@ -6,6 +6,9 @@
 #include <vector>
 #include <unordered_map>
 
+// UTILITY
+#include <hlt_core/hlt_Time.h>
+
 // ECS
 #include "hlt_ECS.inl"
 
@@ -18,3 +21,6 @@
 #include "hlt_Transform3DComponent.h"
 #include "hlt_ConstantMoveComponent.h"
 #include "hlt_InputComponent.h"
+
+// GAME MANAGER
+#include "GameManager.h"

@@ -40,7 +40,9 @@ public:
 	hlt_ECS() = default;
 	~hlt_ECS() = default;
 
-	void Update(float dt);
+	void Destroy();
+
+	void Update();
 
 	// MANAGE ENTITY COMPONENT
 	template <typename T>

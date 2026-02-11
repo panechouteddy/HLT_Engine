@@ -1,7 +1,20 @@
 #include "pch.h"
 
-void hlt_ECS::Update(float dt)
+void hlt_ECS::Update()
 {
 	for (hlt_System::hlt_SystemClass* system : m_pSystems)
-		system->Update(dt);
+		system->Update();
+}
+
+void hlt_ECS::Destroy()
+{
+	for (auto& comp : m_Components)
+	{
+		delete comp.second;
+	}
+
+	for (auto& system : m_pSystems)
+	{
+		delete system;
+	}
 }

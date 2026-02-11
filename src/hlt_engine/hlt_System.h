@@ -11,6 +11,6 @@ namespace hlt_System
 	public:
 		hlt_SystemClass(hlt_ECS* ecs) : m_pECS(ecs) { ; }
 
-		virtual void Update(float dt) = 0;
+		virtual void Update() = 0;
 	};
 }
