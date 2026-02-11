@@ -28,8 +28,8 @@ namespace hlt_Input
 		~KeyboardInput() = default;
 		static KeyboardInput& GetInstance();
 
-		virtual void OnStart() { Reset(); }
-		void OnUpdate();
+		virtual void Start() { Reset(); }
+		void Update();
 
 		void Reset();
 		bool IsKey(int key);
@@ -68,8 +68,8 @@ namespace hlt_Input
 		~MouseInput() = default;
 		static MouseInput& GetInstance();
 
-		virtual void OnStart() { Reset(); }
-		void OnUpdate();
+		virtual void Start() { Reset(); }
+		void Update();
 
 		void Reset();
 		bool IsKey(int key);

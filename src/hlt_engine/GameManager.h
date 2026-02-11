@@ -23,9 +23,18 @@ public:
 	int CreateEntity();
 
 private:
+	void RefreshInput();
+	void HandleWinMsg();
+
+private:
+	// RUN
+	bool m_IsRunning = false;
+
+	// ENTITY MANAGER
 	int m_countEntityID = 0;
 	std::vector<int> m_EntityID;
 
+	// ECS
 	hlt_ECS m_ECS;
 };
 

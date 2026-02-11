@@ -29,10 +29,13 @@ GameManager::~GameManager()
 
 void GameManager::Run()
 {
-	Start();
-	bool isRunning = true;
+	if (m_IsRunning)
+		Destroy();
 
-	while (isRunning)
+	Start();
+	m_IsRunning = true;
+
+	while (m_IsRunning)
 	{
 		Update();
 
@@ -49,6 +52,8 @@ void GameManager::Start()
 void GameManager::Update()
 {
 	m_ECS.Update();
+
+	RefreshInput();
 }
 
 void GameManager::Render()
@@ -70,4 +75,26 @@ int GameManager::CreateEntity()
 	m_countEntityID++;
 
 	return m_countEntityID - 1;
+}
+
+void GameManager::RefreshInput()
+{
+	hlt_Input::KeyboardInput::GetInstance().Update();
+	hlt_Input::MouseInput::GetInstance().Update();
+}
+
+void GameManager::HandleWinMsg()
+{
+	// --- NOUVEAU : La pompe à messages ---
+	MSG msg;
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+		if (msg.message == WM_QUIT)
+			m_IsRunning = false;
+
+		if(msg.message == WM_MOUSEMOVE)
+
+	}
 }

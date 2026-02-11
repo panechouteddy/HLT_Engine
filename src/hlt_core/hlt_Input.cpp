@@ -13,7 +13,7 @@ hlt_Input::KeyboardInput& hlt_Input::KeyboardInput::GetInstance()
     return *s_pInstance;
 }
 
-void hlt_Input::KeyboardInput::OnUpdate()
+void hlt_Input::KeyboardInput::Update()
 {
     for (int i = 1; i < 255; i++)
     {
@@ -86,7 +86,7 @@ hlt_Input::MouseInput& hlt_Input::MouseInput::GetInstance()
     return *s_pInstance;
 }
 
-void hlt_Input::MouseInput::OnUpdate()
+void hlt_Input::MouseInput::Update()
 {
     for (int i = 0; i < 5; i++)
     {
@@ -144,11 +144,8 @@ bool hlt_Input::MouseInput::IsKeyUp(int key)
     return m_ButtonStates[key] == DOWN;
 }
 
-void hlt_Input::MouseInput::MouseMove(UINT uMsg, LPARAM lParam)
+void hlt_Input::MouseInput::MouseMove(LPARAM lParam)
 {
-    if (uMsg == WM_MOUSEMOVE)
-    {
-        m_LastPos = m_Pos;
-        m_Pos = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-    }
+    m_LastPos = m_Pos;
+    m_Pos = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 }
