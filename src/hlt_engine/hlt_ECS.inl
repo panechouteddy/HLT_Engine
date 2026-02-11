@@ -10,10 +10,10 @@ inline T* hlt_ECS::ComponentPool<T>::Add(int ID)
 		entityID.resize(ID + 1, MISS_COMPONENT);
 
 	component.push_back(T());
-	int componentIndex = component.size() - 1;
+	size_t componentIndex = component.size() - 1;
 	componentOwnerID.push_back(ID);
 
-	entityID[ID] = componentIndex;
+	entityID[ID] = (int)componentIndex;
 
 	return &component[entityID[ID]];
 }
@@ -23,7 +23,7 @@ inline bool hlt_ECS::ComponentPool<T>::Have(int ID)
 {
 	if (entityID.size() < ID) return false;
 
-	return entityID[ID] == MISS_COMPONENT;
+	return entityID[ID] != MISS_COMPONENT;
 }
 
 template<typename T>
@@ -31,7 +31,7 @@ inline T* hlt_ECS::ComponentPool<T>::Get(int ID)
 {
 	if (Have(ID) == false) return nullptr;
 
-	return component[ID];
+	return &component[entityID[ID]];
 }
 
 template<typename T>
@@ -46,7 +46,7 @@ inline void hlt_ECS::ComponentPool<T>::Remove(int ID)
 	if (Have(ID) == false) return;
 
 	int componentIndex = entityID[ID];
-	int componentSize = component.size() - 1;
+	size_t componentSize = component.size() - 1;
 
 	std::swap(component[componentIndex], component.back());
 	component.pop_back();
@@ -78,7 +78,8 @@ inline T* hlt_ECS::GetComponent(int ID)
 	if (m_Components.contains(T::ID) == false)
 		return nullptr;
 
-	return m_Components[T::ID]->Get(ID);
+	ComponentPool<T>* componentPool = GetComponent<T>();
+	return componentPool->Get(ID);
 }
 
 template<typename T>
@@ -106,7 +107,6 @@ inline hlt_ECS::ComponentPool<T>* hlt_ECS::GetComponent()
 {
 	if (m_Components.contains(T::ID) == false)
 		return nullptr;
-
 
 	ComponentPool<T>* componentPool = dynamic_cast<ComponentPool<T>*>(m_Components[T::ID]);
 	return componentPool;

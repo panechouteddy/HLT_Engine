@@ -5,7 +5,7 @@ using namespace DirectX;
 
 namespace hlt_Component
 {
-	struct hlt_CMoveComponent
+	struct ConstantMove
 	{
 		static const int ID = 1;
 

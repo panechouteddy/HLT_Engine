@@ -1,6 +1,4 @@
 #pragma once
-#include <vector>
-#include <unordered_map>
 
 #define MISS_COMPONENT -1
 

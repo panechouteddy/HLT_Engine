@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "hlt_Input.h"
+#include <Windowsx.h>
 
 hlt_Input::KeyboardInput* hlt_Input::KeyboardInput::s_pInstance = nullptr;
 
@@ -12,11 +13,11 @@ hlt_Input::KeyboardInput& hlt_Input::KeyboardInput::GetInstance()
     return *s_pInstance;
 }
 
-void hlt_Input::KeyboardInput::OnUpdate(float& dt)
+void hlt_Input::KeyboardInput::OnUpdate()
 {
     for (int i = 1; i < 255; i++)
     {
-        if (GetAsyncKeyState(i) < 0) //&& 0x8000)
+        if (GetAsyncKeyState(i) < 0)
         {
             switch (m_KeyStates[i])
             {
@@ -85,11 +86,11 @@ hlt_Input::MouseInput& hlt_Input::MouseInput::GetInstance()
     return *s_pInstance;
 }
 
-void hlt_Input::MouseInput::OnUpdate(float& dt)
+void hlt_Input::MouseInput::OnUpdate()
 {
     for (int i = 0; i < 5; i++)
     {
-        if (GetAsyncKeyState(buttons[i]) < 0) //&& 0x8000)
+        if (GetAsyncKeyState(buttons[i]) < 0)
         {
             switch (m_ButtonStates[i])
             {
@@ -141,4 +142,13 @@ bool hlt_Input::MouseInput::IsKeyDown(int key)
 bool hlt_Input::MouseInput::IsKeyUp(int key)
 {
     return m_ButtonStates[key] == DOWN;
+}
+
+void hlt_Input::MouseInput::MouseMove(UINT uMsg, LPARAM lParam)
+{
+    if (uMsg == WM_MOUSEMOVE)
+    {
+        m_LastPos = m_Pos;
+        m_Pos = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+    }
 }

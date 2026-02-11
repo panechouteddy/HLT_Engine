@@ -3,5 +3,9 @@
 
 #include <hlt_engine/framework.h>
 
+// TEST FILES
+#include "Test_ECS.hpp"
+#include "Test_Input.hpp"
+
 
 #endif

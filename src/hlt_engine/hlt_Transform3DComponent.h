@@ -5,7 +5,7 @@ using namespace DirectX;
 
 namespace hlt_Component
 {
-	struct hlt_Transform3DComponent
+	struct Transform3D
 	{
 	public:
 		static const int ID = 0;
