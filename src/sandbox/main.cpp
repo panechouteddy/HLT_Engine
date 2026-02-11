@@ -33,6 +33,8 @@ public:
 	void BuildShadersAndInputLayout();
 	void BuildBoxGeometry();
 	void BuildPSO();
+	void UpdateLight(const GameTimer& gt);
+	void LoadTextures();
 
 private:
 
@@ -55,12 +57,15 @@ private:
 	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
 
 	std::unique_ptr<MeshGeometry> mBoxGeo = nullptr;
+	std::unordered_map<std::string, std::unique_ptr<Texture>> mTextures;
 
 	ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
+
+	ComPtr<ID3D12DescriptorHeap> mSrvDescriptorHeap = nullptr;
 	
 	ComPtr<ID3D12PipelineState> mPSO = nullptr;
 
-	hlt_Camera m_camera;
+	//FrameResource* mCurrFrameResource = nullptr;
 
 	XMFLOAT4X4 mWorld = MathHelper::Identity4x4();
 
@@ -71,6 +76,8 @@ private:
 	float mRadius = 5.0f;
 
 	hlt_Material m_material;
+	hlt_Light m_light;
+	hlt_Camera m_camera;
 };
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR cmdLine, int cmdShow)
@@ -112,8 +119,9 @@ bool main::Initialize()
 	// Reset the command list to prep for initialization commands.
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
-	m_material.color = { 1.0f,0.0f,0.0f };
+	m_material.color = { 1.0f,0.0f,0.0f, 0.f };
 
+	LoadTextures();
 	BuildDescriptorHeaps();
 	BuildConstantBuffers();
 	BuildRootSignature();
@@ -141,6 +149,20 @@ void main::BuildDescriptorHeaps()
 	cbvHeapDesc.NodeMask = 0;
 	ThrowIfFailed(m_Device->CreateDescriptorHeap(&cbvHeapDesc,
 		IID_PPV_ARGS(&mCbvHeap)));
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(mSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	auto woodCrateTex = mTextures["woodCrateTex"]->Resource;
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = woodCrateTex->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = woodCrateTex->GetDesc().MipLevels;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	m_Device->CreateShaderResourceView(woodCrateTex.Get(), &srvDesc, hDescriptor);
 }
 
 void main::BuildConstantBuffers()
@@ -359,7 +381,7 @@ void main::Update(const GameTimer& gt)
 	ObjectConstants objConstants2;
 	XMStoreFloat4x4(&objConstants2.WorldViewProj, XMMatrixTranspose(worldViewProj2));
 
-
+	UpdateLight(gt);
 	//mObjectCB->CopyData(0, objConstants);
 
 	//mObjectCB2->CopyData(0, objConstants2);
@@ -488,4 +510,25 @@ void main::OnMouseMove(WPARAM btnState, int x, int y)
 
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
+}
+
+void main::UpdateLight(const GameTimer& gt)
+{
+	m_light.m_Direction = { 0.57735f, -0.57735f, 0.57735f };
+	m_light.m_Strength = { 0.6f, 0.6f, 0.6f };
+
+	//auto currPassCB = mCurrFrameResource->PassCB.get();
+	//currPassCB->CopyData(0, m_light);
+}
+
+void main::LoadTextures()
+{
+	auto woodCrateTex = std::make_unique<Texture>();
+	woodCrateTex->Name = "woodCrateTex";
+	woodCrateTex->Filename = L"../../Textures/WoodCrate01.dds";
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(m_Device.Get(),
+		m_CommandList.Get(), woodCrateTex->Filename.c_str(),
+		woodCrateTex->Resource, woodCrateTex->UploadHeap));
+
+	mTextures[woodCrateTex->Name] = std::move(woodCrateTex);
 }
