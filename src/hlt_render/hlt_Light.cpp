@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "hlt_Light.h"
 
 hlt_Light::hlt_Light()
 {
