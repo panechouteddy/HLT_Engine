@@ -76,7 +76,7 @@ namespace hlt_Input
 		bool IsKeyDown(int key);
 		bool IsKeyUp(int key);
 
-		void MouseMove(UINT uMsg, LPARAM lParam);
+		void MouseMove(LPARAM lParam);
 		XMINT2* GetPos() { return &m_Pos; }
 		XMINT2* GetLastPos() { return &m_LastPos; }
 	};

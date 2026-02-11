@@ -95,6 +95,6 @@ void GameManager::HandleWinMsg()
 			m_IsRunning = false;
 
 		if(msg.message == WM_MOUSEMOVE)
-
+			hlt_Input::MouseInput::GetInstance().MouseMove()
 	}
 }
