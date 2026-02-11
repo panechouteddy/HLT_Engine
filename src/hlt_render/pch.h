@@ -1,6 +1,2 @@
-#ifndef PCH_H
-#define PCH_H
 
-#include <iostream>
-
-#endif
+#include "hlt_render.h"
