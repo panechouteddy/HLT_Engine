@@ -2,12 +2,12 @@
 #include "hlt_CMoveSystem.h"
 
 #include "hlt_CMoveComponent.h"
-#include "hlt_Transform3D.h"
+#include "hlt_Transform3DComponent.h"
 
 void hlt_CMoveSystem::Update(float dt)
 {
     {
-        hlt_ECS::ComponentPool<hlt_Transform3D>* transforms = m_pECS->GetComponent<hlt_Transform3D>();
+        hlt_ECS::ComponentPool<hlt_Transform3DComponent>* transforms = m_pECS->GetComponent<hlt_Transform3DComponent>();
         hlt_ECS::ComponentPool<hlt_CMoveComponent>* cMoves = m_pECS->GetComponent<hlt_CMoveComponent>();
 
         std::vector<int>& cMovesOwners = cMoves->GetComponentOwnersID();

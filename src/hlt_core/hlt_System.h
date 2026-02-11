@@ -1,13 +1,16 @@
 #pragma once
 #include "hlt_ECS.h"
 
-class hlt_System
+namespace hlt_System
 {
-protected:
-	hlt_ECS* m_pECS;
+	class hlt_SystemClass
+	{
+	protected:
+		hlt_ECS* m_pECS;
 
-public:
-	hlt_System(hlt_ECS* ecs) : m_pECS(ecs) { ; }
+	public:
+		hlt_SystemClass(hlt_ECS* ecs) : m_pECS(ecs) { ; }
 
-	virtual void Update(float dt) = 0;
-};
+		virtual void Update(float dt) = 0;
+	};
+}

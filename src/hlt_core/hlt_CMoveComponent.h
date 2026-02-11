@@ -3,10 +3,13 @@
 
 using namespace DirectX;
 
-struct hlt_CMoveComponent
+namespace hlt_Component
 {
-	static const int ID = 1;
+	struct hlt_CMoveComponent
+	{
+		static const int ID = 1;
 
-	float move;
-	XMFLOAT3 dir;
-};
+		float move;
+		XMFLOAT3 dir;
+	};
+}

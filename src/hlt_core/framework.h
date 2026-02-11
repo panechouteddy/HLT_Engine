@@ -1,9 +1,9 @@
-#ifndef PCH_H
-#define PCH_H
+#pragma once
 
 #include <iostream>
 #include <Windows.h>
 #include <memory>
+#include <algorithm>
 
 // CONTAINERS
 #include <vector>
@@ -18,24 +18,24 @@ using namespace DirectX;
 #ifdef NDEBUG
 constexpr bool DEBUG = false;
 #else
-#include <hlt_core/hlt_DebugTools.h>
+#include "hlt_DebugTools.h"
+using namespace hlt_DebugTools;
 constexpr bool DEBUG = true;
 #endif
 
 // ECS
-#include <hlt_core/hlt_ECS.h>
+#include "hlt_ECS.inl"
 
 // ECS SYSTEMS
-#include <hlt_core/hlt_System.h>
-#include <hlt_core/hlt_CMoveSystem.h>
+#include "hlt_System.h"
+#include "hlt_CMoveSystem.h"
+#include "hlt_KeyboardInputSystem.h"
 
 using namespace hlt_System;
 
 // ECS COMPONENT
-#include <hlt_core/hlt_Transform3DComponent.h>
-#include <hlt_core/hlt_CMoveComponent.h>
+#include "hlt_Transform3DComponent.h"
+#include "hlt_CMoveComponent.h"
+#include "hlt_KeyboardInputComponent.h"
 
 using namespace hlt_Component;
-
-
-#endif

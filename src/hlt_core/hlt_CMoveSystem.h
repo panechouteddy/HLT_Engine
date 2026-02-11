@@ -1,11 +1,14 @@
 #pragma once
 #include "hlt_System.h"
 
-class hlt_CMoveSystem : public hlt_System
+namespace hlt_System
 {
-public:
-	hlt_CMoveSystem(hlt_ECS* ecs) : hlt_System(ecs) { ; }
+	class hlt_CMoveSystem : public hlt_SystemClass
+	{
+	public:
+		hlt_CMoveSystem(hlt_ECS* ecs) : hlt_SystemClass(ecs) { ; }
 
-	void Update(float dt) override;
-};
+		void Update(float dt) override;
+	};
+}
 

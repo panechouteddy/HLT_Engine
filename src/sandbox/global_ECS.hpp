@@ -1,26 +1,19 @@
 #include "pch.h"
-#include <hlt_core/hlt_CMoveSystem.h>
-#include <hlt_core/hlt_CMoveComponent.h>
-#include <hlt_core/hlt_Transform3D.h>
-#include <hlt_core/DebugTools.h>
-#include <hlt_core/hlt_ECS.inl>
-
-
 
 int global_ECS()
 {
-	DebugTool::CreateDebugConsole();
-
+	hlt_DebugConsole::CreateDebugConsole();
+	
 	hlt_ECS ECS;
 
 	ECS.AddComponent<hlt_CMoveComponent>();
-	ECS.AddComponent<hlt_Transform3D>();
+	ECS.AddComponent<hlt_Transform3DComponent>();
 
 	hlt_CMoveComponent* cMove = ECS.AddComponent<hlt_CMoveComponent>(1);
 	cMove->move = 1.f;
 	cMove->dir = { 0.5f, 0.5f, 0.5f };
 
-	ECS.AddComponent<hlt_Transform3D>(1);
+	ECS.AddComponent<hlt_Transform3DComponent>(1);
 
 	ECS.AddSystem<hlt_CMoveSystem>();
 
@@ -32,10 +25,10 @@ int global_ECS()
 	}
 
 	ECS.RemoveComponent<hlt_CMoveComponent>(1);
-	ECS.RemoveComponent<hlt_Transform3D>();
+	ECS.RemoveComponent<hlt_Transform3DComponent>();
 	ECS.RemoveSystem<hlt_CMoveSystem>();
 
-	DebugTool::DestroyDebugConsole();
+	hlt_DebugConsole::DestroyDebugConsole();
 
 	return 0;
 }

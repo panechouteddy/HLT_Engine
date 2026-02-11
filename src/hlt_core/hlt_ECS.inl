@@ -129,7 +129,7 @@ inline void hlt_ECS::RemoveComponent()
 template<typename T>
 inline void hlt_ECS::AddSystem()
 {
-	for (hlt_System* system : m_pSystems)
+	for (hlt_System::hlt_SystemClass* system : m_pSystems)
 	{
 		T* t = dynamic_cast<T*>(system);
 		if (t != nullptr)

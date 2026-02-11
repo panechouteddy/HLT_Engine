@@ -1,69 +1,12 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
-#include <memory>
-
-
-
 
 #define MISS_COMPONENT -1
 
-class hlt_System;
-//struct CPool
-//	{
-//	};
-//
-//template <typename T>
-//struct ComponentPool : public CPool
-//	{
-//		std::vector<int> entityID; // INDEX = entityID; VALUE = componentIndex
-//		std::vector<T> component;
-//		std::vector<int> componentOwnerID; // INDEX = componentIndex; VALUE = entityID
-//
-//		void Add(int ID)
-//		{
-//			if (Have(ID)) return;
-//
-//			if (ID >= entityID.capacity())
-//				entityID.resize(ID + 1, MISS_COMPONENT);
-//
-//			component.push_back(T());
-//			int componentIndex = component.size() - 1;
-//			component[componentIndex].Start();
-//			componentOwnerID.push_back(ID);
-//
-//			entityID[ID] = componentIndex;
-//		}
-//
-//		bool Have(int ID)
-//		{
-//			if (entityID.size() >= ID) return false;
-//
-//			return entityID[ID] == MISS_COMPONENT;
-//		}
-//		T* Get(int ID)
-//		{
-//			if (Have(ID) == false) return nullptr;
-//
-//			return component[ID];
-//		}
-//
-//		void Remove(int ID)
-//		{
-//			if (Have(ID) == false) return;
-//
-//			int componentIndex = entityID[ID];
-//			int componentSize = component.size() - 1;
-//
-//			std::swap(component[componentIndex], component.back());
-//			component.pop_back();
-//			std::swap(componentOwnerID[componentIndex], componentOwnerID.back());
-//			componentOwnerID.pop_back();
-//
-//			entityID[componentOwnerID[componentIndex]] = componentIndex;
-//			entityID[ID] = MISS_COMPONENT;
-//		}
-//	};
+namespace hlt_System {
+	class hlt_SystemClass;
+}
 
 class hlt_ECS
 {
@@ -93,7 +36,7 @@ public:
 
 private:
 	std::unordered_map<int, CPool*> m_Components;
-	std::vector<hlt_System*> m_pSystems;
+	std::vector<hlt_System::hlt_SystemClass*> m_pSystems;
 
 public:
 	hlt_ECS() = default;
