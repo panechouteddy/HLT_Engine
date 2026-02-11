@@ -1,8 +1,13 @@
 #include "pch.h"
 #include "D3DApp.h"
 #include <DirectXColors.h>
+#include <array>
+
+constexpr int  CODE_PYRAMID = 151212;
+
 
 using namespace DirectX;
+
 
 class InitDirect3DApp : public D3DApp
 {
@@ -11,7 +16,6 @@ public:
 	~InitDirect3DApp();
 
 	virtual bool Initialize()override;
-
 private:
 	virtual void OnResize()override;
 	virtual void Update(const GameTimer& gt)override;
@@ -29,6 +33,10 @@ InitDirect3DApp::InitDirect3DApp(HINSTANCE hInstance)
 InitDirect3DApp::~InitDirect3DApp()
 {
 }
+
+
+
+
 
 bool InitDirect3DApp::Initialize()
 {
@@ -96,4 +104,6 @@ void InitDirect3DApp::Draw(const GameTimer& gt)
 	// done for simplicity.  Later we will show how to organize our rendering code
 	// so we do not have to wait per frame.
 	FlushCommandQueue();
+
 }
+
