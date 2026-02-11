@@ -2,6 +2,6 @@
 
 hlt_Material::hlt_Material()
 {
-	XMStoreFloat3(&color, Colors::PapayaWhip.v);
+	XMStoreFloat4(&color, Colors::PapayaWhip);
 	values = nullptr;
 }

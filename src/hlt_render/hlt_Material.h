@@ -2,7 +2,7 @@
 class hlt_Material
 {
 public:
-	XMFLOAT3 color;
+	XMFLOAT4 color;
 	void* values;
 
 	hlt_Material();

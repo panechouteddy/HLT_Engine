@@ -6,3 +6,5 @@
 #pragma comment (lib,"../hlt_core/x64/Debug/hlt_core.lib")
 
 #endif
+
+#include "../../src/hlt_render/pch.h"

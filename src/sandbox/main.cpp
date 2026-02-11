@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "main.h"
-#include "UploadBuffer.h"
 #include <hlt_render/InitDirecX3DApp.hpp>
 
 using Microsoft::WRL::ComPtr;
@@ -36,10 +35,19 @@ public:
 	void BuildPSO();
 
 private:
+
+	virtual void OnResize()override;
+	virtual void Update(const GameTimer& gt)override;
+	virtual void Draw(const GameTimer& gt)override;
+
+	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
+	virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
+	virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
+
 	ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
 
-	std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
-	std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB2 = nullptr;
+	/*std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
+	std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB2 = nullptr;*/
 
 	ComPtr<ID3DBlob> mvsByteCode = nullptr;
 	ComPtr<ID3DBlob> mpsByteCode = nullptr;
@@ -51,6 +59,18 @@ private:
 	ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 	
 	ComPtr<ID3D12PipelineState> mPSO = nullptr;
+
+	hlt_Camera m_camera;
+
+	XMFLOAT4X4 mWorld = MathHelper::Identity4x4();
+
+	POINT mLastMousePos;
+
+	float mTheta = 1.5f * XM_PI;
+	float mPhi = XM_PIDIV4;
+	float mRadius = 5.0f;
+
+	hlt_Material m_material;
 };
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR cmdLine, int cmdShow)
@@ -92,6 +112,8 @@ bool main::Initialize()
 	// Reset the command list to prep for initialization commands.
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
+	m_material.color = { 1.0f,0.0f,0.0f };
+
 	BuildDescriptorHeaps();
 	BuildConstantBuffers();
 	BuildRootSignature();
@@ -123,8 +145,8 @@ void main::BuildDescriptorHeaps()
 
 void main::BuildConstantBuffers()
 {
-	mObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>(m_Device.Get(), 1, true);
-	mObjectCB2 = std::make_unique<UploadBuffer<ObjectConstants>>(m_Device.Get(), 1, true);
+	/*mObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>(m_Device.Get(), 1, true);
+	mObjectCB2 = std::make_unique<UploadBuffer<ObjectConstants>>(m_Device.Get(), 1, true);*/
 
 	//UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
 
@@ -205,11 +227,11 @@ void main::BuildBoxGeometry()
 {
 	std::array<Vertex, 8> vertices =
 	{
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) }),
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) }),
+		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(m_material.color) }),
+		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(m_material.color) }),
+		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(m_material.color) }),
+		Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(m_material.color) }),
+		Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(m_material.color) }),
 		Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
 		Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) }),
 		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) })
@@ -301,4 +323,169 @@ void main::BuildPSO()
 	psoDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = m_DepthStencilFormat;
 	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
+}
+
+void main::OnResize()
+{
+	D3DApp::OnResize();
+
+	// The window resized, so update the aspect ratio and recompute the projection matrix.
+	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+	XMStoreFloat4x4(&m_camera.m_Proj, P);
+}
+
+void main::Update(const GameTimer& gt)
+{
+	// Convert Spherical to Cartesian coordinates.
+	m_camera.m_width = mRadius * sinf(mPhi) * cosf(mTheta);
+	m_camera.m_z = mRadius * sinf(mPhi) * sinf(mTheta);
+	m_camera.m_height = mRadius * cosf(mPhi);
+
+	// Build the view matrix.
+	float aspectRatio = AspectRatio();
+	m_camera.Update(aspectRatio);
+
+	XMMATRIX newWorld = XMMatrixTranslation(0, 0, 3);
+
+	XMMATRIX world = XMLoadFloat4x4(&mWorld);
+	XMMATRIX worldViewProj = world * XMLoadFloat4x4(&m_camera.m_ViewProj);
+
+	XMMATRIX worldViewProj2 = newWorld * XMLoadFloat4x4(&m_camera.m_ViewProj);
+
+	// Update the constant buffer with the latest worldViewProj matrix.
+	ObjectConstants objConstants;
+	XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
+
+	ObjectConstants objConstants2;
+	XMStoreFloat4x4(&objConstants2.WorldViewProj, XMMatrixTranspose(worldViewProj2));
+
+
+	//mObjectCB->CopyData(0, objConstants);
+
+	//mObjectCB2->CopyData(0, objConstants2);
+}
+
+void main::Draw(const GameTimer& gt)
+{
+	// Reuse the memory associated with command recording.
+	// We can only reset when the associated command lists have finished execution on the GPU.
+	ThrowIfFailed(m_DirectCmdListAlloc->Reset());
+
+	// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
+	// Reusing the command list reuses memory.
+	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), mPSO.Get()));
+
+	m_CommandList->RSSetViewports(1, &m_ScreenViewport);
+	m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
+
+	// Indicate a state transition on the resource usage.
+	CD3DX12_RESOURCE_BARRIER transition = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	m_CommandList->ResourceBarrier(1, &transition);
+
+	// Clear the back buffer and depth buffer.
+	XMVECTORF32 dynamicColor = { sinf(mTheta), cosf(mPhi), 0.5f, 1.0f };
+
+	D3D12_CPU_DESCRIPTOR_HANDLE currentBackBufferView = CurrentBackBufferView();
+	m_CommandList->ClearRenderTargetView(currentBackBufferView, dynamicColor, 0, nullptr);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = DepthStencilView();
+	m_CommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+	// Specify the buffers we are going to render to.
+	m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = { mCbvHeap.Get() };
+	m_CommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+	// debut obj
+	m_CommandList->SetGraphicsRootSignature(mRootSignature.Get());
+
+	D3D12_VERTEX_BUFFER_VIEW vertex = mBoxGeo->VertexBufferView();
+	m_CommandList->IASetVertexBuffers(0, 1, &vertex);
+	D3D12_INDEX_BUFFER_VIEW index = mBoxGeo->IndexBufferView();
+	m_CommandList->IASetIndexBuffer(&index);
+	m_CommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//m_CommandList->SetGraphicsRootConstantBufferView(0, mObjectCB->Resource()->GetGPUVirtualAddress());
+
+	m_CommandList->DrawIndexedInstanced(
+		mBoxGeo->DrawArgs["box"].IndexCount,
+		1, 0, 0, 0);
+
+	// fin obj
+
+	//m_CommandList->SetGraphicsRootConstantBufferView(0, mObjectCB2->Resource()->GetGPUVirtualAddress());
+
+	m_CommandList->DrawIndexedInstanced(
+		mBoxGeo->DrawArgs["box"].IndexCount,
+		1, 0, 0, 0);
+
+	///////////////
+
+	// Indicate a state transition on the resource usage.
+	CD3DX12_RESOURCE_BARRIER transition1 = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	m_CommandList->ResourceBarrier(1, &transition1);
+
+	// Done recording commands.
+	ThrowIfFailed(m_CommandList->Close());
+
+	// Add the command list to the queue for execution.
+	ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
+	m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+	// swap the back and front buffers
+	ThrowIfFailed(m_SwapChain->Present(0, 0));
+	m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
+
+	// Wait until frame commands are complete.  This waiting is inefficient and is
+	// done for simplicity.  Later we will show how to organize our rendering code
+	// so we do not have to wait per frame.
+	FlushCommandQueue();
+}
+
+void main::OnMouseDown(WPARAM btnState, int x, int y)
+{
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
+
+	SetCapture(m_hMainWnd);
+}
+
+void main::OnMouseUp(WPARAM btnState, int x, int y)
+{
+	ReleaseCapture();
+}
+
+void main::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		// Make each pixel correspond to a quarter of a degree.
+		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
+		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
+
+		// Update angles based on input to orbit camera around box.
+		mTheta += dx;
+		mPhi += dy;
+
+		// Restrict the angle mPhi.
+		mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
+	}
+	else if ((btnState & MK_RBUTTON) != 0)
+	{
+		// Make each pixel correspond to 0.005 unit in the scene.
+		float dx = 0.005f * static_cast<float>(x - mLastMousePos.x);
+		float dy = 0.005f * static_cast<float>(y - mLastMousePos.y);
+
+		// Update the camera radius based on input.
+		mRadius += dx - dy;
+
+		// Restrict the radius.
+		mRadius = MathHelper::Clamp(mRadius, 3.0f, 15.0f);
+	}
+
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
 }
