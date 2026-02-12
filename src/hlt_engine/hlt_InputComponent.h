@@ -30,8 +30,8 @@ namespace hlt_Component
 			std::vector<bool> isUp;
 			std::vector<bool> isKey;
 			
-			DirectX::XMINT2* m_Pos = ::hlt_Input::MouseInput::GetInstance().GetPos();
-			DirectX::XMINT2* m_LastPos = ::hlt_Input::MouseInput::GetInstance().GetLastPos();
+			DirectX::XMINT2* m_Pos = HLT_MOUSE.GetPos();
+			DirectX::XMINT2* m_LastPos = HLT_MOUSE.GetLastPos();
 		};
 	}
 }

@@ -74,6 +74,7 @@ namespace hlt_Input
 		void MouseMove(LPARAM& lParam);
 		XMINT2* GetPos() { return &m_Pos; }
 		XMINT2* GetLastPos() { return &m_LastPos; }
+		XMINT2 GetDeltaPos() { return XMINT2(m_Pos.x - m_LastPos.x, m_Pos.y - m_LastPos.y); }
 	};
 
 	class ControllerInput

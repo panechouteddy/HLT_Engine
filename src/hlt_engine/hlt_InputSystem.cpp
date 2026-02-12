@@ -3,7 +3,7 @@
 
 void hlt_System::hlt_Input::hlt_Keyboard::Update()
 {
-	::hlt_Input::KeyboardInput& keyboard = ::hlt_Input::KeyboardInput::GetInstance();
+	::hlt_Input::KeyboardInput& keyboard = ::HLT_KEYBOARD;
 	keyboard.Update();
 
 	hlt_ECS::ComponentPool<hlt_Component::hlt_Input::hlt_Keyboard>* pKeyboardCPool = m_pECS->GetComponent<hlt_Component::hlt_Input::hlt_Keyboard>();
@@ -43,7 +43,7 @@ void hlt_System::hlt_Input::hlt_Keyboard::SyncKeySize(hlt_Component::hlt_Input::
 
 void hlt_System::hlt_Input::hlt_Mouse::Update()
 {
-	::hlt_Input::MouseInput& mouse = ::hlt_Input::MouseInput ::GetInstance();
+	::hlt_Input::MouseInput& mouse = ::HLT_MOUSE;
 	mouse.Update();
 }
 

@@ -106,8 +106,8 @@ int hlt_GameManager::CreateEntity()
 
 void hlt_GameManager::RefreshInput()
 {
-	hlt_Input::KeyboardInput::GetInstance().Update();
-	hlt_Input::MouseInput::GetInstance().Update();
+	HLT_KEYBOARD.Update();
+	HLT_MOUSE.Update();
 }
 
 LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam)
