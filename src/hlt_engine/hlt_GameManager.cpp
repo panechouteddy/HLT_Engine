@@ -102,24 +102,6 @@ void hlt_GameManager::Destroy()
 		hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole();
 }
 
-///////////////////////////////////////////////////////
-///////////////////////////////////////////////////////
-///////////////////////////////////////////////////////
-
-int hlt_GameManager::CreateEntity()
-{
-	m_EntityID.push_back(m_countEntityID);
-	m_countEntityID++;
-
-	return m_countEntityID - 1;
-}
-
-void hlt_GameManager::RefreshInput()
-{
-	HLT_KEYBOARD.Update();
-	HLT_MOUSE.Update();
-}
-
 LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam)
 {
 	switch (msg)
@@ -132,12 +114,16 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 		HLT_MOUSE.SetMouseWheel(wParam);
 		break;
 
-	case WM_SIZING:
-		m_pWindow->ResizeWnd(wParam);
-		break;
+	case WM_SIZING: // TO KEEP A WINDOW RATIO OR A MIN/MAX
+		m_pWindow->IsPaused() = true;
+		m_pWindow->IsResizing() = true;
+		return 0;
 
-	case WM_SIZE:
-		break;
+	case WM_SIZE: //  TO ADAPT WINDOW SIZE
+		m_pWindow->ResizeWnd(lParam);
+		m_pWindow->IsPaused() = false;
+		m_pWindow->IsResizing() = false;
+		return 0;
 
 	case WM_CLOSE:
 		if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
@@ -150,4 +136,51 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 		break;
 	}
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+
+int hlt_GameManager::CreateEntity()
+{
+	// OPTI POSSIBLE : INVALIDER LES ENTITY DETRUITE AVEC UNE VALEUR DEFINIE
+	// EXEMPLE : 0, 1, 2, -1, 4
+	int entityID;
+	if(m_PoolEntityID.size() == 0)
+	{
+		entityID = m_countEntityID;
+		m_EntityID.push_back(m_countEntityID);
+		m_countEntityID++;
+	}
+	else
+	{
+		entityID = m_PoolEntityID[0];
+		m_EntityID.push_back(entityID);
+		std::swap(m_PoolEntityID[0], m_PoolEntityID.back());
+		m_PoolEntityID.pop_back();
+	}
+	std::sort(m_EntityID.begin(), m_EntityID.end());
+	return entityID;
+}
+
+void hlt_GameManager::DeleteEntity(int ID)
+{
+	auto it = std::find(m_EntityID.begin(), m_EntityID.end(), ID);
+	if (it == m_EntityID.end())
+		return;
+	
+	m_ECS.RemoveEntity(*it);
+	m_PoolEntityID.push_back(*it);
+	m_EntityID.erase(it);
+}
+
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+
+void hlt_GameManager::RefreshInput()
+{
+	HLT_KEYBOARD.Update();
+	HLT_MOUSE.Update();
 }

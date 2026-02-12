@@ -15,11 +15,16 @@ public:
 
 	std::wstring& GetWndName() { return m_WindowName; }
 	HWND& GetWnd() { return m_MainWindow; }
-	XMINT2& GetWndSize() { return m_WindowSize; }
 
-	bool IsPaused() { return m_IsPaused; }
+	bool& IsPaused() { return m_IsPaused; }
+	bool& IsMinimized() { return m_IsMinimized; }
+	bool& IsMaximized() { return m_IsMaximized; }
+	bool& IsResizing() { return m_IsResizing; }
+	bool& IsFullscreen() { return m_IsFullscreen; }
 
-	void ResizeWnd(WPARAM& wParam);
+	XMINT2 GetWndSize() { return m_WindowSize; }
+	void SetWndSize(XMINT2 newSize);
+	void ResizeWnd(LPARAM& lParam);
 
 private:
 	std::wstring m_WindowName = L"Basic Window";

@@ -1,10 +1,14 @@
 #pragma once
 
+// LOWER LEVEL FRAMEWORK
 #include <hlt_core/framework.h>
 
 // CONTAINERS
 #include <vector>
 #include <unordered_map>
+
+// LOGIC
+#include <algorithm>
 
 // UTILITY
 #include <hlt_core/hlt_Time.h>

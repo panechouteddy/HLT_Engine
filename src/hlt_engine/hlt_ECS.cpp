@@ -18,3 +18,11 @@ void hlt_ECS::Destroy()
 		delete system;
 	}
 }
+
+void hlt_ECS::RemoveEntity(int ID)
+{
+	for (auto& compPool : m_Components)
+	{
+		compPool.second->Remove(ID);
+	}
+}

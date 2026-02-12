@@ -17,7 +17,9 @@ public:
 	LRESULT WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 
 	hlt_ECS* GetECS() { return &m_ECS; }
+
 	int CreateEntity();
+	void DeleteEntity(int ID);
 
 private:
 	void Start();
@@ -37,6 +39,7 @@ private:
 	// ENTITY MANAGER
 	int m_countEntityID = 0;
 	std::vector<int> m_EntityID;
+	std::vector<int> m_PoolEntityID;
 
 	// ECS
 	hlt_ECS m_ECS;

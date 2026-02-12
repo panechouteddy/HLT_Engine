@@ -2,7 +2,10 @@
 
 inline int Test_ECS()
 {
-	hlt_DebugConsole::CreateDebugConsole();
+	if constexpr(DEBUG)
+	{
+		hlt_DebugConsole::CreateDebugConsole();
+	}
 	
 	hlt_ECS ECS;
 
@@ -32,7 +35,10 @@ inline int Test_ECS()
 	ECS.RemoveComponent<hlt_Component::Transform3D>();
 	ECS.RemoveSystem<hlt_System::ConstantMove>();
 
-	hlt_DebugConsole::DestroyDebugConsole();
+	if constexpr(DEBUG)
+	{
+		hlt_DebugConsole::DestroyDebugConsole();
+	}
 
 	return 0;
 }

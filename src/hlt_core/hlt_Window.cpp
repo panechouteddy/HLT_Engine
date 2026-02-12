@@ -80,6 +80,17 @@ bool hlt_Window::CreateWnd(WNDPROC lpfnWndProc)
 	return true;
 }
 
-void hlt_Window::ResizeWnd(WPARAM& wParam)
+void hlt_Window::SetWndSize(XMINT2 newSize)
 {
+	m_WindowSize = newSize;
+
+	RECT rc = { 0, 0, m_WindowSize.x, m_WindowSize.y };
+	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+
+	SetWindowPos(m_MainWindow, NULL, 0, 0, rc.right - rc.left, rc.bottom - rc.top, SWP_NOMOVE | SWP_NOZORDER);
+}
+
+void hlt_Window::ResizeWnd(LPARAM& lParam)
+{
+	m_WindowSize = XMINT2(LOWORD(lParam), HIWORD(lParam));
 }

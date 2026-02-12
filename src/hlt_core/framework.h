@@ -12,11 +12,11 @@ using namespace DirectX;
 #ifdef NDEBUG
 constexpr bool DEBUG = false;
 #else
-#include "hlt_DebugTools.h"
-using namespace hlt_DebugTools;
 constexpr bool DEBUG = true;
 #endif
 
+#include "hlt_DebugTools.h"
+using namespace hlt_DebugTools;
 
 /// INPUTS DEFINE
 #define VK_Z 0x5A

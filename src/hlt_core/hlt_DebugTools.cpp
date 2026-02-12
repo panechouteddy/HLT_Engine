@@ -1,5 +1,11 @@
 #include "pch.h"
+#include "hlt_DebugTools.h"
 
+#ifdef NDEBUG
+void hlt_DebugTools::hlt_DebugConsole::CreateDebugConsole() {}
+
+void hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole() {}
+#else
 void hlt_DebugTools::hlt_DebugConsole::CreateDebugConsole()
 {
     if (AllocConsole())
@@ -34,3 +40,4 @@ void hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole()
     std::fclose(stdin);
     FreeConsole();
 }
+#endif

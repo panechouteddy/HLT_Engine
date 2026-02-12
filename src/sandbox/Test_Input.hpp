@@ -2,7 +2,10 @@
 
 inline int Test_Inputs()
 {
-	hlt_DebugConsole::CreateDebugConsole();
+	if constexpr(DEBUG)
+	{
+		hlt_DebugConsole::CreateDebugConsole();
+	}
 
 	hlt_ECS ECS;
 
@@ -35,7 +38,10 @@ inline int Test_Inputs()
 	ECS.RemoveComponent<hlt_Component::Transform3D>();
 	ECS.RemoveSystem<hlt_System::hlt_Input::hlt_Keyboard>();
 
-	hlt_DebugConsole::DestroyDebugConsole();
+	if constexpr (DEBUG)
+	{
+		hlt_DebugConsole::DestroyDebugConsole();
+	}
 
 	return 0;
 }

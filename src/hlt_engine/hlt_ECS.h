@@ -13,6 +13,7 @@ public:
 	struct CPool
 	{
 		virtual ~CPool() = default;
+		virtual void Remove(int ID) = 0;
 	};
 
 	template <typename T>
@@ -43,6 +44,9 @@ public:
 	void Destroy();
 
 	void Update();
+
+	// TO COMPLETELY REMOVE AN ENTITY
+	void RemoveEntity(int ID);
 
 	// MANAGE ENTITY COMPONENT
 	template <typename T>
