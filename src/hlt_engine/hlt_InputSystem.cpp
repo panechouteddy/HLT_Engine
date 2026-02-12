@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "hlt_Input.h"
 
-void hlt_System::hlt_Input::hlt_Keyboard::Update(float dt)
+void hlt_System::hlt_Input::hlt_Keyboard::Update()
 {
 	::hlt_Input::KeyboardInput& keyboard = ::hlt_Input::KeyboardInput::GetInstance();
-	keyboard.OnUpdate();
+	keyboard.Update();
 
 	hlt_ECS::ComponentPool<hlt_Component::hlt_Input::hlt_Keyboard>* pKeyboardCPool = m_pECS->GetComponent<hlt_Component::hlt_Input::hlt_Keyboard>();
 
@@ -41,10 +41,10 @@ void hlt_System::hlt_Input::hlt_Keyboard::SyncKeySize(hlt_Component::hlt_Input::
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void hlt_System::hlt_Input::hlt_Mouse::Update(float dt)
+void hlt_System::hlt_Input::hlt_Mouse::Update()
 {
 	::hlt_Input::MouseInput& mouse = ::hlt_Input::MouseInput ::GetInstance();
-	mouse.OnUpdate();
+	mouse.Update();
 }
 
 void hlt_System::hlt_Input::hlt_Mouse::SyncKeySize(hlt_Component::hlt_Input::hlt_Mouse& comp)

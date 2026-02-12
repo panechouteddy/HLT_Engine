@@ -1,10 +1,5 @@
 #pragma once
 
-#define VK_Z 0x5A
-#define VK_Q 0x51
-#define VK_S 0x53
-#define VK_D 0x44
-
 namespace hlt_Input
 {
 	class KeyboardInput
@@ -76,7 +71,7 @@ namespace hlt_Input
 		bool IsKeyDown(int key);
 		bool IsKeyUp(int key);
 
-		void MouseMove(LPARAM lParam);
+		void MouseMove(LPARAM& lParam);
 		XMINT2* GetPos() { return &m_Pos; }
 		XMINT2* GetLastPos() { return &m_LastPos; }
 	};

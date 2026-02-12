@@ -11,7 +11,7 @@ namespace hlt_System
 		public:
 			hlt_Keyboard(hlt_ECS* ecs) : hlt_SystemClass(ecs) { ; }
 
-			void Update(float dt) override;
+			void Update() override;
 
 		private:
 			void SyncKeySize(hlt_Component::hlt_Input::hlt_Keyboard& comp);
@@ -22,7 +22,7 @@ namespace hlt_System
 		public:
 			hlt_Mouse(hlt_ECS* ecs) : hlt_SystemClass(ecs) { ; }
 
-			void Update(float dt) override;
+			void Update() override;
 
 		private:
 			void SyncKeySize(hlt_Component::hlt_Input::hlt_Mouse& comp);

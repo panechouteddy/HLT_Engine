@@ -12,7 +12,7 @@ void hlt_System::ConstantMove::Update()
 
         std::vector<int>& cMovesOwners = cMoves->GetComponentOwnersID();
         
-        // dt à implémenter
+		float dt = hlt_Time::GetInstance().GetDeltaTime();
 
         for (int i = 0; i < cMovesOwners.size(); i++)
         {
@@ -28,8 +28,6 @@ void hlt_System::ConstantMove::Update()
             XMFLOAT3 newPos = { entityPos.x + toMove.x * dt, entityPos.y + toMove.y * dt, entityPos.z + toMove.z * dt };
 
             transforms->component[transforms->entityID[entityID]].pos = newPos;
-            std::cout << newPos.x << "|" << newPos.y << "|" << newPos.z << std::endl;
         }
     }
 }
-

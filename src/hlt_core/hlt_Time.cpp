@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "hlt_Time.h"
 
+
 hlt_Time* hlt_Time::s_pInstance = nullptr;
 
 hlt_Time& hlt_Time::GetInstance()
@@ -26,8 +27,13 @@ void hlt_Time::Reset()
 
 void hlt_Time::Update()
 {
-    m_SystemTime = timeGetTime();
+    DWORD currentTime = timeGetTime();
 
-    m_DeltaTime = m_SystemTime - m_TotalTime;
+    float dt = m_SystemTime - currentTime;
+    if (dt > 30)
+        dt = 30.f;
+
+	m_SystemTime = currentTime;
+    m_DeltaTime = dt / 1000.f;
     m_TotalTime += m_DeltaTime;
 }

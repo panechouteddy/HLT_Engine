@@ -23,7 +23,7 @@ inline int Test_Inputs()
 
 	while(run)
 	{
-		ECS.Update(1.f);
+		ECS.Update();
 
 		if (comp->isKey[0])
 			std::cout << "Z";

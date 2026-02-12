@@ -13,18 +13,22 @@ inline int Test_ECS()
 	cMove->move = 1.f;
 	cMove->dir = { 0.5f, 0.5f, 0.5f };
 	
-	ECS.AddComponent<hlt_Component::Transform3D>(1);
+	hlt_Component::Transform3D* trans = ECS.AddComponent<hlt_Component::Transform3D>(1);
 
 	ECS.AddSystem<hlt_System::ConstantMove>();
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
+		hlt_Time::GetInstance().Update();
+
 		cMove->move = 1.f + i;
-		ECS.Update(1.f);
+		ECS.Update();
+		std::cout << trans->pos.x << "|" << trans->pos.y << "|" << trans->pos.z << " : " << hlt_Time::GetInstance().GetDeltaTime() << std::endl;
 		Sleep(1000);
 	}
 
 	ECS.RemoveComponent<hlt_Component::ConstantMove>(1);
+	ECS.RemoveComponent<hlt_Component::ConstantMove>();
 	ECS.RemoveComponent<hlt_Component::Transform3D>();
 	ECS.RemoveSystem<hlt_System::ConstantMove>();
 

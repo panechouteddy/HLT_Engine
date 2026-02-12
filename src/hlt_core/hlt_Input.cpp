@@ -144,7 +144,7 @@ bool hlt_Input::MouseInput::IsKeyUp(int key)
     return m_ButtonStates[key] == DOWN;
 }
 
-void hlt_Input::MouseInput::MouseMove(LPARAM lParam)
+void hlt_Input::MouseInput::MouseMove(LPARAM& lParam)
 {
     m_LastPos = m_Pos;
     m_Pos = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };

@@ -22,5 +22,19 @@
 #include "hlt_ConstantMoveComponent.h"
 #include "hlt_InputComponent.h"
 
+// WINDOW
+#include <hlt_core/hlt_Window.h>
+
 // GAME MANAGER
-#include "GameManager.h"
+#include "hlt_GameManager.h"
+
+
+
+/// HLT ENGINE CLASS DEFINE
+#define HLT_TIME hlt_Time::GetInstance()
+#define HLT_WINDOW hlt_Window::GetInstance()
+#define HLT_GAMEMANAGER hlt_GameManager::GetInstance()
+
+
+#define HLT_MOUSE hlt_Input::MouseInput::GetInstance()
+#define HLT_KEYBOARD hlt_Input::KeyboardInput::GetInstance()

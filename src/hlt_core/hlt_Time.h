@@ -16,7 +16,7 @@ private:
 	~hlt_Time() = default;
 
 public:
-	hlt_Time& GetInstance();
+	static hlt_Time& GetInstance();
 
 	void Reset();
 

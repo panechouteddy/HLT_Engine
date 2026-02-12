@@ -21,7 +21,7 @@ inline T* hlt_ECS::ComponentPool<T>::Add(int ID)
 template<typename T>
 inline bool hlt_ECS::ComponentPool<T>::Have(int ID)
 {
-	if (entityID.size() < ID) return false;
+	if (entityID.size() <= ID) return false;
 
 	return entityID[ID] != MISS_COMPONENT;
 }
@@ -53,7 +53,6 @@ inline void hlt_ECS::ComponentPool<T>::Remove(int ID)
 	std::swap(componentOwnerID[componentIndex], componentOwnerID.back());
 	componentOwnerID.pop_back();
 
-	entityID[componentOwnerID[componentIndex]] = componentIndex;
 	entityID[ID] = MISS_COMPONENT;
 }
 
