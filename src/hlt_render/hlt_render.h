@@ -7,5 +7,10 @@
 #include "hlt_Light.h"
 #include "hlt_Shader.h"
 #include "hlt_RenderItem.h"
+#include "hlt_UI.h"
 
+#include "d3dApp.h"
+#include "d3dUtil.h"
+#include "DDSTextureLoader.h" 
+#include "GameTimer.h"
 #include "MathHelper.h"

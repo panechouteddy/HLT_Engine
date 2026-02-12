@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "GameTimer.h"
 #include <windows.h>
 
 GameTimer::GameTimer()

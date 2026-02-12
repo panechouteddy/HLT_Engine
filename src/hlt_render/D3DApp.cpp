@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "d3dApp.h"
 #include <WindowsX.h>
 
 using Microsoft::WRL::ComPtr;
