@@ -1,55 +1,95 @@
 #include "pch.h"
 #include "Mesh.h"
-#include "D3DApp.h"
-#include "InitDirecX3DApp.hpp"
-void Mesh::CreatePyramid()
-{
-	int number = m_VertexList.size();
+#include <unordered_map>
 
-	
+#include <DirectXColors.h>
+
+#include "D3DApp.h"
+#include "d3dUtil.h"
+using namespace DirectX;
+
+struct Vertex
+{
+	XMFLOAT3 Pos;
+	XMFLOAT4 Color;
+};
+
+void Mesh::InitPyramidMesh(MeshManager* manager)
+{
+	m_Mesh = manager->GetMesh("Pyramid");
+}
+
+MeshGeometry* Mesh::GetGeometry()
+{
+	return m_Mesh;
+}
+
+
+
+void MeshManager::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+{
+	CreatePyramid(device,commandList);
+}
+
+
+
+
+void MeshManager::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+{
+	std::array<Vertex, 5> vertices =
+	{
+		Vertex({ XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT4(Colors::White) }),//A
+		Vertex({ XMFLOAT3(1.0f, 0.0f, -1.0f), XMFLOAT4(Colors::Black) }), //B
+		Vertex({ XMFLOAT3(0.0f, +2.0f, 0.0f), XMFLOAT4(Colors::Red) }),//C
+		Vertex({ XMFLOAT3(-1.0f, 0.0f, +1.0f), XMFLOAT4(Colors::Green) }),//D
+		Vertex({ XMFLOAT3(+1.0f, 0.0f, +1.0f), XMFLOAT4(Colors::Blue) }),//E
+
+	};
+	std::array<std::uint16_t, 18> indices =
+	{
 		// front face
-		m_IndexList.push_back(2 + number), m_IndexList.push_back(1 + number), m_IndexList.push_back(0 + number), //C B A
+		2, 1, 0,
 
 		// back face
-		m_IndexList.push_back(2 + number), m_IndexList.push_back(3 + number), m_IndexList.push_back(4 + number),  //C D E
+		2, 3, 4,
 
 		// left face
-		m_IndexList.push_back(2 + number), m_IndexList.push_back(0 + number), m_IndexList.push_back(3 + number), // C A D
+		2, 0, 3,
 
 		// right face
-		m_IndexList.push_back(2 + number), m_IndexList.push_back(4 + number), m_IndexList.push_back(1 + number), //C E B
+		2, 4, 1,
 
 		// bottom face
-		m_IndexList.push_back(0 + number), m_IndexList.push_back(1 + number), m_IndexList.push_back(3 + number),// A B D
-		m_IndexList.push_back(1 + number), m_IndexList.push_back(4 + number), m_IndexList.push_back(3 + number),// B  E D
+		0, 1, 3,
+		1, 4, 3
+	};
+	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
-
-	// Point du Triangle
-	AddVertex(Vertex({ XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT4(Colors::White) }));//A
-	AddVertex(Vertex({ XMFLOAT3(1.0f, 0.0f, -1.0f), XMFLOAT4(Colors::Black) })); //B
-	AddVertex(Vertex({ XMFLOAT3(0.0f, +2.0f, 0.0f), XMFLOAT4(Colors::Red) }));//C
-	AddVertex(Vertex({ XMFLOAT3(-1.0f, 0.0f, +1.0f), XMFLOAT4(Colors::Green) }));//D
-	AddVertex(Vertex({ XMFLOAT3(+1.0f, 0.0f, +1.0f), XMFLOAT4(Colors::Blue) }));//E
+	MeshGeometry* boxGeomety = new MeshGeometry;
+	boxGeomety->Name = "Pyramid";
+	ThrowIfFailed(D3DCreateBlob(vbByteSize,&boxGeomety->VertexBufferCPU));
+	CopyMemory(boxGeomety->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
 	
-}
+	ThrowIfFailed(D3DCreateBlob(ibByteSize,&boxGeomety->IndexBufferCPU));
+	CopyMemory(boxGeomety->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
-void Mesh::AddVertex(Vertex VertexAdded)
-{
-	m_VertexList.push_back(VertexAdded);
-}
+	boxGeomety->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(device,commandList, vertices.data(), vbByteSize,boxGeomety->VertexBufferUploader);
 
-void Mesh::AddIndex(std::vector<uint16_t> IndexAdded)
-{
+	boxGeomety->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(device,commandList, indices.data(), ibByteSize, boxGeomety->IndexBufferUploader);
 
-}
+	boxGeomety->VertexByteStride = sizeof(Vertex);
+	boxGeomety->VertexBufferByteSize = vbByteSize;
+	boxGeomety->IndexFormat = DXGI_FORMAT_R16_UINT;
+	boxGeomety->IndexBufferByteSize = ibByteSize;
 
+	SubmeshGeometry submesh;
+	submesh.IndexCount = (UINT)indices.size();
+	submesh.StartIndexLocation = 0;
+	submesh.BaseVertexLocation = 0;
 
-std::vector<Vertex> Mesh::GetVertex()
-{
-	return m_VertexList;
-}
+	boxGeomety->DrawArgs["pyramid"] = submesh;
 
-std::vector<uint16_t> Mesh::GetIndex()
-{
-	return m_IndexList;
+	m_BoxOfMesh.insert(std::make_pair("Pyramid", boxGeomety));
+	//m_BoxMesh["pyramid"] = boxmesh;
 }

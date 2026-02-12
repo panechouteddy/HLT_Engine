@@ -21,6 +21,7 @@ protected:
 	D3DApp(const D3DApp& rhs) = delete;
 	D3DApp& operator=(const D3DApp& rhs) = delete;
 	virtual ~D3DApp();
+	
 
 public:
 

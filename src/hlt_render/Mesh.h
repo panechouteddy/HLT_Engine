@@ -1,22 +1,27 @@
 #pragma once
+#include <array>
+#include <unordered_map>
+#include "DirectXMath.h"
 
-struct Vertex
+class MeshManager
 {
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
-};
 
+protected:
+    std::unordered_map<std::string, MeshGeometry*> m_BoxOfMesh;
+public:
+    MeshManager() {};
+    MeshGeometry* GetMesh(std::string form) { return m_BoxOfMesh[form]; }
+    void CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+    void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+
+};
 class Mesh
 {
-	std::vector<Vertex> m_VertexList;
-	std::vector<uint16_t> m_IndexList;
-public:
+    MeshGeometry* m_Mesh;
 
-    void CreatePyramid();
-	void AddVertex(Vertex VertexAdded);
-	void AddIndex(std::vector<uint16_t> IndexAdded);
-	std::vector<Vertex> GetVertex();
-	std::vector<uint16_t> GetIndex();
+public :
+    Mesh() {};
+    void InitPyramidMesh(MeshManager * Manager);
+    MeshGeometry* GetGeometry();
 };
-
 
