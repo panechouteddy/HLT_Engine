@@ -27,25 +27,14 @@ hlt_Window::~hlt_Window()
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
-int hlt_Window::Update()
-{
-	MSG msg = { 0 };
-
-	while (msg.message != WM_QUIT)
-	{
-		// If there are Window messages then process them.
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
-
-	return (int)msg.wParam;
-}
-
 bool hlt_Window::CreateWnd(WNDPROC lpfnWndProc)
 {
+	m_IsPaused = false;
+	m_IsMinimized = false;
+	m_IsMaximized = false;
+	m_IsResizing = false;
+	m_IsFullscreen = false;
+
 	WNDCLASS wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = lpfnWndProc;
@@ -91,6 +80,6 @@ bool hlt_Window::CreateWnd(WNDPROC lpfnWndProc)
 	return true;
 }
 
-void hlt_Window::DestroyWnd()
+void hlt_Window::ResizeWnd(WPARAM& wParam)
 {
 }

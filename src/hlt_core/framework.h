@@ -6,7 +6,6 @@
 
 // DIRECTX API
 #include <DirectXMath.h>
-
 using namespace DirectX;
 
 // DEBUG TOOL

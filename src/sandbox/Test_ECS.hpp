@@ -23,7 +23,7 @@ inline int Test_ECS()
 
 		cMove->move = 1.f + i;
 		ECS.Update();
-		std::cout << trans->pos.x << "|" << trans->pos.y << "|" << trans->pos.z << " : " << hlt_Time::GetInstance().GetDeltaTime() << std::endl;
+		std::cout << trans->transform.pos.x << "|" << trans->transform.pos.y << "|" << trans->transform.pos.z << " : " << hlt_Time::GetInstance().GetDeltaTime() << std::endl;
 		Sleep(1000);
 	}
 

@@ -14,17 +14,17 @@ public:
 	static hlt_GameManager& GetInstance();
 	void Run();
 
-	void Start();
-	void Update();
-	void Render();
-	void Destroy();
-
 	LRESULT WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 
 	hlt_ECS* GetECS() { return &m_ECS; }
 	int CreateEntity();
 
 private:
+	void Start();
+	void Update();
+	void Render();
+	void Destroy();
+
 	void RefreshInput();
 
 private:

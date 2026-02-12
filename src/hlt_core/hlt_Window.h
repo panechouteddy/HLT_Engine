@@ -11,18 +11,15 @@ private:
 
 public:
 	static hlt_Window& GetInstance();
-
 	bool CreateWnd(WNDPROC lpfnWndProc);
-	void DestroyWnd();
-
-	int Update();
 
 	std::wstring& GetWndName() { return m_WindowName; }
-
 	HWND& GetWnd() { return m_MainWindow; }
 	XMINT2& GetWndSize() { return m_WindowSize; }
 
 	bool IsPaused() { return m_IsPaused; }
+
+	void ResizeWnd(WPARAM& wParam);
 
 private:
 	std::wstring m_WindowName = L"Basic Window";

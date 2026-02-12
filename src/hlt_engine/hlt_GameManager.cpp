@@ -43,16 +43,26 @@ void hlt_GameManager::Run()
 
 	m_IsRunning = true;
 	Start();
+	MSG msg = { 0 };
 
-	while (m_IsRunning)
+	while (m_IsRunning && msg.message != WM_QUIT)
 	{
-		if (GetAsyncKeyState(VK_ESCAPE) > 0)
-			m_IsRunning = false;
+		// If there are Window messages then process them.
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else
+		{
+			if (GetAsyncKeyState(VK_ESCAPE) > 0)
+				m_IsRunning = false;
 
-		if(m_pWindow->IsPaused() == false)
-			Update();
+			if (m_pWindow->IsPaused() == false)
+				Update();
 
-		Render();
+			Render();
+		}
 	}
 
 	Destroy();
@@ -76,7 +86,7 @@ void hlt_GameManager::Update()
 
 	RefreshInput();
 
-	m_pWindow->Update();
+	//m_pWindow->Update();
 }
 
 void hlt_GameManager::Render()
@@ -86,7 +96,7 @@ void hlt_GameManager::Render()
 void hlt_GameManager::Destroy()
 {
 	m_ECS.Destroy();
-	m_pWindow->DestroyWnd();
+	//m_pWindow->DestroyWnd();
 
 	if (DEBUG)
 		hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole();
@@ -115,7 +125,25 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 	switch (msg)
 	{
 	case WM_MOUSEMOVE:
-		HLT_MOUSE.MouseMove(lParam);
+		HLT_MOUSE.SetMouseMove(lParam);
+		break;
+
+	case WM_MOUSEWHEEL:
+		HLT_MOUSE.SetMouseWheel(wParam);
+		break;
+
+	case WM_SIZING:
+		m_pWindow->ResizeWnd(wParam);
+		break;
+
+	case WM_SIZE:
+		break;
+
+	case WM_CLOSE:
+		if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
+		{
+			m_IsRunning = false;
+		}
 		break;
 
 	default:

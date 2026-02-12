@@ -54,7 +54,7 @@ namespace hlt_Input
 			VK_XBUTTON2
 		};
 		unsigned char m_ButtonStates[5];
-		float m_ScrollDelta = 0.f;
+		float m_MouseWheelDelta = 0.f;
 		XMINT2 m_Pos = { 0, 0 };
 		XMINT2 m_LastPos = { 0, 0 };
 		
@@ -71,7 +71,8 @@ namespace hlt_Input
 		bool IsKeyDown(int key);
 		bool IsKeyUp(int key);
 
-		void MouseMove(LPARAM& lParam);
+		void SetMouseMove(LPARAM& lParam);
+		void SetMouseWheel(WPARAM& wParam);
 		XMINT2* GetPos() { return &m_Pos; }
 		XMINT2* GetLastPos() { return &m_LastPos; }
 		XMINT2 GetDeltaPos() { return XMINT2(m_Pos.x - m_LastPos.x, m_Pos.y - m_LastPos.y); }
