@@ -6,4 +6,6 @@
 #include "hlt_Camera.h"
 #include "hlt_Light.h"
 #include "hlt_Shader.h"
+#include "hlt_RenderItem.h"
 
+#include "MathHelper.h"
