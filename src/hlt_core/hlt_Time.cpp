@@ -29,9 +29,9 @@ void hlt_Time::Update()
 {
     DWORD currentTime = timeGetTime();
 
-    float dt = m_SystemTime - currentTime;
+    DWORD dt = m_SystemTime - currentTime;
     if (dt > 30)
-        dt = 30.f;
+        dt = 30;
 
 	m_SystemTime = currentTime;
     m_DeltaTime = dt / 1000.f;

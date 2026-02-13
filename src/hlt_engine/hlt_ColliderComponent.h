@@ -5,6 +5,9 @@ namespace hlt_Component
 {
 	struct BoxCollider
 	{
-		hlt_Box::Box3D box;
+		static const int ID = 4;
+
+		hlt_Box::Box3D_AABB box;
+		bool isColliding = false;
 	};
 }

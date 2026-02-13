@@ -27,7 +27,7 @@ private:
 	void Render();
 	void Destroy();
 
-	void RefreshInput();
+	void RefreshCore();
 
 private:
 	// RUN

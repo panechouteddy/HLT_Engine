@@ -84,7 +84,7 @@ void hlt_GameManager::Update()
 {
 	m_ECS.Update();
 
-	RefreshInput();
+	RefreshCore();
 
 	//m_pWindow->Update();
 }
@@ -179,8 +179,9 @@ void hlt_GameManager::DeleteEntity(int ID)
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 
-void hlt_GameManager::RefreshInput()
+void hlt_GameManager::RefreshCore()
 {
 	HLT_KEYBOARD.Update();
 	HLT_MOUSE.Update();
+	HLT_TIME.Update();
 }

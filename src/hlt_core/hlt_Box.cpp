@@ -1,22 +1,71 @@
 #include "pch.h"
 #include "hlt_Box.h"
 
-hlt_Box::Box3D::Box3D(DirectX::XMFLOAT3 min, DirectX::XMFLOAT3 max)
+hlt_Box::Box3D_AABB::Box3D_AABB(DirectX::XMFLOAT3 min, DirectX::XMFLOAT3 max)
 {
 	m_Min = min;
 	m_Max = max;
 }
 
-void hlt_Box::Box3D::Zero()
+void hlt_Box::Box3D_AABB::Zero()
 {
 	m_Min = { 0.f, 0.f, 0.f };
 	m_Max = { 0.f, 0.f, 0.f };
 }
 
-bool hlt_Box::Box3D::Contains(DirectX::XMFLOAT3 p)
+XMFLOAT3 hlt_Box::Box3D_AABB::Size()
+{
+	XMFLOAT3 boxSize;
+	XMVECTOR boxMax = XMLoadFloat3(&m_Max);
+	XMVECTOR boxMin = XMLoadFloat3(&m_Min);
+	XMStoreFloat3(&boxSize, XMVectorSubtract(boxMax, boxMin));
+	return boxSize;
+}
+
+bool hlt_Box::Box3D_AABB::Contains(DirectX::XMFLOAT3 p)
 {
 	return p.x >= m_Min.x && p.x <= m_Max.x && p.y >= m_Min.y && p.y <= m_Max.y && p.z >= m_Min.z && p.z <= m_Max.z;
 }
+
+bool hlt_Box::Box3D_AABB::Contains(hlt_Box::Box3D_AABB box)
+{
+	if (Contains(box.m_Min))
+		return true;
+	if (Contains(box.m_Max))
+		return true;
+
+	XMFLOAT3 boxSize = box.Size();
+
+	if (Contains(DirectX::XMFLOAT3(box.m_Max.x - boxSize.x, box.m_Max.y, box.m_Max.z)))
+		return true;
+	if (Contains(DirectX::XMFLOAT3(box.m_Max.x, box.m_Max.y - boxSize.y, box.m_Max.z)))
+		return true;
+	if (Contains(DirectX::XMFLOAT3(box.m_Max.x, box.m_Max.y, box.m_Max.z - boxSize.x)))
+		return true;
+	if (Contains(DirectX::XMFLOAT3(box.m_Min.x + boxSize.x, box.m_Min.y, box.m_Min.z)))
+		return true;
+	if (Contains(DirectX::XMFLOAT3(box.m_Min.x, box.m_Min.y + boxSize.y, box.m_Min.z)))
+		return true;
+	if (Contains(DirectX::XMFLOAT3(box.m_Min.x, box.m_Min.y, box.m_Min.z + boxSize.x)))
+		return true;
+
+	return false;
+}
+
+hlt_Box::Box3D_AABB hlt_Box::Box3D_AABB::operator+(hlt_Transform3D boxPos)
+{
+	Box3D_AABB newBox;
+	DirectX::XMFLOAT3 boxSize = Size();
+	DirectX::XMFLOAT3 halfBoxSize{ boxSize.x * 0.5f, boxSize.y * 0.5f, boxSize.z * 0.5f };
+	newBox.m_Min = DirectX::XMFLOAT3(m_Min.x - halfBoxSize.x + boxPos.pos.x, m_Min.y - halfBoxSize.y + boxPos.pos.y, m_Min.z - halfBoxSize.z + boxPos.pos.z);
+	newBox.m_Max = DirectX::XMFLOAT3(m_Max.x + halfBoxSize.x + boxPos.pos.x, m_Max.y + halfBoxSize.y + boxPos.pos.y, m_Max.z + halfBoxSize.z + boxPos.pos.z);
+
+	return newBox;
+}
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

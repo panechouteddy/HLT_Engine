@@ -22,7 +22,7 @@ namespace hlt_Component
 		struct hlt_Mouse
 		{
 		public:
-			static const int ID = 2;
+			static const int ID = 3;
 
 			std::vector<int> keys;
 
