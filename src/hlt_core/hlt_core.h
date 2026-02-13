@@ -29,5 +29,8 @@
 using namespace DirectX;
 
 #include <d3d12.h>
+#include <d2d1_3.h>
+#include <dwrite.h>
+#include <windows.foundation.h>
 
 const float PI = 3.1415926535f;

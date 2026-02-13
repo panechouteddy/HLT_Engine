@@ -68,6 +68,7 @@ private:
 	std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> mPSOs;
 
 	//FrameResource* mCurrFrameResource = nullptr;
+	std::shared_ptr<DX::DeviceResources> m_deviceResources;
 
 	XMFLOAT4X4 mWorld = MathHelper::Identity4x4();
 
@@ -449,6 +450,20 @@ void main::Draw(const GameTimer& gt)
 	// done for simplicity.  Later we will show how to organize our rendering code
 	// so we do not have to wait per frame.
 	FlushCommandQueue();
+
+	auto d2dContext = m_DeviceResources->GetD2DDeviceContext();
+	d2dContext->DrawText(
+		wsbuffer,
+		length,
+		m_textFormatBodySymbol.get(),
+		D2D1::RectF(
+			windowBounds.Width - GameUIConstants::HudRightOffset,
+			GameUIConstants::HudTopOffset + (GameUIConstants::HudBodyPointSize + GameUIConstants::Margin) * 3 + GameUIConstants::Margin,
+			windowBounds.Width,
+			GameUIConstants::HudTopOffset + (GameUIConstants::HudBodyPointSize + GameUIConstants::Margin) * 4
+		),
+		m_textBrush.get()
+	);
 }
 
 void main::OnMouseDown(WPARAM btnState, int x, int y)

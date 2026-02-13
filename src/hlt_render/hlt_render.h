@@ -12,6 +12,7 @@
 
 #include "D3DApp.h"
 #include "d3dUtil.h"
+#include "hlt_D2DResource.h"
 #include "DDSTextureLoader.h" 
 #include "GameTimer.h"
 #include "MathHelper.h"
