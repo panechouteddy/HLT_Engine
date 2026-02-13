@@ -14,7 +14,7 @@ struct Vertex
 	XMFLOAT4 Color;
 };
 
-void Mesh::InitPyramidMesh(MeshManager* manager)
+void Mesh::InitPyramidMesh(MeshBox* manager)
 {
 	m_Mesh = manager->GetMesh("Pyramid");
 }
@@ -26,7 +26,7 @@ MeshGeometry* Mesh::GetGeometry()
 
 
 
-void MeshManager::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+void MeshBox::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	CreatePyramid(device,commandList);
 }
@@ -34,7 +34,7 @@ void MeshManager::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList*
 
 
 
-void MeshManager::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	std::array<Vertex, 5> vertices =
 	{

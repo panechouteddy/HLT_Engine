@@ -11,11 +11,7 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-struct Vertex
-{
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
-};
+
 
 class InitDirect3DApp : public D3DApp
 {
@@ -39,7 +35,7 @@ private:
 
 	std::unique_ptr<MeshGeometry> mBoxGeo = nullptr;
 
-	MeshManager* m_Box;
+	MeshBox* m_Box;
 	Mesh* m_testMesh;
 	ConstantBuffer* m_CBobject;
 
@@ -98,7 +94,7 @@ bool InitDirect3DApp::Initialize()
 
 	CreateAllMesh();
 	CreateMesh();
-	m_CBobject = new ConstantBuffer(m_D3dDevice.Get());
+	m_CBobject = new ConstantBuffer(m_Device.Get());
 
 	//m_CommandList->Close();
 	ThrowIfFailed(m_CommandList->Close());
@@ -221,8 +217,8 @@ void InitDirect3DApp::Draw(const GameTimer& gt)
 
 void InitDirect3DApp::CreateAllMesh()
 {
-	m_Box = new MeshManager;
-	m_Box->CreateAllMesh(m_D3dDevice.Get(), m_CommandList.Get());
+	m_Box = new MeshBox;
+	m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
 
 }
 
@@ -234,7 +230,7 @@ inline void InitDirect3DApp::BuildDescriptorHeaps()
 	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
-	ThrowIfFailed(m_D3dDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&m_CbvHeap)));
+	ThrowIfFailed(m_Device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&m_CbvHeap)));
 }
 
 inline void InitDirect3DApp::BuildRootSignature()
@@ -262,7 +258,7 @@ inline void InitDirect3DApp::BuildRootSignature()
 	}
 	ThrowIfFailed(hr);
 
-	ThrowIfFailed(m_D3dDevice->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
+	ThrowIfFailed(m_Device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
 }
 
 inline void InitDirect3DApp::BuildShadersAndInputLayout()
@@ -279,13 +275,13 @@ inline void InitDirect3DApp::BuildShadersAndInputLayout()
 	};
 }
 
-inline void InitDirect3DApp::CreateMesh()
-{
-	m_testMesh = new Mesh;
-	m_testMesh->InitPyramidMesh(m_Box);
-
-	m_CBobject = new ConstantBuffer(m_D3dDevice.Get());
-}
+//inline void InitDirect3DApp::CreateMesh()
+//{
+//	m_testMesh = new Mesh;
+//	m_testMesh->InitPyramidMesh(m_Box);
+//
+//	m_CBobject = new ConstantBuffer(m_Device.Get());
+//}
 
 inline void InitDirect3DApp::BuildPSO()
 {
@@ -313,77 +309,6 @@ inline void InitDirect3DApp::BuildPSO()
 	psoDesc.SampleDesc.Count = m_4xMsaaState ? 4 : 1;
 	psoDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = m_DepthStencilFormat;
-	ThrowIfFailed(m_D3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_PSO)));
+	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_PSO)));
 }
 
-inline void InitDirect3DApp::BuildBoxGeometry()
-{
-	std::array<Vertex, 8> vertices =
-	{
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) }),
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) })
-	};
-
-	std::array<std::uint16_t, 36> indices =
-	{
-		// front face
-		0, 1, 2,
-		0, 2, 3,
-
-		// back face
-		4, 6, 5,
-		4, 7, 6,
-
-		// left face
-		4, 5, 1,
-		4, 1, 0,
-
-		// right face
-		3, 2, 6,
-		3, 6, 7,
-
-		// top face
-		1, 5, 6,
-		1, 6, 2,
-
-		// bottom face
-		4, 0, 3,
-		4, 3, 7
-	};
-
-	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
-	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
-
-	mBoxGeo = std::make_unique<MeshGeometry>();
-	mBoxGeo->Name = "boxGeo";
-
-	//ThrowIfFailed(D3DCreateBlob(vbByteSize, &mBoxGeo->VertexBufferCPU));
-	//CopyMemory(mBoxGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-	//
-	//ThrowIfFailed(D3DCreateBlob(ibByteSize, &mBoxGeo->IndexBufferCPU));
-	//CopyMemory(mBoxGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
-
-	mBoxGeo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(m_D3dDevice.Get(),
-		m_CommandList.Get(), vertices.data(), vbByteSize, mBoxGeo->VertexBufferUploader);
-
-	mBoxGeo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(m_D3dDevice.Get(),
-		m_CommandList.Get(), indices.data(), ibByteSize, mBoxGeo->IndexBufferUploader);
-
-	mBoxGeo->VertexByteStride = sizeof(Vertex);
-	mBoxGeo->VertexBufferByteSize = vbByteSize;
-	mBoxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
-	mBoxGeo->IndexBufferByteSize = ibByteSize;
-
-	SubmeshGeometry submesh;
-	submesh.IndexCount = (UINT)indices.size();
-	submesh.StartIndexLocation = 0;
-	submesh.BaseVertexLocation = 0;
-
-	mBoxGeo->DrawArgs["box"] = submesh;
-}

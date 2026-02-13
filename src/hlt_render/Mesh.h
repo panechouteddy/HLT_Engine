@@ -3,13 +3,13 @@
 #include <unordered_map>
 #include "DirectXMath.h"
 
-class MeshManager
+class MeshBox
 {
 
 protected:
     std::unordered_map<std::string, MeshGeometry*> m_BoxOfMesh;
 public:
-    MeshManager() {};
+    MeshBox() {};
     MeshGeometry* GetMesh(std::string form) { return m_BoxOfMesh[form]; }
     void CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
     void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
@@ -21,7 +21,7 @@ class Mesh
 
 public :
     Mesh() {};
-    void InitPyramidMesh(MeshManager * Manager);
+    void InitPyramidMesh(MeshBox * Manager);
     MeshGeometry* GetGeometry();
 };
 
