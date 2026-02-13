@@ -1,6 +1,5 @@
 #pragma once
 #include "hlt_Transform3D.h"
-#include <DirectXCollision.h>
 
 namespace hlt_Box
 {
