@@ -8,8 +8,9 @@
 #include "hlt_Shader.h"
 #include "hlt_RenderItem.h"
 #include "hlt_UI.h"
+#include "hlt_PSO.h"
 
-#include "d3dApp.h"
+#include "D3DApp.h"
 #include "d3dUtil.h"
 #include "DDSTextureLoader.h" 
 #include "GameTimer.h"
