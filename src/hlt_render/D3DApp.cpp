@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <WindowsX.h>
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
