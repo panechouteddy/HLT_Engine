@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "hlt_Box.h"
 
-hlt_Box::Box3D_AABB::Box3D_AABB(DirectX::XMFLOAT3 min, DirectX::XMFLOAT3 max)
+hlt_Box::Box3D_AABB::Box3D_AABB(DirectX::FXMVECTOR minPos, DirectX::FXMVECTOR maxPos)
 {
-	m_Min = min;
-	m_Max = max;
+	XMStoreFloat3(&m_Min, minPos);
+	XMStoreFloat3(&m_Max, maxPos);
 }
 
 void hlt_Box::Box3D_AABB::Zero()
@@ -22,9 +22,11 @@ XMFLOAT3 hlt_Box::Box3D_AABB::Size()
 	return boxSize;
 }
 
-bool hlt_Box::Box3D_AABB::Contains(DirectX::XMFLOAT3 p)
+bool hlt_Box::Box3D_AABB::Contains(DirectX::FXMVECTOR p)
 {
-	return p.x >= m_Min.x && p.x <= m_Max.x && p.y >= m_Min.y && p.y <= m_Max.y && p.z >= m_Min.z && p.z <= m_Max.z;
+	DirectX::XMFLOAT3 pPos;
+	XMStoreFloat3(&pPos, p);
+	return pPos.x >= m_Min.x && pPos.x <= m_Max.x && pPos.y >= m_Min.y && pPos.y <= m_Max.y && pPos.z >= m_Min.z && pPos.z <= m_Max.z;
 }
 
 bool hlt_Box::Box3D_AABB::Contains(hlt_Box::Box3D_AABB box)
@@ -66,6 +68,33 @@ hlt_Box::Box3D_AABB hlt_Box::Box3D_AABB::operator+(hlt_Transform3D boxPos)
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
+
+hlt_Box::Box3D_OBB::Box3D_OBB(DirectX::FXMVECTOR centerPos, DirectX::FXMVECTOR size, DirectX::FXMVECTOR rotation)
+{
+	DirectX::XMFLOAT3 boxPos;
+	DirectX::XMFLOAT3 boxSize;
+	DirectX::XMFLOAT4 boxRotation;
+
+	XMStoreFloat3(&boxPos, centerPos);
+	XMStoreFloat3(&boxSize, size);
+	XMStoreFloat4(&boxRotation, rotation);
+
+	m_Box = DirectX::BoundingOrientedBox(
+		boxPos,
+		boxSize,
+		boxRotation
+	);
+}
+
+void hlt_Box::Box3D_OBB::Zero()
+{
+	m_Box = DirectX::BoundingOrientedBox();
+}
+
+bool hlt_Box::Box3D_OBB::Contains(Box3D_OBB obb)
+{
+	return m_Box.Contains(obb.m_Box);
+}
 
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////

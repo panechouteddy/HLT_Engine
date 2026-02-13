@@ -1,5 +1,6 @@
 #pragma once
 #include "hlt_Transform3D.h"
+#include <DirectXCollision.h>
 
 namespace hlt_Box
 {
@@ -7,13 +8,13 @@ namespace hlt_Box
 	{
 	public:
 		Box3D_AABB() { Zero(); }
-		Box3D_AABB(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b);
+		Box3D_AABB(DirectX::FXMVECTOR minPos, DirectX::FXMVECTOR maxPos);
 		~Box3D_AABB() = default;
 
 		void Zero();
 		DirectX::XMFLOAT3 Size();
 
-		bool Contains(DirectX::XMFLOAT3 p);
+		bool Contains(DirectX::FXMVECTOR p);
 		bool Contains(Box3D_AABB box);
 
 		Box3D_AABB operator+(hlt_Transform3D boxPos);
@@ -23,22 +24,20 @@ namespace hlt_Box
 		DirectX::XMFLOAT3 m_Max;
 	};
 
-	/*class Box3D_OBB
+	class Box3D_OBB
 	{
 	public:
 		Box3D_OBB() { Zero(); }
-		Box3D_OBB(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b);
+		Box3D_OBB(DirectX::FXMVECTOR centerPos, DirectX::FXMVECTOR size, DirectX::FXMVECTOR rotation);
 		~Box3D_OBB() = default;
 
 		void Zero();
 
-		bool Contains(DirectX::XMFLOAT3 p);
-
+		bool Contains(Box3D_OBB obb);
 
 	public:
-		DirectX::XMFLOAT3 m_Min;
-		DirectX::XMFLOAT3 m_Max;
-	};*/
+		DirectX::BoundingOrientedBox m_Box;
+	};
 
 	class Box2D
 	{
