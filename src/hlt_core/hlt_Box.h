@@ -8,7 +8,7 @@ namespace hlt_Box
 	{
 	public:
 		Box3D_AABB() { Zero(); }
-		Box3D_AABB(DirectX::FXMVECTOR minPos, DirectX::FXMVECTOR maxPos);
+		Box3D_AABB(DirectX::FXMVECTOR center, DirectX::FXMVECTOR size);
 		~Box3D_AABB() = default;
 
 		void Zero();
@@ -20,8 +20,7 @@ namespace hlt_Box
 		Box3D_AABB operator+(hlt_Transform3D boxPos);
 
 	public:
-		DirectX::XMFLOAT3 m_Min;
-		DirectX::XMFLOAT3 m_Max;
+		DirectX::BoundingBox m_Box;
 	};
 
 	class Box3D_OBB

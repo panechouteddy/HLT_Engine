@@ -1,68 +1,50 @@
 #include "pch.h"
 #include "hlt_Box.h"
 
-hlt_Box::Box3D_AABB::Box3D_AABB(DirectX::FXMVECTOR minPos, DirectX::FXMVECTOR maxPos)
+hlt_Box::Box3D_AABB::Box3D_AABB(DirectX::FXMVECTOR center, DirectX::FXMVECTOR size)
 {
-	XMStoreFloat3(&m_Min, minPos);
-	XMStoreFloat3(&m_Max, maxPos);
+	DirectX::XMFLOAT3 centerBox;
+	DirectX::XMFLOAT3 sizeBox;
+	XMStoreFloat3(&centerBox, center);
+	XMStoreFloat3(&sizeBox, size);
+
+	m_Box = DirectX::BoundingBox(centerBox, sizeBox);
 }
 
 void hlt_Box::Box3D_AABB::Zero()
 {
-	m_Min = { 0.f, 0.f, 0.f };
-	m_Max = { 0.f, 0.f, 0.f };
+	m_Box = DirectX::BoundingBox();
 }
 
 XMFLOAT3 hlt_Box::Box3D_AABB::Size()
 {
-	XMFLOAT3 boxSize;
-	XMVECTOR boxMax = XMLoadFloat3(&m_Max);
-	XMVECTOR boxMin = XMLoadFloat3(&m_Min);
-	XMStoreFloat3(&boxSize, XMVectorSubtract(boxMax, boxMin));
-	return boxSize;
+	DirectX::XMVECTOR boxSize = XMLoadFloat3(&m_Box.Extents);
+	DirectX::XMFLOAT3 multiplier = DirectX::XMFLOAT3(2, 2, 2);
+	DirectX::XMVECTOR times2 = XMLoadFloat3(&multiplier);
+	XMVectorMultiply(boxSize, times2);
+
+	DirectX::XMFLOAT3 result;
+	XMStoreFloat3(&result, boxSize);
+	return result;
 }
 
 bool hlt_Box::Box3D_AABB::Contains(DirectX::FXMVECTOR p)
 {
 	DirectX::XMFLOAT3 pPos;
 	XMStoreFloat3(&pPos, p);
-	return pPos.x >= m_Min.x && pPos.x <= m_Max.x && pPos.y >= m_Min.y && pPos.y <= m_Max.y && pPos.z >= m_Min.z && pPos.z <= m_Max.z;
+	DirectX::BoundingBox point = DirectX::BoundingBox(pPos, DirectX::XMFLOAT3());
+	return m_Box.Contains(point);
 }
 
 bool hlt_Box::Box3D_AABB::Contains(hlt_Box::Box3D_AABB box)
 {
-	if (Contains(box.m_Min))
-		return true;
-	if (Contains(box.m_Max))
-		return true;
-
-	XMFLOAT3 boxSize = box.Size();
-
-	if (Contains(DirectX::XMFLOAT3(box.m_Max.x - boxSize.x, box.m_Max.y, box.m_Max.z)))
-		return true;
-	if (Contains(DirectX::XMFLOAT3(box.m_Max.x, box.m_Max.y - boxSize.y, box.m_Max.z)))
-		return true;
-	if (Contains(DirectX::XMFLOAT3(box.m_Max.x, box.m_Max.y, box.m_Max.z - boxSize.x)))
-		return true;
-	if (Contains(DirectX::XMFLOAT3(box.m_Min.x + boxSize.x, box.m_Min.y, box.m_Min.z)))
-		return true;
-	if (Contains(DirectX::XMFLOAT3(box.m_Min.x, box.m_Min.y + boxSize.y, box.m_Min.z)))
-		return true;
-	if (Contains(DirectX::XMFLOAT3(box.m_Min.x, box.m_Min.y, box.m_Min.z + boxSize.x)))
-		return true;
-
-	return false;
+	return m_Box.Contains(box.m_Box);
 }
 
 hlt_Box::Box3D_AABB hlt_Box::Box3D_AABB::operator+(hlt_Transform3D boxPos)
 {
-	Box3D_AABB newBox;
-	DirectX::XMFLOAT3 boxSize = Size();
-	DirectX::XMFLOAT3 halfBoxSize{ boxSize.x * 0.5f, boxSize.y * 0.5f, boxSize.z * 0.5f };
-	newBox.m_Min = DirectX::XMFLOAT3(m_Min.x - halfBoxSize.x + boxPos.pos.x, m_Min.y - halfBoxSize.y + boxPos.pos.y, m_Min.z - halfBoxSize.z + boxPos.pos.z);
-	newBox.m_Max = DirectX::XMFLOAT3(m_Max.x + halfBoxSize.x + boxPos.pos.x, m_Max.y + halfBoxSize.y + boxPos.pos.y, m_Max.z + halfBoxSize.z + boxPos.pos.z);
-
-	return newBox;
+	m_Box.Center = boxPos.pos;
+	return *this;
 }
 
 /////////////////////////////////////////////////////////////////
