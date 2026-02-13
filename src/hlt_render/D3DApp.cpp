@@ -110,6 +110,8 @@ bool D3DApp::Initialize()
     // Do the initial resize code.
     OnResize();
 
+    InitDirect3DDraw();
+
     return true;
 }
 LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -413,6 +415,14 @@ bool D3DApp::InitDirect3D()
     CreateRtvAndDsvDescriptorHeaps();
 
     return true;
+}
+
+void D3DApp::InitDirect3DDraw()
+{
+    void BuildDescriptorHeaps();
+    void BuildRootSignature();
+    void BuildShadersAndInputLayout();
+    void BuildPSO();
 }
 
 void D3DApp::CreateCommandObjects()

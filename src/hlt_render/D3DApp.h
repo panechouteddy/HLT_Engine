@@ -54,6 +54,7 @@ protected:
 
 	bool InitMainWindow();
 	bool InitDirect3D();
+	void InitDirect3DDraw();
 	void CreateCommandObjects();
 	void CreateSwapChain();
 
@@ -69,6 +70,12 @@ protected:
 	void LogAdapterOutputs(IDXGIAdapter* adapter);
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 
+	void CreateMeshBox();
+	void BuildDescriptorHeaps();
+	void BuildRootSignature();
+	void BuildShadersAndInputLayout();
+	void BuildPSO();
+	ConstantBuffer* CreateConstantBufferObject()const;
 
 protected:
 	static D3DApp* m_App;
@@ -116,6 +123,18 @@ protected:
 
 	D3D12_VIEWPORT m_ScreenViewport ;
 	D3D12_RECT m_ScissorRect;
+
+	//Mesh
+	MeshBox* m_Box;
+
+	//Draw
+	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
+	ComPtr<ID3D12DescriptorHeap> m_CbvHeap = nullptr;
+	ComPtr<ID3D12PipelineState> m_PSO = nullptr;
+
+	ComPtr<ID3DBlob> m_VsByteCode = nullptr;
+	ComPtr<ID3DBlob> m_PsByteCode = nullptr;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
 
 	int m_ClientWidth = 1280;
 	int m_ClientHeight = 720;

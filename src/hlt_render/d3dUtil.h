@@ -21,6 +21,8 @@
 #include "d3dx12.h"
 #include "DDSTextureLoader.h"
 #include "MathHelper.h"
+#include "Mesh.h"
+#include "ConstantBuffer.h"
 
 extern const int gNumFrameResources;
 

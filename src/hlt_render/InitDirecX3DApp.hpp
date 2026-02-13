@@ -2,7 +2,7 @@
 #include "D3DApp.h"
 
 #include <array>
-#include "Mesh.h"
+
 #include "ConstantBuffer.h"
 
 using namespace DirectX;
@@ -21,36 +21,16 @@ public:
 
 	virtual bool Initialize()override;
 private:
-
-
-
-	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
-	ComPtr<ID3D12DescriptorHeap> m_CbvHeap = nullptr;
-	ComPtr<ID3D12PipelineState> m_PSO = nullptr;
-
-	ComPtr<ID3DBlob> m_VsByteCode = nullptr;
-	ComPtr<ID3DBlob> m_PsByteCode = nullptr;
-	std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
-
-
-	std::unique_ptr<MeshGeometry> mBoxGeo = nullptr;
-
-	MeshBox* m_Box;
-	Mesh* m_testMesh;
 	ConstantBuffer* m_CBobject;
 
-
 	virtual void OnResize()override;
-	 void CreateAllMesh();
 	virtual void Update(const GameTimer& gt)override;
 	virtual void Draw(const GameTimer& gt)override;
-
 	void BuildDescriptorHeaps();
 	void BuildRootSignature();
 	void BuildShadersAndInputLayout();
-	void CreateMesh();
 	void BuildPSO();
-	void BuildBoxGeometry();
+
 
 	XMFLOAT4X4 m_View = MathHelper::Identity4x4();
 	XMFLOAT4X4 m_Proj = MathHelper::Identity4x4();
@@ -92,8 +72,6 @@ bool InitDirect3DApp::Initialize()
 	m_DirectCmdListAlloc->Reset();
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
-	CreateAllMesh();
-	CreateMesh();
 	m_CBobject = new ConstantBuffer(m_Device.Get());
 
 	//m_CommandList->Close();
