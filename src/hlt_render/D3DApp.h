@@ -88,7 +88,7 @@ protected:
 
 	Microsoft::WRL::ComPtr<IDXGIFactory4> m_DxgiFactory;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_SwapChain;
-	Microsoft::WRL::ComPtr<ID3D12Device> m_Device;
+	Microsoft::WRL::ComPtr<ID3D12Device> m_D3dDevice;
 
 	//Fence 
 	Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence;
