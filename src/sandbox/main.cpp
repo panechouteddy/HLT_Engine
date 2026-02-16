@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "main.h"
+#include <d3d11on12.h>
 #include <hlt_render/InitDirecX3DApp.hpp>
 
 using Microsoft::WRL::ComPtr;
@@ -68,7 +69,17 @@ private:
 	std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> mPSOs;
 
 	//FrameResource* mCurrFrameResource = nullptr;
-	std::shared_ptr<DX::DeviceResources> m_deviceResources;
+	std::shared_ptr<hlt_D2DResource> m_DeviceResources;
+	ComPtr<IDWriteTextFormat> m_textFormatBody; 
+	ComPtr<ID2D1SolidColorBrush> m_textBrush;
+
+	ComPtr<ID3D11Device> m_d3d11Device;
+	ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
+	ComPtr<ID3D11On12Device> m_d3d11On12Device;
+	ComPtr<ID2D1DeviceContext2> m_d2dContext;
+
+	// Ressources enveloppées (une par back buffer)
+	ComPtr<ID3D11Resource> m_wrappedBackBuffers[SwapChainBufferCount];
 
 	XMFLOAT4X4 mWorld = MathHelper::Identity4x4();
 
@@ -120,11 +131,76 @@ bool main::Initialize()
 	if (!D3DApp::Initialize())
 		return false;
 
-	// Reset the command list to prep for initialization commands.
+	// Réinitialiser la liste de commandes pour enregistrer les commandes d'initialisation (textures, etc.)
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
-	m_material.m_Color = { 1.0f,0.0f,0.0f, 0.f };
+	// 2. Initialisation du Pont D3D11on12
+	// On crée un device D3D11 "virtuel" qui utilise la file de commande DX12
+	UINT d3d11DeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#if defined(DEBUG) || defined(_DEBUG)
+	d3d11DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 
+	ThrowIfFailed(D3D11On12CreateDevice(
+		m_Device.Get(),
+		d3d11DeviceFlags,
+		nullptr, 0,
+		reinterpret_cast<IUnknown**>(m_CommandQueue.GetAddressOf()),
+		1,
+		0,
+		&m_d3d11Device,
+		&m_d3d11DeviceContext,
+		nullptr
+	));
+
+	// Obtenir l'interface 11on12 pour créer les ressources enveloppées
+	ThrowIfFailed(m_d3d11Device.As(&m_d3d11On12Device));
+
+	// 3. Création des Wrapped Resources pour Direct2D
+	// On crée une vue DX11 pour chaque Back Buffer de la SwapChain DX12
+	D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
+
+	for (UINT i = 0; i < SwapChainBufferCount; i++)
+	{
+		ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(
+			m_SwapChainBuffer[i].Get(),
+			&d3d11Flags,
+			D3D12_RESOURCE_STATE_PRESENT,     // État d'entrée
+			D3D12_RESOURCE_STATE_RENDER_TARGET, // État de sortie après usage D2D
+			IID_PPV_ARGS(&m_wrappedBackBuffers[i])
+		));
+	}
+
+	// 4. Initialisation de Direct2D et DirectWrite
+	D2D1_FACTORY_OPTIONS options = {};
+#if defined(DEBUG) || defined(_DEBUG)
+	options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+#endif
+
+	ComPtr<ID2D1Factory3> d2dFactory;
+	ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, &d2dFactory));
+
+	ComPtr<IDXGIDevice> dxgiDevice;
+	ThrowIfFailed(m_d3d11On12Device.As(&dxgiDevice));
+
+	ComPtr<ID2D1Device2> d2dDevice;
+	ThrowIfFailed(d2dFactory->CreateDevice(dxgiDevice.Get(), &d2dDevice));
+	ThrowIfFailed(d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_d2dContext));
+
+	// 5. Création des ressources de texte (DirectWrite)
+	ComPtr<IDWriteFactory> writeFactory;
+	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &writeFactory));
+
+	ThrowIfFailed(writeFactory->CreateTextFormat(
+		L"Consolas", nullptr, DWRITE_FONT_WEIGHT_NORMAL,
+		DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+		20.0f, L"en-us", &m_textFormatBody
+	));
+
+	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Yellow), &m_textBrush));
+
+	// 6. Chargement de vos ressources 3D (votre code original)
+	m_material.m_Color = { 1.0f, 0.0f, 0.0f, 1.0f };
 	LoadTextures();
 	BuildDescriptorHeaps();
 	BuildConstantBuffers();
@@ -133,12 +209,10 @@ bool main::Initialize()
 	BuildBoxGeometry();
 	BuildPSO();
 
-	// Execute the initialization commands.
+	// Exécuter et finaliser l'initialisation DX12
 	ThrowIfFailed(m_CommandList->Close());
 	ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
 	m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-
-	// Wait until initialization is complete.
 	FlushCommandQueue();
 
 	return true;
@@ -374,96 +448,90 @@ void main::Update(const GameTimer& gt)
 
 void main::Draw(const GameTimer& gt)
 {
-	// Reuse the memory associated with command recording.
-	// We can only reset when the associated command lists have finished execution on the GPU.
+	// 1. Initialisation de la liste de commandes DX12
 	ThrowIfFailed(m_DirectCmdListAlloc->Reset());
-
-	// A command list can be reset after it has been added to the command queue via ExecuteCommandList.
-	// Reusing the command list reuses memory.
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), mPSO.Get()));
 
+	// 2. Setup standard (Viewport, Scissor, Barrière)
 	m_CommandList->RSSetViewports(1, &m_ScreenViewport);
 	m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
 
-	// Indicate a state transition on the resource usage.
-	CD3DX12_RESOURCE_BARRIER transition = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+	auto barrierToTarget = CD3DX12_RESOURCE_BARRIER::Transition(
+		CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	m_CommandList->ResourceBarrier(1, &transition);
+	m_CommandList->ResourceBarrier(1, &barrierToTarget);
 
-	// Clear the back buffer and depth buffer.
-	XMVECTORF32 dynamicColor = { sinf(mTheta), cosf(mPhi), 0.5f, 1.0f };
+	// 3. Rendu de la scène 3D (votre Cube)
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv = CurrentBackBufferView();
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DepthStencilView();
+	m_CommandList->ClearRenderTargetView(rtv, Colors::LightSteelBlue, 0, nullptr);
+	m_CommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	m_CommandList->OMSetRenderTargets(1, &rtv, true, &dsv);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE currentBackBufferView = CurrentBackBufferView();
-	m_CommandList->ClearRenderTargetView(currentBackBufferView, dynamicColor, 0, nullptr);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = DepthStencilView();
-	m_CommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-
-	// Specify the buffers we are going to render to.
-	m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
-
-	ID3D12DescriptorHeap* descriptorHeaps[] = { mCbvHeap.Get() };
-	m_CommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
-	// debut obj
+	// --- (Ici vos appels DrawIndexed pour le cube) ---
 	m_CommandList->SetGraphicsRootSignature(mRootSignature.Get());
-
 	D3D12_VERTEX_BUFFER_VIEW vertex = mBoxGeo->VertexBufferView();
 	m_CommandList->IASetVertexBuffers(0, 1, &vertex);
 	D3D12_INDEX_BUFFER_VIEW index = mBoxGeo->IndexBufferView();
 	m_CommandList->IASetIndexBuffer(&index);
-	m_CommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_CommandList->DrawIndexedInstanced(mBoxGeo->DrawArgs["box"].IndexCount, 1, 0, 0, 0);
 
-	//m_CommandList->SetGraphicsRootConstantBufferView(0, mObjectCB->Resource()->GetGPUVirtualAddress());
-
-	m_CommandList->DrawIndexedInstanced(
-		mBoxGeo->DrawArgs["box"].IndexCount,
-		1, 0, 0, 0);
-
-	// fin obj
-
-	//m_CommandList->SetGraphicsRootConstantBufferView(0, mObjectCB2->Resource()->GetGPUVirtualAddress());
-
-	m_CommandList->DrawIndexedInstanced(
-		mBoxGeo->DrawArgs["box"].IndexCount,
-		1, 0, 0, 0);
-
-	///////////////
-
-	// Indicate a state transition on the resource usage.
-	CD3DX12_RESOURCE_BARRIER transition1 = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-	m_CommandList->ResourceBarrier(1, &transition1);
-
-	// Done recording commands.
+	// 4. SYNCHRONISATION : On ferme la liste DX12 pour laisser D2D prendre la main
 	ThrowIfFailed(m_CommandList->Close());
-
-	// Add the command list to the queue for execution.
 	ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
 	m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-	// swap the back and front buffers
+	ComPtr<IDXGISurface> surface;
+	ThrowIfFailed(m_wrappedBackBuffers[m_CurrBackBuffer].As(&surface));
+
+	// Créer un bitmap D2D pointant sur cette surface
+	D2D1_BITMAP_PROPERTIES1 bitmapProperties = D2D1::BitmapProperties1(
+		D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+		D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
+	);
+
+	ComPtr<ID2D1Bitmap1> d2dTargetBitmap;
+	ThrowIfFailed(m_d2dContext->CreateBitmapFromDxgiSurface(surface.Get(), &bitmapProperties, &d2dTargetBitmap));
+
+	// Définir la cible et dessiner
+	m_d2dContext->SetTarget(d2dTargetBitmap.Get());
+	m_d3d11On12Device->AcquireWrappedResources(m_wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
+
+	m_d2dContext->BeginDraw();
+	// Dessin du rectangle (votre code original)
+	auto windowBounds = m_DeviceResources->GetLogicalSize();
+	m_d2dContext->DrawRectangle(
+		D2D1::RectF(10.0f, 10.0f, 200.0f, 100.0f),
+		m_textBrush.Get()
+	);
+
+	// Dessin du texte
+	std::wstring stats = L"FPS: " + std::to_wstring(1.0f / gt.DeltaTime());
+	m_d2dContext->DrawText(
+		stats.c_str(),
+		(UINT32)stats.length(),
+		m_textFormatBody.Get(),
+		D2D1::RectF(15.0f, 15.0f, 500.0f, 100.0f),
+		m_textBrush.Get()
+	);
+
+	m_d2dContext->EndDraw();
+
+	// 1. Libérer la ressource UNE SEULE FOIS
+	m_d3d11On12Device->ReleaseWrappedResources(m_wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
+
+	// 2. Retirer la cible pour libérer le lien avec le buffer
+	m_d2dContext->SetTarget(nullptr);
+
+	// 3. Envoyer les commandes D3D11 au GPU (Indispensable)
+	m_d3d11DeviceContext->Flush();
+
+	// 4. Présentation
 	ThrowIfFailed(m_SwapChain->Present(0, 0));
 	m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
 
-	// Wait until frame commands are complete.  This waiting is inefficient and is
-	// done for simplicity.  Later we will show how to organize our rendering code
-	// so we do not have to wait per frame.
+	// 5. On n'appelle FlushCommandQueue() qu'APRES le Present pour ne pas bloquer le CPU
 	FlushCommandQueue();
-
-	auto d2dContext = m_DeviceResources->GetD2DDeviceContext();
-	d2dContext->DrawText(
-		wsbuffer,
-		length,
-		m_textFormatBodySymbol.get(),
-		D2D1::RectF(
-			windowBounds.Width - GameUIConstants::HudRightOffset,
-			GameUIConstants::HudTopOffset + (GameUIConstants::HudBodyPointSize + GameUIConstants::Margin) * 3 + GameUIConstants::Margin,
-			windowBounds.Width,
-			GameUIConstants::HudTopOffset + (GameUIConstants::HudBodyPointSize + GameUIConstants::Margin) * 4
-		),
-		m_textBrush.get()
-	);
 }
 
 void main::OnMouseDown(WPARAM btnState, int x, int y)
