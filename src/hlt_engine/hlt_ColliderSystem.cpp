@@ -2,7 +2,7 @@
 
 void hlt_System::BoxCollider::Update()
 {
-	hlt_ECS::ComponentPool<hlt_Component::BoxCollider>* boxCollider = m_pECS->GetComponent<hlt_Component::BoxCollider>();
+	hlt_ECS::ComponentPool<hlt_Component::BoxCollider3D>* boxCollider = m_pECS->GetComponent<hlt_Component::BoxCollider3D>();
 	hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transfrom3D = m_pECS->GetComponent<hlt_Component::Transform3D>();
 
 	for (int i = 0; i < boxCollider->componentOwnerID.size(); i++)
@@ -11,7 +11,13 @@ void hlt_System::BoxCollider::Update()
 		if (myTransform == nullptr)
 			continue;
 
-		hlt_Box::Box3D_AABB myBox = boxCollider->component[i].box + myTransform->transform;
+		if (boxCollider->component[i].boxType == hlt_Component::BoxCollider3D::COUNT)
+			continue;
+		else if(boxCollider->component[i].boxType == hlt_Component::BoxCollider3D::AABB)
+			boxCollider->component[i].boxAABB = boxCollider->component[i].boxAABB + myTransform->transform;
+		else if(boxCollider->component[i].boxType == hlt_Component::BoxCollider3D::OBB)
+			boxCollider->component[i].boxAABB = boxCollider->component[i].boxAABB + myTransform->transform;
+
 		boxCollider->component[i].isColliding = false;
 		
 		for (int j = 0; j < boxCollider->componentOwnerID.size(); j++)
@@ -23,10 +29,26 @@ void hlt_System::BoxCollider::Update()
 			if (otherTransform == nullptr)
 				continue;
 
-			hlt_Box::Box3D_AABB otherBox = boxCollider->component[j].box + otherTransform->transform;
+			if (boxCollider->component[j].boxType == hlt_Component::BoxCollider3D::COUNT)
+				continue;
+			else if (boxCollider->component[j].boxType == hlt_Component::BoxCollider3D::AABB)
+			{
+				boxCollider->component[j].boxAABB = boxCollider->component[j].boxAABB + otherTransform->transform;
 
-			if (myBox.Contains(otherBox))
-				boxCollider->component[i].isColliding = true;
+				if (boxCollider->component[i].boxType == hlt_Component::BoxCollider3D::AABB && boxCollider->component[i].boxAABB.Contains(boxCollider->component[j].boxAABB))
+					boxCollider->component[i].isColliding = true;
+				else if (boxCollider->component[i].boxType == hlt_Component::BoxCollider3D::OBB && boxCollider->component[i].boxOBB.Contains(boxCollider->component[j].boxAABB))
+					boxCollider->component[i].isColliding = true;
+			}
+			else if (boxCollider->component[j].boxType == hlt_Component::BoxCollider3D::OBB)
+			{
+				boxCollider->component[j].boxAABB = boxCollider->component[j].boxAABB + otherTransform->transform;
+
+				if (boxCollider->component[i].boxType == hlt_Component::BoxCollider3D::AABB && boxCollider->component[i].boxAABB.Contains(boxCollider->component[j].boxOBB))
+					boxCollider->component[i].isColliding = true;
+				else if (boxCollider->component[i].boxType == hlt_Component::BoxCollider3D::OBB && boxCollider->component[i].boxOBB.Contains(boxCollider->component[j].boxOBB))
+					boxCollider->component[i].isColliding = true;
+			}
 		}
 	}
 }

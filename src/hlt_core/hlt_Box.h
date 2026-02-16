@@ -3,6 +3,8 @@
 
 namespace hlt_Box
 {
+	class Box3D_OBB;
+
 	class Box3D_AABB
 	{
 	public:
@@ -15,6 +17,7 @@ namespace hlt_Box
 
 		bool Contains(DirectX::FXMVECTOR p);
 		bool Contains(Box3D_AABB box);
+		bool Contains(Box3D_OBB obb);
 
 		Box3D_AABB operator+(hlt_Transform3D boxPos);
 
@@ -32,6 +35,7 @@ namespace hlt_Box
 		void Zero();
 
 		bool Contains(Box3D_OBB obb);
+		bool Contains(Box3D_AABB aabb);
 
 	public:
 		DirectX::BoundingOrientedBox m_Box;

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "hlt_Box.h"
 
-hlt_Box::Box3D_AABB::Box3D_AABB(XMVECTOR center, FXMVECTOR size)
+hlt_Box::Box3D_AABB::Box3D_AABB(DirectX::FXMVECTOR center, DirectX::FXMVECTOR size)
 {
 	XMFLOAT3 centerBox;
 	XMFLOAT3 sizeBox;
@@ -41,6 +41,11 @@ bool hlt_Box::Box3D_AABB::Contains(hlt_Box::Box3D_AABB box)
 	return m_Box.Contains(box.m_Box);
 }
 
+bool hlt_Box::Box3D_AABB::Contains(Box3D_OBB obb)
+{
+	return m_Box.Contains(obb.m_Box);
+}
+
 hlt_Box::Box3D_AABB hlt_Box::Box3D_AABB::operator+(hlt_Transform3D boxPos)
 {
 	m_Box.Center = boxPos.pos;
@@ -76,6 +81,11 @@ void hlt_Box::Box3D_OBB::Zero()
 bool hlt_Box::Box3D_OBB::Contains(Box3D_OBB obb)
 {
 	return m_Box.Contains(obb.m_Box);
+}
+
+bool hlt_Box::Box3D_OBB::Contains(Box3D_AABB aabb)
+{
+	return m_Box.Contains(aabb.m_Box);
 }
 
 /////////////////////////////////////////////////////////////////

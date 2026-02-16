@@ -3,11 +3,21 @@
 
 namespace hlt_Component
 {
-	struct BoxCollider
+	struct BoxCollider3D
 	{
 		static const int ID = 4;
 
-		hlt_Box::Box3D_AABB box;
+		enum BoxType {
+			AABB,
+			OBB,
+
+			COUNT
+		};
+
+		BoxType boxType = BoxType::COUNT;
+
+		hlt_Box::Box3D_AABB boxAABB = hlt_Box::Box3D_AABB();
+		hlt_Box::Box3D_OBB boxOBB = hlt_Box::Box3D_OBB();
 		bool isColliding = false;
 	};
 }
