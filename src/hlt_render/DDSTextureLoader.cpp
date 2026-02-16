@@ -1284,19 +1284,18 @@ static HRESULT CreateD3DResources12(
 		}
 		else
 		{
-			const UINT num2DSubresources = texDesc.DepthOrArraySize * texDesc.MipLevels;
-			const UINT64 uploadBufferSize = GetRequiredIntermediateSize(texture.Get(), 0, num2DSubresources);
+            const UINT num2DSubresources = texDesc.DepthOrArraySize * texDesc.MipLevels;
+            const UINT64 uploadBufferSize = GetRequiredIntermediateSize(texture.Get(), 0, num2DSubresources);
 
-            CD3DX12_RESOURCE_DESC* buffer = new CD3DX12_RESOURCE_DESC;
-            buffer->Buffer(uploadBufferSize);
-            properties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-			hr = device->CreateCommittedResource(
-                &properties,
-				D3D12_HEAP_FLAG_NONE,
-                buffer,
-				D3D12_RESOURCE_STATE_GENERIC_READ,
-				nullptr,
-				IID_PPV_ARGS(&textureUploadHeap));
+            CD3DX12_RESOURCE_DESC buffer = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
+            CD3DX12_HEAP_PROPERTIES properties2 = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+            hr = device->CreateCommittedResource(
+                &properties2,
+                D3D12_HEAP_FLAG_NONE,
+                &buffer,
+                D3D12_RESOURCE_STATE_GENERIC_READ,
+                nullptr,
+                IID_PPV_ARGS(&textureUploadHeap));
 			if (FAILED(hr))
 			{
 				texture = nullptr;
