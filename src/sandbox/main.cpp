@@ -464,7 +464,7 @@ void main::Draw(const GameTimer& gt)
 	// 3. Rendu de la scène 3D (votre Cube)
 	D3D12_CPU_DESCRIPTOR_HANDLE rtv = CurrentBackBufferView();
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = DepthStencilView();
-	m_CommandList->ClearRenderTargetView(rtv, Colors::LightSteelBlue, 0, nullptr);
+	m_CommandList->ClearRenderTargetView(rtv, Colors::Red, 0, nullptr);
 	m_CommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	m_CommandList->OMSetRenderTargets(1, &rtv, true, &dsv);
 
@@ -480,6 +480,7 @@ void main::Draw(const GameTimer& gt)
 	ThrowIfFailed(m_CommandList->Close());
 	ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
 	m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
 
 	ComPtr<IDXGISurface> surface;
 	ThrowIfFailed(m_wrappedBackBuffers[m_CurrBackBuffer].As(&surface));
@@ -498,11 +499,13 @@ void main::Draw(const GameTimer& gt)
 	m_d3d11On12Device->AcquireWrappedResources(m_wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
 
 	m_d2dContext->BeginDraw();
-	// Dessin du rectangle (votre code original)
-	auto windowBounds = m_DeviceResources->GetLogicalSize();
+
+	m_d2dContext->Clear(D2D1::ColorF(D2D1::ColorF::Red, 0.2f)); // Teinte l'écran en rouge si D2D marche
+
 	m_d2dContext->DrawRectangle(
-		D2D1::RectF(10.0f, 10.0f, 200.0f, 100.0f),
-		m_textBrush.Get()
+		D2D1::RectF(50.0f, 50.0f, 300.0f, 300.0f),
+		m_textBrush.Get(),
+		2.0f // Épaisseur de ligne
 	);
 
 	// Dessin du texte
