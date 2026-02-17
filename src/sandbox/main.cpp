@@ -477,21 +477,18 @@ void main::Draw(const GameTimer& gt)
 	// Specify the buffers we are going to render to.
 	m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
 
-	// Indicate a state transition on the resource usage.
-	auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-	m_CommandList->ResourceBarrier(1, &barrierToPresent);
-
-	// Done recording commands.
 	ThrowIfFailed(m_CommandList->Close());
-
-	// Add the command list to the queue for execution.
 	ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
 	m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
+	// Synchronisation : On s'assure que DX12 a fini avant que D2D ne commence
+	// Dans un moteur optimisé, on utiliserait un Fence, ici Flush suffit pour tester
+	FlushCommandQueue();
+
+	// --- PARTIE D2D ---
 	ComPtr<IDXGISurface> surface;
 	ThrowIfFailed(m_wrappedBackBuffers[m_CurrBackBuffer].As(&surface));
 
-	// Créer un bitmap D2D pointant sur cette surface
 	D2D1_BITMAP_PROPERTIES1 bitmapProperties = D2D1::BitmapProperties1(
 		D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
 		D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
@@ -500,13 +497,13 @@ void main::Draw(const GameTimer& gt)
 	ComPtr<ID2D1Bitmap1> d2dTargetBitmap;
 	ThrowIfFailed(m_d2dContext->CreateBitmapFromDxgiSurface(surface.Get(), &bitmapProperties, &d2dTargetBitmap));
 
-	// Définir la cible et dessiner
 	m_d2dContext->SetTarget(d2dTargetBitmap.Get());
+
+	// On acquiert la ressource (Le pont la passe de PRESENT à RENDER_TARGET en interne)
 	m_d3d11On12Device->AcquireWrappedResources(m_wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
 
 	m_d2dContext->BeginDraw();
-
-	m_d2dContext->Clear(D2D1::ColorF(D2D1::ColorF::Red, 0.2f)); // Teinte l'écran en rouge si D2D marche
+	m_d2dContext->Clear(D2D1::ColorF(D2D1::ColorF::Red, 0.4f)); // Test visuel
 
 	m_d2dContext->DrawRectangle(
 		D2D1::RectF(50.0f, 50.0f, 300.0f, 300.0f),
@@ -516,30 +513,21 @@ void main::Draw(const GameTimer& gt)
 
 	// Dessin du texte
 	std::wstring stats = L"FPS: " + std::to_wstring(1.0f / gt.DeltaTime());
-	m_d2dContext->DrawText(
-		stats.c_str(),
-		(UINT32)stats.length(),
-		m_textFormatBody.Get(),
-		D2D1::RectF(15.0f, 15.0f, 500.0f, 100.0f),
-		m_textBrush.Get()
-	);
+	m_d2dContext->DrawText(stats.c_str(), (UINT32)stats.length(), m_textFormatBody.Get(),
+		D2D1::RectF(15, 15, 500, 100), m_textBrush.Get());
 
 	m_d2dContext->EndDraw();
 
-	// 1. Libérer la ressource UNE SEULE FOIS
+	// On libère (Le pont repasse la ressource de RENDER_TARGET à PRESENT)
 	m_d3d11On12Device->ReleaseWrappedResources(m_wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
 
-	// 2. Retirer la cible pour libérer le lien avec le buffer
 	m_d2dContext->SetTarget(nullptr);
+	m_d3d11DeviceContext->Flush(); // Important pour envoyer les commandes D2D au GPU
 
-	// 3. Envoyer les commandes D3D11 au GPU (Indispensable)
-	m_d3d11DeviceContext->Flush();
-
-	// 4. Présentation
+	// --- FIN ---
 	ThrowIfFailed(m_SwapChain->Present(0, 0));
 	m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
 
-	// 5. On n'appelle FlushCommandQueue() qu'APRES le Present pour ne pas bloquer le CPU
 	FlushCommandQueue();
 }
 
