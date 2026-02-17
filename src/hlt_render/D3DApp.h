@@ -13,6 +13,7 @@
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
 
+
 class D3DApp
 {
 protected:
@@ -133,15 +134,16 @@ protected:
 	hlt_Camera* m_Camera;
 	//Draw
 	RenderManager m_RenderManager;
-	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
-	ComPtr<ID3D12DescriptorHeap> m_CbvHeap = nullptr;
-	ComPtr<ID3D12PipelineState> m_PSO = nullptr;
 
-	ComPtr<ID3DBlob> m_VsByteCode = nullptr;
-	ComPtr<ID3DBlob> m_PsByteCode = nullptr;
+	ID3D12RootSignature * m_RootSignature = nullptr;
+	ID3D12DescriptorHeap * m_CbvHeap = nullptr;
+	ID3D12PipelineState * m_PSO = nullptr;
+
+	ID3DBlob * m_VsByteCode = nullptr;
+	ID3DBlob * m_PsByteCode = nullptr;
 	std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
 
-	std::vector< ObjectConstant> m_MeshPosition;
+	std::vector<ObjectConstant> m_MeshPosition;
 
 	int m_ClientWidth = 1280;
 	int m_ClientHeight = 720;

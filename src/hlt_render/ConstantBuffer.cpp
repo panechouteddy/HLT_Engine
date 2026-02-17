@@ -12,4 +12,9 @@ ConstantBuffer::~ConstantBuffer()
 	delete m_bufferConstats;
 }
 
+ID3D12Resource* ConstantBuffer::GetResource()
+{
+	return m_bufferConstats->Resource();
+}
+
 
