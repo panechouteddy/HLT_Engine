@@ -23,7 +23,8 @@
 #include "MathHelper.h"
 #include "Mesh.h"
 #include "ConstantBuffer.h"
-
+#include "hlt_Camera.h"
+#include "RenderManager.h"
 extern const int gNumFrameResources;
 
 inline void d3dSetDebugName(IDXGIObject* obj, const char* name)

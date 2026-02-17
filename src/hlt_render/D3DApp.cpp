@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include <WindowsX.h>
+#include "D3DApp.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
@@ -114,6 +115,13 @@ bool D3DApp::Initialize()
 
     return true;
 }
+void D3DApp::Update(const GameTimer& gt)
+{
+   
+
+
+}
+
 LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
@@ -423,6 +431,18 @@ void D3DApp::InitDirect3DDraw()
     void BuildRootSignature();
     void BuildShadersAndInputLayout();
     void BuildPSO();
+
+    ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
+
+    CreateMeshBox();
+
+
+    ThrowIfFailed(m_CommandList->Close());
+    ID3D12CommandList* cmdsLists2[] = { m_CommandList.Get() };
+    m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists2), cmdsLists2);
+
+
+    FlushCommandQueue();
 }
 
 void D3DApp::CreateCommandObjects()
@@ -475,6 +495,11 @@ void D3DApp::CreateRtvAndDsvDescriptorHeaps()
     dsvHeapDesc.NodeMask = 0;
     ThrowIfFailed(m_Device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(m_DsvHeap.GetAddressOf())));
 
+}
+inline void D3DApp::CreateMeshBox()
+{
+    m_Box = new MeshBox;
+    m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
 }
 void D3DApp::FlushCommandQueue()
 {
@@ -544,6 +569,19 @@ void D3DApp::CalculateFrameStats()
         frameCnt = 0;
         timeElapsed += 1.0f;
     }
+}
+
+ConstantBuffer* D3DApp::CreateConstantBufferObject() const
+{
+    ConstantBuffer* cb = new ConstantBuffer(m_Device.Get());
+
+    return cb;
+}
+
+float D3DApp::GetWindowRatio() const
+{
+    return ((float)m_ClientWidth / (float)m_ClientHeight);
+
 }
 
 void D3DApp::LogAdapters()

@@ -38,12 +38,14 @@ public:
 
 	virtual bool Initialize();
 	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	ConstantBuffer* CreateConstantBufferObject()const;
+	float GetWindowRatio()const;
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
 	virtual void OnResize();
-	virtual void Update(const GameTimer& gt) = 0;
-	virtual void Draw(const GameTimer& gt) = 0;
+	virtual void Update(const GameTimer& gt);
+	virtual void Draw(const GameTimer& gt);
 
 	// Convenience overrides for handling mouse input.
 	virtual void OnMouseDown(WPARAM btnState, int x, int y) {}
@@ -63,6 +65,7 @@ protected:
 	ID3D12Resource* CurrentBackBuffer()const;
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView()const;
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView()const;
+	
 
 	void CalculateFrameStats();
 
@@ -75,8 +78,7 @@ protected:
 	void BuildRootSignature();
 	void BuildShadersAndInputLayout();
 	void BuildPSO();
-	ConstantBuffer* CreateConstantBufferObject()const;
-
+	
 protected:
 	static D3DApp* m_App;
 
@@ -127,7 +129,10 @@ protected:
 	//Mesh
 	MeshBox* m_Box;
 
+	//Camera
+	hlt_Camera* m_Camera;
 	//Draw
+	RenderManager m_RenderManager;
 	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 	ComPtr<ID3D12DescriptorHeap> m_CbvHeap = nullptr;
 	ComPtr<ID3D12PipelineState> m_PSO = nullptr;
@@ -135,6 +140,8 @@ protected:
 	ComPtr<ID3DBlob> m_VsByteCode = nullptr;
 	ComPtr<ID3DBlob> m_PsByteCode = nullptr;
 	std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
+
+	std::vector< ObjectConstant> m_MeshPosition;
 
 	int m_ClientWidth = 1280;
 	int m_ClientHeight = 720;

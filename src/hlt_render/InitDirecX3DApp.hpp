@@ -72,7 +72,6 @@ bool InitDirect3DApp::Initialize()
 	m_DirectCmdListAlloc->Reset();
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
-	m_CBobject = new ConstantBuffer(m_Device.Get());
 
 	//m_CommandList->Close();
 	ThrowIfFailed(m_CommandList->Close());
@@ -87,38 +86,6 @@ bool InitDirect3DApp::Initialize()
 void InitDirect3DApp::OnResize()
 {
 	D3DApp::OnResize();
-
-}
-
-void InitDirect3DApp::Update(const GameTimer& gt)
-{
-	// Convert Spherical to Cartesian coordinates.
-	float x = mRadius * sinf(mPhi) * cosf(mTheta);
-	float z = mRadius * sinf(mPhi) * sinf(mTheta);
-	float y = mRadius * cosf(mPhi) + 2;
-
-	XMVECTOR pos = XMVectorSet(x, y, z, 2.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f); //cam
-
-	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&m_View, view);
-
-	XMFLOAT4X4 CBworld = m_CBobject->GetWorldMatrix();
-	XMMATRIX world = XMLoadFloat4x4(&CBworld);// objet
-
-	float fovY = DirectX::XM_PIDIV4; float nearPlane = 0.01f; float farPlane = 100.f;
-	DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(fovY, (float)m_ClientWidth / (float)m_ClientHeight, nearPlane, farPlane);
-	DirectX::XMStoreFloat4x4(&m_Proj, proj);
-	//XMMATRIX proj = XMLoadFloat4x4(&m_Proj); //cam
-	XMMATRIX worldViewProj = world * view * proj;
-
-
-	// Update the constant buffer with the latest worldViewProj matrix.
-	CBfView objConstants;
-	XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
-	m_CBobject->GetBuffer()->CopyData(0, objConstants);
-
 
 }
 
@@ -193,12 +160,14 @@ void InitDirect3DApp::Draw(const GameTimer& gt)
 
 }
 
-void InitDirect3DApp::CreateAllMesh()
-{
-	m_Box = new MeshBox;
-	m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
+//void InitDirect3DApp::CreateAllMesh()
+//{
+//	m_Box = new MeshBox;
+//	m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
+//
+//}
 
-}
+
 
 inline void InitDirect3DApp::BuildDescriptorHeaps()
 {
@@ -289,4 +258,6 @@ inline void InitDirect3DApp::BuildPSO()
 	psoDesc.DSVFormat = m_DepthStencilFormat;
 	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_PSO)));
 }
+
+
 

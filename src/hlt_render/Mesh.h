@@ -17,7 +17,8 @@ public:
 };
 class Mesh
 {
-    MeshGeometry* m_Mesh;
+    MeshGeometry* m_Mesh = nullptr;
+    bool IsVisible = true ;
 
 public :
     Mesh() {};
