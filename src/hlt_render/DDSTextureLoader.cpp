@@ -1303,16 +1303,15 @@ static HRESULT CreateD3DResources12(
 			}
 			else
 			{
-                CD3DX12_RESOURCE_BARRIER* barrier = new CD3DX12_RESOURCE_BARRIER;
-                barrier->Transition(texture.Get(),
+                CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(texture.Get(),
                     D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
-				cmdList->ResourceBarrier(1, barrier);
+				cmdList->ResourceBarrier(1, &barrier);
 
 				// Use Heap-allocating UpdateSubresources implementation for variable number of subresources (which is the case for textures).
 				UpdateSubresources(cmdList, texture.Get(), textureUploadHeap.Get(), 0, 0, num2DSubresources, initData);
-                 barrier->Transition(texture.Get(),
+                 barrier.Transition(texture.Get(),
                  D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-				cmdList->ResourceBarrier(1,barrier);
+				cmdList->ResourceBarrier(1,&barrier);
 			}
 		}
 	} break;
