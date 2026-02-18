@@ -1,16 +1,23 @@
 #pragma once
 
-class Texture;
-
-class hlt_UI
+class hlt_UI : public hlt_D2DResource
 {
 public:
-	Texture* m_pTexture;
-	XMFLOAT3 m_Pos;
-	XMFLOAT2 m_Scale;
-	XMFLOAT2 m_Center;
+	hlt_UI() = default;
+	
+	void Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC);
+	void Draw(const GameTimer& gt, int m_CurrBackBuffer);
 
-	hlt_UI();
-	void SetCenter();
+public:
+	
+	ComPtr<ID3D11Resource> m_wrappedBackBuffers[2];
+	ComPtr<ID3D12Resource> m_SwapChainBuffer[2];
+
+	ComPtr<ID3D11Device> m_d3d11Device;
+	ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
+	ComPtr<ID3D11On12Device> m_d3d11On12Device;
+	ComPtr<ID2D1DeviceContext2> m_d2dContext;
+
+	ComPtr<IDWriteTextFormat> m_textFormatBody;
+	ComPtr<ID2D1SolidColorBrush> m_textBrush;
 };
-

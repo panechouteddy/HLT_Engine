@@ -1,6 +1,5 @@
 #pragma once
 
-#include <windows.foundation.h>
 
 class hlt_D2DResource
 {
@@ -12,5 +11,9 @@ public:
 	ABI::Windows::Foundation::Size GetLogicalSize() const { return m_logicalSize; }
 
 	ID2D1DeviceContext2* GetD2DDeviceContext() const { return m_D2DContext.Get(); }
+
+public:
+	UINT d3d11DeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
 };
 

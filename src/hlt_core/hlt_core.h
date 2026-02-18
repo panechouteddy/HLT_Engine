@@ -1,11 +1,11 @@
 #pragma once
 
 
-
 #include <winsock2.h>
 #include <windows.h>
 #include <Ws2tcpip.h>
 #include <wrl.h>
+#include <windows.foundation.h>
 
 #include <stdlib.h>
 #include <malloc.h>
@@ -28,8 +28,13 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 
+
+#include <d3d11on12.h>
 #include <d3d12.h>
 #include <d2d1_3.h>
 #include <dwrite.h>
 
 const float PI = 3.1415926535f;
+
+
+using Microsoft::WRL::ComPtr;
