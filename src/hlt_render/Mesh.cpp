@@ -14,9 +14,11 @@ struct Vertex
 	XMFLOAT4 Color;
 };
 
-void Mesh::InitPyramidMesh(MeshBox* manager)
+void Mesh::InitPyramidMesh()
 {
-	m_Mesh = manager->GetMesh("Pyramid");
+	
+	m_Mesh = D3DApp::GetApp()->GetMeshBox()->GetMesh("Pyramid");
+	m_MeshName = "Pyramid";
 }
 
 MeshGeometry* Mesh::GetGeometry()
@@ -88,7 +90,7 @@ void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* com
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs["pyramid"] = submesh;
+	boxGeomety->DrawArgs["Pyramid"] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair("Pyramid", boxGeomety));
 	//m_BoxMesh["pyramid"] = boxmesh;

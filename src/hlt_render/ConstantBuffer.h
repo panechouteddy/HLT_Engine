@@ -1,11 +1,18 @@
 #pragma once
-#pragma once
 #include "MathHelper.h"
-#include "d3dUtil.h"
-#include "UploadBuffer.h"
 #include <DirectXMath.h>
+//#include "UploadBuffer.h"
 using namespace DirectX;
 
+struct ObjectConstant
+{
+	ObjectConstant() {};
+	ObjectConstant(XMFLOAT4X4 pos) { WorldViewProj = pos;}
+	XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+};
+
+template <typename T>
+class UploadBuffer;
 
 
 class ConstantBuffer

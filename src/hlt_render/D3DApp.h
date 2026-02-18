@@ -41,6 +41,7 @@ public:
 	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	ConstantBuffer* CreateConstantBufferObject()const;
 	float GetWindowRatio()const;
+	MeshBox* GetMeshBox() const;
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
@@ -66,19 +67,16 @@ protected:
 	ID3D12Resource* CurrentBackBuffer()const;
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView()const;
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView()const;
-	
 
 	void CalculateFrameStats();
 
 	void LogAdapters();
 	void LogAdapterOutputs(IDXGIAdapter* adapter);
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
-
 	void CreateMeshBox();
-	void BuildDescriptorHeaps();
-	void BuildRootSignature();
-	void BuildShadersAndInputLayout();
-	void BuildPSO();
+	void AddMeshPosition (XMFLOAT4X4* pos );
+	void AddMesh(Mesh* pos);
+	
 	
 protected:
 	static D3DApp* m_App;
@@ -128,22 +126,15 @@ protected:
 	D3D12_RECT m_ScissorRect;
 
 	//Mesh
-	MeshBox* m_Box;
+	
 
 	//Camera
 	hlt_Camera* m_Camera;
 	//Draw
-	RenderManager m_RenderManager;
+	RenderManager* m_RenderManager;
+	MeshBox* m_Box;
 
-	ID3D12RootSignature * m_RootSignature = nullptr;
-	ID3D12DescriptorHeap * m_CbvHeap = nullptr;
-	ID3D12PipelineState * m_PSO = nullptr;
-
-	ID3DBlob * m_VsByteCode = nullptr;
-	ID3DBlob * m_PsByteCode = nullptr;
-	std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
-
-	std::vector<ObjectConstant> m_MeshPosition;
+	std::vector<XMFLOAT4X4*> m_MeshPosition;
 
 	int m_ClientWidth = 1280;
 	int m_ClientHeight = 720;

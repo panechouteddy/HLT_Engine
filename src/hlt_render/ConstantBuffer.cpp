@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ConstantBuffer.h"
+#include "UploadBuffer.h"
 
 
 ConstantBuffer::ConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device>  Device)

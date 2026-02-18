@@ -2,7 +2,9 @@
 #include <array>
 #include <unordered_map>
 #include "DirectXMath.h"
-#include "d3dUtil.h"
+
+struct MeshGeometry;
+
 class MeshBox
 {
 
@@ -17,12 +19,17 @@ public:
 };
 class Mesh
 {
+protected:
     MeshGeometry* m_Mesh = nullptr;
-    bool IsVisible = true ;
+    bool m_IsVisible = false ;
+    std::string m_MeshName;
 
 public :
     Mesh() {};
-    void InitPyramidMesh(MeshBox * Manager);
+    void InitPyramidMesh();
     MeshGeometry* GetGeometry();
+    bool MeshIsVisible() { return m_IsVisible ;}
+    void SetMeshVisibility(bool state) { m_IsVisible = state; }
+    std::string GetMeshName() { return m_MeshName;}
 };
 

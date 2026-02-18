@@ -25,13 +25,9 @@
 #include "ConstantBuffer.h"
 #include "hlt_Camera.h"
 #include "RenderManager.h"
+
 extern const int gNumFrameResources;
 
-
-struct ObjectConstant
-{
-    XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
-};
 
 inline void d3dSetDebugName(IDXGIObject* obj, const char* name)
 {
