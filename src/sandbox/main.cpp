@@ -103,6 +103,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR cmdLine, int cmdS
 		MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
 		return 0;
 	}
+	Test_GameManager();
+
+	return 0;
 }
 
 //main::main(HINSTANCE hInstance)
