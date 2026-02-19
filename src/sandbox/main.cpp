@@ -416,8 +416,9 @@ void main::Draw(const GameTimer& gt)
 	FlushCommandQueue();
 
 	// --- PARTIE D2D ---
-	
-	m_ui.Draw(gt, m_CurrBackBuffer, m_wrappedBackBuffers, m_ClientWidth*0.5);
+
+	std::wstring stats = L"FPS: " + std::to_wstring(1.0f / gt.DeltaTime());
+	m_ui.Draw(gt, m_CurrBackBuffer, m_wrappedBackBuffers, m_ClientWidth*0.5, stats);
 
 	// --- FIN ---
 	ThrowIfFailed(m_SwapChain->Present(0, 0));

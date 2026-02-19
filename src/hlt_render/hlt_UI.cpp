@@ -64,7 +64,7 @@ void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> 
 
 }
 
-void hlt_UI::Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers, float WindowWidthMiddle)
+void hlt_UI::Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers, float WindowWidthMiddle, std::wstring stats)
 {
 	ComPtr<IDXGISurface> surface;
 	ThrowIfFailed(wrappedBackBuffers[m_CurrBackBuffer].As(&surface));
@@ -85,7 +85,6 @@ void hlt_UI::Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resour
 	m_d2dContext->BeginDraw();
 
 	// Dessin du texte
-	std::wstring stats = L"FPS: " + std::to_wstring(1.0f / gt.DeltaTime());
 	m_d2dContext->DrawText(stats.c_str(), (UINT32)stats.length(), m_textFormatBody.Get(),
 		D2D1::RectF(WindowWidthMiddle, 0, WindowWidthMiddle*2, 0), m_textBrush.Get());
 
