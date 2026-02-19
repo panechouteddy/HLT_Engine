@@ -1,6 +1,7 @@
 #include "pch.h"
 
-void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC)
+void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC,
+	ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
 #if defined(DEBUG) || defined(_DEBUG)
 	d3d11DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -25,11 +26,11 @@ void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> 
 	for (UINT i = 0; i < swapChainBC; i++)
 	{
 		ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(
-			m_SwapChainBuffer[i].Get(),
+			swapChainBuffer[i].Get(),
 			&d3d11Flags,
 			D3D12_RESOURCE_STATE_PRESENT,     // État d'entrée
 			D3D12_RESOURCE_STATE_RENDER_TARGET, // État de sortie après usage D2D
-			IID_PPV_ARGS(&m_wrappedBackBuffers[i])
+			IID_PPV_ARGS(&wrappedBackBuffers[i])
 		));
 	}
 
@@ -59,14 +60,14 @@ void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> 
 		20.0f, L"en-us", &m_textFormatBody
 	));
 
-	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Yellow), &m_textBrush));
+	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_textBrush));
 
 }
 
-void hlt_UI::Draw(const GameTimer& gt, int m_CurrBackBuffer)
+void hlt_UI::Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers, float WindowWidthMiddle)
 {
 	ComPtr<IDXGISurface> surface;
-	ThrowIfFailed(m_wrappedBackBuffers[m_CurrBackBuffer].As(&surface));
+	ThrowIfFailed(wrappedBackBuffers[m_CurrBackBuffer].As(&surface));
 
 	D2D1_BITMAP_PROPERTIES1 bitmapProperties = D2D1::BitmapProperties1(
 		D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
@@ -79,26 +80,19 @@ void hlt_UI::Draw(const GameTimer& gt, int m_CurrBackBuffer)
 	m_d2dContext->SetTarget(d2dTargetBitmap.Get());
 
 	// On acquiert la ressource (Le pont la passe de PRESENT à RENDER_TARGET en interne)
-	m_d3d11On12Device->AcquireWrappedResources(m_wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
+	m_d3d11On12Device->AcquireWrappedResources(wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
 
 	m_d2dContext->BeginDraw();
-	m_d2dContext->Clear(D2D1::ColorF(D2D1::ColorF::Red, 0.4f)); // Test visuel
-
-	m_d2dContext->DrawRectangle(
-		D2D1::RectF(50.0f, 50.0f, 300.0f, 300.0f),
-		m_textBrush.Get(),
-		2.0f // Épaisseur de ligne
-	);
 
 	// Dessin du texte
 	std::wstring stats = L"FPS: " + std::to_wstring(1.0f / gt.DeltaTime());
 	m_d2dContext->DrawText(stats.c_str(), (UINT32)stats.length(), m_textFormatBody.Get(),
-		D2D1::RectF(15, 15, 500, 100), m_textBrush.Get());
+		D2D1::RectF(WindowWidthMiddle, 0, WindowWidthMiddle*2, 0), m_textBrush.Get());
 
 	m_d2dContext->EndDraw();
 
 	// On libère (Le pont repasse la ressource de RENDER_TARGET à PRESENT)
-	m_d3d11On12Device->ReleaseWrappedResources(m_wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
+	m_d3d11On12Device->ReleaseWrappedResources(wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
 
 	m_d2dContext->SetTarget(nullptr);
 	m_d3d11DeviceContext->Flush(); // Important pour envoyer les commandes D2D au GPU

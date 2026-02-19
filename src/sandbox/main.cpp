@@ -125,12 +125,7 @@ bool main::Initialize()
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
 
-	
-	//m_ui.m_wrappedBackBuffers[SwapChainBufferCount] = m_wrappedBackBuffers;
-	//m_ui.m_SwapChainBuffer[SwapChainBufferCount] = m_SwapChainBuffer;
-
-
-	//m_ui.Initialize(m_Device, m_CommandQueue, SwapChainBufferCount);
+	m_ui.Initialize(m_Device, m_CommandQueue, SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
 	// 6. Chargement de vos ressources 3D (votre code original)
 	m_material.m_Color = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -422,7 +417,7 @@ void main::Draw(const GameTimer& gt)
 
 	// --- PARTIE D2D ---
 	
-	//m_ui.Draw(gt, m_CurrBackBuffer);
+	m_ui.Draw(gt, m_CurrBackBuffer, m_wrappedBackBuffers, m_ClientWidth*0.5);
 
 	// --- FIN ---
 	ThrowIfFailed(m_SwapChain->Present(0, 0));
