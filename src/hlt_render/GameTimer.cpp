@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <windows.h>
+#include "GameTimer.h"
 
 GameTimer::GameTimer()
 	: m_SecondsPerCount(0.0), m_DeltaTime(-1.0), m_BaseTime(0),

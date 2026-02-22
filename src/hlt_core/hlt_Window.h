@@ -1,4 +1,6 @@
 #pragma once
+#include <Windows.h>
+#include <DirectXMath.h>
 
 class hlt_Window
 {
@@ -15,20 +17,21 @@ public:
 
 	std::wstring& GetWndName() { return m_WindowName; }
 	HWND& GetWnd() { return m_MainWindow; }
+	HINSTANCE& GetWndInstance() { return m_WindowInstance; }
 
 	bool& IsPaused() { return m_IsPaused; }
-	bool& IsMinimized() { return m_IsMinimized; }
-	bool& IsMaximized() { return m_IsMaximized; }
+	bool& IsMini() { return m_IsMinimized; }
+	bool& IsMaxi() { return m_IsMaximized; }
 	bool& IsResizing() { return m_IsResizing; }
 	bool& IsFullscreen() { return m_IsFullscreen; }
 
-	XMINT2 GetWndSize() { return m_WindowSize; }
-	void SetWndSize(XMINT2 newSize);
+	DirectX::XMINT2& GetWndSize() { return m_WindowSize; }
+	void SetWndSize(DirectX::XMINT2 newSize);
 	void ResizeWnd(LPARAM& lParam);
 
 private:
 	std::wstring m_WindowName = L"Basic Window";
-	XMINT2 m_WindowSize = { 800, 600 };
+	DirectX::XMINT2 m_WindowSize = { 800, 600 };
 
 	HINSTANCE m_WindowInstance = nullptr;
 	HWND      m_MainWindow = nullptr; // main window handle

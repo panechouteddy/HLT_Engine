@@ -1,5 +1,5 @@
 #pragma once
-
+#include "hlt_System.h"
 
 namespace hlt_System
 {

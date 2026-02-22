@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "hlt_GameManager.h"
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -78,6 +77,11 @@ void hlt_GameManager::Start()
 	m_pWindow->GetWndSize() = XMINT2(1080, 720);
 	if (m_pWindow->CreateWnd(MainWndProc) == false)
 		m_IsRunning = false;
+
+	if(m_pD3D12App == nullptr)
+		m_pD3D12App = new InitDirectX3DApp(m_pWindow);
+	if (m_pD3D12App->Initialize() == false)
+		m_IsRunning = false;
 }
 
 void hlt_GameManager::Update()
@@ -87,16 +91,21 @@ void hlt_GameManager::Update()
 	RefreshCore();
 
 	//m_pWindow->Update();
+	m_pD3D12App->Update();
 }
 
 void hlt_GameManager::Render()
 {
+	// TO DO
 }
 
 void hlt_GameManager::Destroy()
 {
 	m_ECS.Destroy();
 	//m_pWindow->DestroyWnd();
+
+	if (m_pD3D12App != nullptr)
+		delete m_pD3D12App;
 
 	if (DEBUG)
 		hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole();
@@ -114,6 +123,19 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 		HLT_MOUSE.SetMouseWheel(wParam);
 		break;
 
+	case WM_ACTIVATE: // PAUSE THE WINDOW
+		if (LOWORD(wParam) == WA_INACTIVE)
+		{
+			m_pWindow->IsPaused() = true;
+			//m_Timer.Stop();
+		}
+		else
+		{
+			m_pWindow->IsPaused() = false;
+			//m_Timer.Start();
+		}
+		break;
+
 	case WM_SIZING: // TO KEEP A WINDOW RATIO OR A MIN/MAX
 		m_pWindow->IsPaused() = true;
 		m_pWindow->IsResizing() = true;
@@ -121,9 +143,56 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 
 	case WM_SIZE: //  TO ADAPT WINDOW SIZE
 		m_pWindow->ResizeWnd(lParam);
-		m_pWindow->IsPaused() = false;
-		m_pWindow->IsResizing() = false;
-		return 0;
+		if (wParam == SIZE_MINIMIZED)
+		{
+			m_pWindow->IsPaused() = true;
+			m_pWindow->IsMini() = true;
+			m_pWindow->IsMaxi() = false;
+		}
+		else if (wParam == SIZE_MAXIMIZED)
+		{
+			m_pWindow->IsPaused() = false;
+			m_pWindow->IsMini() = false;
+			m_pWindow->IsMaxi() = true;
+			if(m_pD3D12App != nullptr)
+				m_pD3D12App->OnResize();
+		}
+		else if (wParam == SIZE_RESTORED)
+		{
+			// Restoring from minimized state?
+			if (m_pWindow->IsMini())
+			{
+				m_pWindow->IsPaused() = false;
+				m_pWindow->IsMini() = false;
+				if (m_pD3D12App != nullptr)
+					m_pD3D12App->OnResize();
+			}
+
+			// Restoring from maximized state?
+			else if ((m_pWindow->IsMaxi)())
+			{
+				m_pWindow->IsPaused() = false;
+				m_pWindow->IsMaxi() = false;
+				if (m_pD3D12App != nullptr)
+					m_pD3D12App->OnResize();
+			}
+			else if (m_pWindow->IsResizing())
+			{
+				// If user is dragging the resize bars, we do not resize 
+				// the buffers here because as the user continuously 
+				// drags the resize bars, a stream of WM_SIZE messages are
+				// sent to the window, and it would be pointless (and slow)
+				// to resize for each WM_SIZE message received from dragging
+				// the resize bars.  So instead, we reset after the user is 
+				// done resizing the window and releases the resize bars, which 
+				// sends a WM_EXITSIZEMOVE message.
+			}
+			else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
+			{
+				if (m_pD3D12App != nullptr)
+					m_pD3D12App->OnResize();
+			}
+		}
 
 	case WM_CLOSE:
 		if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
@@ -132,9 +201,40 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 		}
 		break;
 
+	case WM_ENTERSIZEMOVE:
+		m_pWindow->IsPaused() = true;
+		m_pWindow->IsResizing() = true;
+		return 0;
+
+		// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
+		// Here we reset everything based on the new window dimensions.
+	case WM_EXITSIZEMOVE:
+		m_pWindow->IsPaused() = false;
+		m_pWindow->IsResizing() = false;
+		m_pD3D12App->OnResize();
+		return 0;
+
+		// WM_DESTROY is sent when the window is being destroyed.
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+
+		// The WM_MENUCHAR message is sent when a menu is active and the user presses 
+		// a key that does not correspond to any mnemonic or accelerator key. 
+	case WM_MENUCHAR:
+		// Don't beep when we alt-enter.
+		return MAKELRESULT(0, MNC_CLOSE);
+
+		// Catch this message so to prevent the window from becoming too small.
+	case WM_GETMINMAXINFO:
+		((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
+		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
+		return 0;
+
 	default:
 		break;
 	}
+	//D3DApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 

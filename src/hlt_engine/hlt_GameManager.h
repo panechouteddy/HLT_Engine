@@ -35,6 +35,7 @@ private:
 
 	// WINDOW
 	hlt_Window* m_pWindow = nullptr;
+	InitDirectX3DApp* m_pD3D12App = nullptr;
 
 	// ENTITY MANAGER
 	int m_countEntityID = 0;

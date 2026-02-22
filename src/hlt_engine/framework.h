@@ -2,6 +2,7 @@
 
 // LOWER LEVEL FRAMEWORK
 #include <hlt_core/framework.h>
+#include <hlt_render/framework.h>
 
 // CONTAINERS
 #include <vector>
@@ -12,15 +13,10 @@
 
 // UTILITY
 #include <hlt_core/hlt_Time.h>
+#include <hlt_core/hlt_Window.h>
 
 // ECS
 #include "hlt_ECS.inl"
-
-// ECS SYSTEMS
-#include "hlt_System.h"
-#include "hlt_ConstantMoveSystem.h"
-#include "hlt_InputSystem.h"
-#include "hlt_ColliderSystem.h"
 
 // ECS COMPONENT
 #include "hlt_Transform3DComponent.h"
@@ -28,8 +24,11 @@
 #include "hlt_InputComponent.h"
 #include "hlt_ColliderComponent.h"
 
-// WINDOW
-#include <hlt_core/hlt_Window.h>
+// ECS SYSTEMS
+#include "hlt_System.h"
+#include "hlt_ConstantMoveSystem.h"
+#include "hlt_InputSystem.h"
+#include "hlt_ColliderSystem.h"
 
 // GAME MANAGER
 #include "hlt_GameManager.h"

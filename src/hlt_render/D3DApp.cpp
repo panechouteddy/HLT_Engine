@@ -1,24 +1,23 @@
 #include "pch.h"
 
 #include <WindowsX.h>
-#include "D3DApp.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
 using namespace DirectX;
 
-LRESULT CALLBACK
-MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    // Forward hwnd on because we can get messages (e.g., WM_CREATE)
-    // before CreateWindow returns, and thus before mhMainWnd is valid.
-    return D3DApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
-}
+//LRESULT CALLBACK
+//MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+//{
+//    // Forward hwnd on because we can get messages (e.g., WM_CREATE)
+//    // before CreateWindow returns, and thus before mhMainWnd is valid.
+//    return D3DApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
+//}
 
 D3DApp* D3DApp::m_App = nullptr;
 
-D3DApp::D3DApp(HINSTANCE hInstance)
-    : m_hAppInst(hInstance)
+D3DApp::D3DApp(hlt_Window* window)
+    : m_pWindow(window)
 {
     // Only one D3DApp can be constructed.
     assert(m_App == nullptr);
@@ -39,17 +38,18 @@ D3DApp* D3DApp::GetApp()
 
 HINSTANCE D3DApp::AppInst() const
 {
-    return m_hAppInst;
+    return m_pWindow->GetWndInstance();
 }
 
 HWND D3DApp::MainWnd() const
 {
-    return m_hMainWnd;
+    return m_pWindow->GetWnd();
 }
 
 float D3DApp::AspectRatio() const
 {
-    return static_cast<float>(m_ClientWidth) / m_ClientHeight;
+    XMINT2 clientSize = m_pWindow->GetWndSize();
+    return static_cast<float>(clientSize.x) / clientSize.y;
 }
 
 bool D3DApp::Get4xMsaaState() const
@@ -70,8 +70,6 @@ int D3DApp::Run()
 {
     MSG msg = { 0 };
 
-    m_Timer.Reset();
-
     while (msg.message != WM_QUIT)
     {
         // If there are Window messages then process them.
@@ -83,13 +81,11 @@ int D3DApp::Run()
         // Otherwise, do animation/game stuff.
         else
         {
-            m_Timer.Tick();
-
-            if (!m_AppPaused)
+            if (!m_pWindow->IsPaused())
             {
                 CalculateFrameStats();
-                Update(m_Timer);
-                Draw(m_Timer);
+                Update();
+                Draw();
             }
             else
             {
@@ -102,8 +98,8 @@ int D3DApp::Run()
 }
 bool D3DApp::Initialize()
 {
-    if (!InitMainWindow())
-        return false;
+    //if (!InitMainWindow())
+    //    return false;
 
     if (!InitDirect3D())
         return false;
@@ -116,16 +112,15 @@ bool D3DApp::Initialize()
 
     return true;
 }
-void D3DApp::Update(const GameTimer& gt)
+void D3DApp::Update()
 {
     m_RenderManager->UpdateConstantBuffer(m_MeshPosition);
     m_RenderManager->UpdateView(m_Camera->m_View);
 
 }
 
-void D3DApp::Draw(const GameTimer& gt)
+void D3DApp::Draw()
 {
-
     ThrowIfFailed(m_DirectCmdListAlloc->Reset());
 
     ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
@@ -163,142 +158,142 @@ void D3DApp::Draw(const GameTimer& gt)
     FlushCommandQueue();
 }
 
-LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    switch (msg)
-    {
-        // WM_ACTIVATE is sent when the window is activated or deactivated.  
-        // We pause the game when the window is deactivated and unpause it 
-        // when it becomes active.  
-    case WM_ACTIVATE:
-        if (LOWORD(wParam) == WA_INACTIVE)
-        {
-            m_AppPaused = true;
-            m_Timer.Stop();
-        }
-        else
-        {
-            m_AppPaused = false;
-            m_Timer.Start();
-        }
-        return 0;
-
-        // WM_SIZE is sent when the user resizes the window.  
-    case WM_SIZE:
-        // Save the new client area dimensions.
-        m_ClientWidth = LOWORD(lParam);
-        m_ClientHeight = HIWORD(lParam);
-        if (m_Device)
-        {
-            if (wParam == SIZE_MINIMIZED)
-            {
-                m_AppPaused = true;
-                m_Minimized = true;
-                m_Maximized = false;
-            }
-            else if (wParam == SIZE_MAXIMIZED)
-            {
-                m_AppPaused = false;
-                m_Minimized = false;
-                m_Maximized = true;
-                OnResize();
-            }
-            else if (wParam == SIZE_RESTORED)
-            {
-
-                // Restoring from minimized state?
-                if (m_Minimized)
-                {
-                    m_AppPaused = false;
-                    m_Minimized = false;
-                    OnResize();
-                }
-
-                // Restoring from maximized state?
-                else if (m_Maximized)
-                {
-                    m_AppPaused = false;
-                    m_Maximized = false;
-                    OnResize();
-                }
-                else if (m_Resizing)
-                {
-                    // If user is dragging the resize bars, we do not resize 
-                    // the buffers here because as the user continuously 
-                    // drags the resize bars, a stream of WM_SIZE messages are
-                    // sent to the window, and it would be pointless (and slow)
-                    // to resize for each WM_SIZE message received from dragging
-                    // the resize bars.  So instead, we reset after the user is 
-                    // done resizing the window and releases the resize bars, which 
-                    // sends a WM_EXITSIZEMOVE message.
-                }
-                else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
-                {
-                    OnResize();
-                }
-            }
-        }
-        return 0;
-
-        // WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
-    case WM_ENTERSIZEMOVE:
-        m_AppPaused = true;
-        m_Resizing = true;
-        m_Timer.Stop();
-        return 0;
-
-        // WM_EXITSIZEMOVE is sent when the user releases the resize bars.
-        // Here we reset everything based on the new window dimensions.
-    case WM_EXITSIZEMOVE:
-        m_AppPaused = false;
-        m_Resizing = false;
-        m_Timer.Start();
-        OnResize();
-        return 0;
-
-        // WM_DESTROY is sent when the window is being destroyed.
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
-
-        // The WM_MENUCHAR message is sent when a menu is active and the user presses 
-        // a key that does not correspond to any mnemonic or accelerator key. 
-    case WM_MENUCHAR:
-        // Don't beep when we alt-enter.
-        return MAKELRESULT(0, MNC_CLOSE);
-
-        // Catch this message so to prevent the window from becoming too small.
-    case WM_GETMINMAXINFO:
-        ((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
-        ((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
-        return 0;
-
-    case WM_LBUTTONDOWN:
-    case WM_MBUTTONDOWN:
-    case WM_RBUTTONDOWN:
-        OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        return 0;
-    case WM_LBUTTONUP:
-    case WM_MBUTTONUP:
-    case WM_RBUTTONUP:
-        OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        return 0;
-    case WM_MOUSEMOVE:
-        OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        return 0;
-    case WM_KEYUP:
-        if (wParam == VK_ESCAPE)
-        {
-            PostQuitMessage(0);
-        }
-        else if ((int)wParam == VK_F2)
-            Set4xMsaaState(!m_4xMsaaState);
-
-        return 0;
-    }
-
-    return DefWindowProc(hwnd, msg, wParam, lParam);
-}
+//LRESULT D3DApp::MsgProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam)
+//{
+//    //switch (msg)
+//    //{
+//    //    // WM_ACTIVATE is sent when the window is activated or deactivated.  
+//    //    // We pause the game when the window is deactivated and unpause it 
+//    //    // when it becomes active.  
+//    ////case WM_ACTIVATE:
+//    ////    if (LOWORD(wParam) == WA_INACTIVE)
+//    ////    {
+//    ////        m_AppPaused = true;
+//    ////        m_Timer.Stop();
+//    ////    }
+//    ////    else
+//    ////    {
+//    ////        m_AppPaused = false;
+//    ////        m_Timer.Start();
+//    ////    }
+//    ////    return 0;
+//
+//    //    // WM_SIZE is sent when the user resizes the window.  
+//    ////case WM_SIZE:
+//    ////    // Save the new client area dimensions.
+//    ////    //m_ClientWidth = LOWORD(lParam);
+//    ////    //m_ClientHeight = HIWORD(lParam);
+//    ////    if (m_Device)
+//    ////    {
+//    ////        if (wParam == SIZE_MINIMIZED)
+//    ////        {
+//    ////            m_AppPaused = true;
+//    ////            m_Minimized = true;
+//    ////            m_Maximized = false;
+//    ////        }
+//    ////        else if (wParam == SIZE_MAXIMIZED)
+//    ////        {
+//    ////            m_AppPaused = false;
+//    ////            m_Minimized = false;
+//    ////            m_Maximized = true;
+//    ////            OnResize();
+//    ////        }
+//    ////        else if (wParam == SIZE_RESTORED)
+//    ////        {
+//
+//    ////            // Restoring from minimized state?
+//    ////            if (m_Minimized)
+//    ////            {
+//    ////                m_AppPaused = false;
+//    ////                m_Minimized = false;
+//    ////                OnResize();
+//    ////            }
+//
+//    ////            // Restoring from maximized state?
+//    ////            else if (m_Maximized)
+//    ////            {
+//    ////                m_AppPaused = false;
+//    ////                m_Maximized = false;
+//    ////                OnResize();
+//    ////            }
+//    ////            else if (m_Resizing)
+//    ////            {
+//    ////                // If user is dragging the resize bars, we do not resize 
+//    ////                // the buffers here because as the user continuously 
+//    ////                // drags the resize bars, a stream of WM_SIZE messages are
+//    ////                // sent to the window, and it would be pointless (and slow)
+//    ////                // to resize for each WM_SIZE message received from dragging
+//    ////                // the resize bars.  So instead, we reset after the user is 
+//    ////                // done resizing the window and releases the resize bars, which 
+//    ////                // sends a WM_EXITSIZEMOVE message.
+//    ////            }
+//    ////            else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
+//    ////            {
+//    ////                OnResize();
+//    ////            }
+//    ////        }
+//    ////    }
+//    ////    return 0;
+//
+//    //    // WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
+//    //case WM_ENTERSIZEMOVE:
+//    //    m_AppPaused = true;
+//    //    m_Resizing = true;
+//    //    m_Timer.Stop();
+//    //    return 0;
+//
+//    //    // WM_EXITSIZEMOVE is sent when the user releases the resize bars.
+//    //    // Here we reset everything based on the new window dimensions.
+//    //case WM_EXITSIZEMOVE:
+//    //    m_AppPaused = false;
+//    //    m_Resizing = false;
+//    //    m_Timer.Start();
+//    //    OnResize();
+//    //    return 0;
+//
+//    //    // WM_DESTROY is sent when the window is being destroyed.
+//    //case WM_DESTROY:
+//    //    PostQuitMessage(0);
+//    //    return 0;
+//
+//    //    // The WM_MENUCHAR message is sent when a menu is active and the user presses 
+//    //    // a key that does not correspond to any mnemonic or accelerator key. 
+//    //case WM_MENUCHAR:
+//    //    // Don't beep when we alt-enter.
+//    //    return MAKELRESULT(0, MNC_CLOSE);
+//
+//    //    // Catch this message so to prevent the window from becoming too small.
+//    //case WM_GETMINMAXINFO:
+//    //    ((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
+//    //    ((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
+//    //    return 0;
+//
+//    //case WM_LBUTTONDOWN:
+//    //case WM_MBUTTONDOWN:
+//    //case WM_RBUTTONDOWN:
+//    //    OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+//    //    return 0;
+//    //case WM_LBUTTONUP:
+//    //case WM_MBUTTONUP:
+//    //case WM_RBUTTONUP:
+//    //    OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+//    //    return 0;
+//    //case WM_MOUSEMOVE:
+//    //    OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+//    //    return 0;
+//    //case WM_KEYUP:
+//    //    if (wParam == VK_ESCAPE)
+//    //    {
+//    //        PostQuitMessage(0);
+//    //    }
+//    //    else if ((int)wParam == VK_F2)
+//    //        Set4xMsaaState(!m_4xMsaaState);
+//
+//    //    return 0;
+//    //}
+//
+//    //return DefWindowProc(hwnd, msg, wParam, lParam);
+//}
 void D3DApp::OnResize()
 {
     assert(m_Device);
@@ -313,7 +308,8 @@ void D3DApp::OnResize()
         m_SwapChainBuffer[i].Reset();
     m_DepthStencilBuffer.Reset();
 
-    ThrowIfFailed(m_SwapChain->ResizeBuffers(SwapChainBufferCount,m_ClientWidth, m_ClientHeight,m_BackBufferFormat,DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
+    XMINT2 clientSize = m_pWindow->GetWndSize();
+    ThrowIfFailed(m_SwapChain->ResizeBuffers(SwapChainBufferCount, clientSize.x, clientSize.y, m_BackBufferFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
 
     m_CurrBackBuffer = 0;
 
@@ -328,8 +324,8 @@ void D3DApp::OnResize()
     D3D12_RESOURCE_DESC depthStencilDesc;
     depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     depthStencilDesc.Alignment = 0;
-    depthStencilDesc.Width = m_ClientWidth;
-    depthStencilDesc.Height = m_ClientHeight;
+    depthStencilDesc.Width = clientSize.x;
+    depthStencilDesc.Height = clientSize.y;
     depthStencilDesc.DepthOrArraySize = 1;
     depthStencilDesc.MipLevels = 1;
 
@@ -373,53 +369,53 @@ void D3DApp::OnResize()
     // Update the viewport transform to cover the client area.
     m_ScreenViewport.TopLeftX = 0;
     m_ScreenViewport.TopLeftY = 0;
-    m_ScreenViewport.Width = static_cast<float>(m_ClientWidth);
-    m_ScreenViewport.Height = static_cast<float>(m_ClientHeight);
+    m_ScreenViewport.Width = static_cast<float>(clientSize.x);
+    m_ScreenViewport.Height = static_cast<float>(clientSize.y);
     m_ScreenViewport.MinDepth = 0.0f;
     m_ScreenViewport.MaxDepth = 1.0f;
 
-    m_ScissorRect = { 0, 0, m_ClientWidth, m_ClientHeight };
+    m_ScissorRect = { 0, 0, clientSize.x, clientSize.y };
 }
-bool D3DApp::InitMainWindow()
-{
-
-    WNDCLASS wc;
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = MainWndProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = m_hAppInst;
-    wc.hIcon = LoadIcon(0, IDI_APPLICATION);
-    wc.hCursor = LoadCursor(0, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
-    wc.lpszMenuName = 0;
-    wc.lpszClassName = L"MainWnd";
-
-    if (!RegisterClass(&wc))
-    {
-        MessageBox(0, L"RegisterClass Failed.", 0, 0);
-        return false;
-    }
-
-    // Compute window rectangle dimensions based on requested client area dimensions.
-    RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
-    AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
-    int width = R.right - R.left;
-    int height = R.bottom - R.top;
-
-    m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
-        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);
-    if (!m_hMainWnd)
-    {
-        MessageBox(0, L"CreateWindow Failed.", 0, 0);
-        return false;
-    }
-
-    ShowWindow(m_hMainWnd, SW_SHOW);
-    UpdateWindow(m_hMainWnd);
-
-    return true;
-}
+//bool D3DApp::InitMainWindow()
+//{
+//
+//    WNDCLASS wc;
+//    wc.style = CS_HREDRAW | CS_VREDRAW;
+//    wc.lpfnWndProc = MainWndProc;
+//    wc.cbClsExtra = 0;
+//    wc.cbWndExtra = 0;
+//    wc.hInstance = m_hAppInst;
+//    wc.hIcon = LoadIcon(0, IDI_APPLICATION);
+//    wc.hCursor = LoadCursor(0, IDC_ARROW);
+//    wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
+//    wc.lpszMenuName = 0;
+//    wc.lpszClassName = L"MainWnd";
+//
+//    if (!RegisterClass(&wc))
+//    {
+//        MessageBox(0, L"RegisterClass Failed.", 0, 0);
+//        return false;
+//    }
+//
+//    // Compute window rectangle dimensions based on requested client area dimensions.
+//    RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
+//    AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+//    int width = R.right - R.left;
+//    int height = R.bottom - R.top;
+//
+//    m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
+//        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);
+//    if (!m_hMainWnd)
+//    {
+//        MessageBox(0, L"CreateWindow Failed.", 0, 0);
+//        return false;
+//    }
+//
+//    ShowWindow(m_hMainWnd, SW_SHOW);
+//    UpdateWindow(m_hMainWnd);
+//
+//    return true;
+//}
 bool D3DApp::InitDirect3D()
 {
    // #if defined(DEBUG) || defined(_DEBUG)
@@ -501,10 +497,12 @@ void D3DApp::CreateCommandObjects()
 }
 void D3DApp::CreateSwapChain()
 {
+    XMINT2 clientSize = m_pWindow->GetWndSize();
+
     m_SwapChain.Reset();
     DXGI_SWAP_CHAIN_DESC sd;
-    sd.BufferDesc.Width = m_ClientWidth;
-    sd.BufferDesc.Height = m_ClientHeight;
+    sd.BufferDesc.Width = clientSize.x;
+    sd.BufferDesc.Height = clientSize.y;
     sd.BufferDesc.RefreshRate.Numerator = 60;
     sd.BufferDesc.RefreshRate.Denominator = 1;
     sd.BufferDesc.Format = m_BackBufferFormat;
@@ -514,7 +512,7 @@ void D3DApp::CreateSwapChain()
     sd.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     sd.BufferCount = SwapChainBufferCount;
-    sd.OutputWindow = m_hMainWnd;
+    sd.OutputWindow = m_pWindow->GetWnd();
     sd.Windowed = true;
     sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -592,7 +590,7 @@ void D3DApp::CalculateFrameStats()
 
     frameCnt++;
 
-    if ((m_Timer.TotalTime() - timeElapsed) >= 1.0f)
+    if ((hlt_Time::GetInstance().GetTotalTime() - timeElapsed) >= 1.0f)
     {
         float fps = (float)frameCnt; // fps 
         float mspf = 1000.0f / fps;
@@ -604,7 +602,7 @@ void D3DApp::CalculateFrameStats()
             L"    fps: " + fpsStr +
             L"   mspf: " + mspfStr;
 
-        SetWindowText(m_hMainWnd, windowText.c_str());
+        SetWindowText(m_pWindow->GetWnd(), windowText.c_str());
 
         // Reset for next average.
         frameCnt = 0;
@@ -621,8 +619,8 @@ ConstantBuffer* D3DApp::CreateConstantBufferObject() const
 
 float D3DApp::GetWindowRatio() const
 {
-    return ((float)m_ClientWidth / (float)m_ClientHeight);
-
+    XMINT2 clientSize = m_pWindow->GetWndSize();
+    return ((float)clientSize.x / (float)clientSize.y);
 }
 
 

@@ -5,20 +5,30 @@
 #include <crtdbg.h>
 #endif
 
-#include "d3dUtil.h"
-#include "GameTimer.h"
+//#include "d3dUtil.h"
+//#include "GameTimer.h"
+
+//#include "ConstantBuffer.h"
+//#include "Mesh.h"
+//#include "hlt_Camera.h"
+//#include "RenderManager.h"
 
 // Link necessary d3d12 libraries.
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
 
+class ConstantBuffer;
+class Mesh;
+class hlt_Camera;
+class RenderManager;
+
 
 class D3DApp
 {
 protected:
 
-	D3DApp(HINSTANCE hInstance);
+	D3DApp(hlt_Window* window);
 	D3DApp(const D3DApp& rhs) = delete;
 	D3DApp& operator=(const D3DApp& rhs) = delete;
 	virtual ~D3DApp();
@@ -38,7 +48,7 @@ public:
 	int Run();
 
 	virtual bool Initialize();
-	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	//virtual LRESULT MsgProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 	ConstantBuffer* CreateConstantBufferObject()const;
 	float GetWindowRatio()const;
 	MeshBox* GetMeshBox() const;
@@ -46,8 +56,8 @@ public:
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
 	virtual void OnResize();
-	virtual void Update(const GameTimer& gt);
-	virtual void Draw(const GameTimer& gt);
+	virtual void Update();
+	virtual void Draw();
 
 	// Convenience overrides for handling mouse input.
 	virtual void OnMouseDown(WPARAM btnState, int x, int y) {}
@@ -56,7 +66,7 @@ protected:
 
 protected:
 
-	bool InitMainWindow();
+	//bool InitMainWindow();
 	bool InitDirect3D();
 	void InitDirect3DDraw();
 	void CreateCommandObjects();
@@ -81,18 +91,19 @@ protected:
 protected:
 	static D3DApp* m_App;
 
-	HINSTANCE m_hAppInst = nullptr; // application instance handle
-	HWND      m_hMainWnd = nullptr; // main window handle
-	bool      m_AppPaused = false;  // is the application paused?
-	bool      m_Minimized = false;  // is the application minimized?
-	bool      m_Maximized = false;  // is the application maximized?
-	bool      m_Resizing = false;   // are the resize bars being dragged?
-	bool      m_FullscreenState = false;// fullscreen enabled
+	//HINSTANCE m_hAppInst = nullptr; // application instance handle
+	//HWND      m_hMainWnd = nullptr; // main window handle
+	//bool      m_AppPaused = false;  // is the application paused?
+	//bool      m_Minimized = false;  // is the application minimized?
+	//bool      m_Maximized = false;  // is the application maximized?
+	//bool      m_Resizing = false;   // are the resize bars being dragged?
+	//bool      m_FullscreenState = false;// fullscreen enabled
+	hlt_Window* m_pWindow = nullptr;
 
 	bool m_4xMsaaState = false;
 	UINT m_4xMsaaQuality = 0;
 
-	GameTimer m_Timer;
+	//GameTimer m_Timer;
 
 	Microsoft::WRL::ComPtr<IDXGIFactory4> m_DxgiFactory;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_SwapChain;
@@ -136,8 +147,8 @@ protected:
 
 	std::vector<XMFLOAT4X4*> m_MeshPosition;
 
-	int m_ClientWidth = 1280;
-	int m_ClientHeight = 720;
+	//int m_ClientWidth = 1280;
+	//int m_ClientHeight = 720;
 
 	//4XMAA
 	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;

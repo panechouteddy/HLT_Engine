@@ -18,13 +18,15 @@
 #include <fstream>
 #include <sstream>
 #include <cassert>
-#include "d3dx12.h"
-#include "DDSTextureLoader.h"
+
+//#include "d3dx12.h"
+//#include "DDSTextureLoader.h"
 #include "MathHelper.h"
-#include "Mesh.h"
-#include "ConstantBuffer.h"
-#include "hlt_Camera.h"
-#include "RenderManager.h"
+#include "d3dx12.h"
+//#include "Mesh.h"
+//#include "ConstantBuffer.h"
+//#include "hlt_Camera.h"
+//#include "RenderManager.h"
 
 extern const int gNumFrameResources;
 
