@@ -7,9 +7,10 @@ public:
 	
 	void Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC,
 		ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers) override;
-	void Draw(ID2D1DeviceContext2* context, float WindowWidthMiddle, std::wstring stats);
+	void Draw(float WindowWidthMiddle, std::wstring stats);
 
 public:
+	bool m_Initialize = false;
 
 	ComPtr<IDWriteTextFormat> m_textFormatBody;
 	ComPtr<ID2D1SolidColorBrush> m_textBrush;

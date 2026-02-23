@@ -7,8 +7,8 @@ public:
 	void Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC,
 		ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers) override;
 	
-	void Draw(ID2D1DeviceContext2* context);
-	void DrawButton(D2D1_RECT_F rect, std::wstring label, bool isHovered, ID2D1DeviceContext2* context);
+	void Draw();
+	void DrawButton(D2D1_RECT_F rect, std::wstring label, bool isHovered);
 
 public:
 	bool m_Start = false;

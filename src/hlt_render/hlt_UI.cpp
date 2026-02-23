@@ -54,15 +54,14 @@ void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> 
 
 	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_textBrush));
 
+	m_Initialize = true;
 }
 
-void hlt_UI::Draw(ID2D1DeviceContext2* context, float WindowWidthMiddle, std::wstring stats)
+void hlt_UI::Draw(float WindowWidthMiddle, std::wstring stats)
 {
-	if (!context) return;
-
 	D2D1_RECT_F layoutRect = D2D1::RectF(50.0f, 50.0f, 300.0f, 300.0f);
 	
-	context->DrawText(
+	m_d2dContext->DrawText(
 		stats.c_str(),
 		(UINT32)stats.length(),
 		m_textFormatBody.Get(),

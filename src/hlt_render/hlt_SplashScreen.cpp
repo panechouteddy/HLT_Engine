@@ -23,8 +23,8 @@ void hlt_SplashScreen::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12Comm
 		ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(
 			swapChainBuffer[i].Get(),
 			&d3d11Flags,
-			D3D12_RESOURCE_STATE_PRESENT,     // État d'entrée
-			D3D12_RESOURCE_STATE_RENDER_TARGET, // État de sortie après usage D2D
+			D3D12_RESOURCE_STATE_PRESENT,
+			D3D12_RESOURCE_STATE_RENDER_TARGET,
 			IID_PPV_ARGS(&wrappedBackBuffers[i])
 		));
 	}
@@ -42,7 +42,6 @@ void hlt_SplashScreen::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12Comm
 	ThrowIfFailed(d2dFactory->CreateDevice(dxgiDevice.Get(), &d2dDevice));
 	ThrowIfFailed(d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_d2dContext));
 
-	// 5. Création des ressources de texte (DirectWrite)
 	ComPtr<IDWriteFactory> writeFactory;
 	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &writeFactory));
 
@@ -55,7 +54,7 @@ void hlt_SplashScreen::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12Comm
 	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &m_textBrush));
 }
 
-void hlt_SplashScreen::Draw(ID2D1DeviceContext2* context)
+void hlt_SplashScreen::Draw()
 {
 	if (m_Start)
 		return;
@@ -68,22 +67,22 @@ void hlt_SplashScreen::Draw(ID2D1DeviceContext2* context)
 
 }
 
-void hlt_SplashScreen::DrawButton(D2D1_RECT_F rect, std::wstring label, bool isHovered, ID2D1DeviceContext2* context)
+void hlt_SplashScreen::DrawButton(D2D1_RECT_F rect, std::wstring label, bool isHovered)
 {
 	auto color = isHovered ? D2D1::ColorF(D2D1::ColorF::WhiteSmoke) : D2D1::ColorF(D2D1::ColorF::White);
 
 	ComPtr<ID2D1SolidColorBrush> buttonBrush;
-	context->CreateSolidColorBrush(color, &buttonBrush);
+	m_d2dContext->CreateSolidColorBrush(color, &buttonBrush);
 
-	context->FillRectangle(rect, buttonBrush.Get());
+	m_d2dContext->FillRectangle(rect, buttonBrush.Get());
 
 	buttonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
-	context->DrawRectangle(rect, buttonBrush.Get(), 2.0f);
+	m_d2dContext->DrawRectangle(rect, buttonBrush.Get(), 2.0f);
 
 	m_textFormatBody->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 	m_textFormatBody->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-	context->DrawText(
+	m_d2dContext->DrawText(
 		label.c_str(),
 		(UINT32)label.length(),
 		m_textFormatBody.Get(),
