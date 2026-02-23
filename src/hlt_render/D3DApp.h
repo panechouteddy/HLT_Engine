@@ -54,8 +54,13 @@ public:
 	virtual bool Initialize();
 	//virtual LRESULT MsgProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 	ConstantBuffer* CreateConstantBufferObject()const;
+	ColorBuffer* CreateColorBufferObject()const;
 	float GetWindowRatio()const;
+
 	MeshBox* GetMeshBox() const;
+
+	void AddMeshPosition(hlt_Transform3D* pos) const;
+	void AddMesh(Mesh* pos) const;
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
@@ -85,8 +90,7 @@ protected:
 	void LogAdapterOutputs(IDXGIAdapter* adapter);
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 	void CreateMeshBox();
-	void AddMeshPosition (XMFLOAT4X4* pos );
-	void AddMesh(Mesh* pos);
+	
 	
 	
 protected:
@@ -145,8 +149,6 @@ protected:
 	//Draw
 	RenderManager* m_RenderManager;
 	MeshBox* m_Box;
-
-	std::vector<XMFLOAT4X4*> m_MeshPosition;
 
 	//int m_ClientWidth = 1280;
 	//int m_ClientHeight = 720;

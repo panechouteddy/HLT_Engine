@@ -12,6 +12,6 @@ public:
 
 	hlt_Camera();
 
-	void Update(float aspectRatio);
+	void Update();
 };
 

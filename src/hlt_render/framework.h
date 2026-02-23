@@ -11,6 +11,7 @@
 
 #include "UploadBuffer.h"
 #include "ConstantBuffer.h"
+#include "ColorBuffer.h"
 #include "Mesh.h"
 #include "RenderManager.h"
 

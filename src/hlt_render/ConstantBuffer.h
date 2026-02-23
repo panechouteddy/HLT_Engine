@@ -21,14 +21,14 @@ class ConstantBuffer
 
 	XMFLOAT4X4 m_world = MathHelper::Identity4x4();
 protected:
-	UploadBuffer<ObjectConstant>* m_bufferConstats;
+	UploadBuffer<ObjectConstant>* m_pBufferConstants;
 	
 
 public:
 	ConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device> Device);
 	~ConstantBuffer();
 
-	UploadBuffer<ObjectConstant>* GetBuffer() { return m_bufferConstats;}
+	UploadBuffer<ObjectConstant>* GetBuffer() { return m_pBufferConstants;}
 	XMFLOAT4X4 GetWorldMatrix() { return m_world; }
 	ID3D12Resource* GetResource();
 	void SetWorldMatrix(XMFLOAT4X4 entityworld) {m_world= entityworld ;}

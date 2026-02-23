@@ -5,7 +5,9 @@ class RenderManager
 {
 private:
     std::vector<Mesh*> m_MeshToDrawList;
+    std::vector<hlt_Transform3D*> m_MeshTransform;
     std::vector<ConstantBuffer*> m_ConstantBufferList;
+    std::vector<ColorBuffer*> m_ColorBufferList;
 protected:
 
     ID3D12GraphicsCommandList* m_CommandList;
@@ -24,11 +26,16 @@ protected:
 
 public:
     RenderManager(ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* directCmdListAlloc);
-    void UpdateConstantBuffer(const std::vector<XMFLOAT4X4*>& objects);
-    void UpdateView(XMFLOAT4X4 m_View);
+    ~RenderManager();
+    void UpdateRender(hlt_Camera* camera);
+    void UpdateColorBuffer();
+    void UpdateConstantBuffer();
+    void UpdateView(hlt_Camera* camera);
     void Draw();
     void AddMeshToDraw(Mesh* mesh) { m_MeshToDrawList.push_back(mesh); }
+    void AddMeshTransform(hlt_Transform3D* transform) { m_MeshTransform.push_back(transform);}
     void AddConstantBuffer();
+    void AddColorBuffer();
     void BuildDescriptorHeaps(ID3D12Device* device);
     void BuildRootSignature(ID3D12Device* device);
     void BuildShadersAndInputLayout();

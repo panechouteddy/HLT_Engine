@@ -22,8 +22,10 @@ public:
 	int CreateEntity() { return m_EntityManager.CreateEntity(); }
 	void DeleteEntity(int ID) { return m_EntityManager.DeleteEntity(ID); }
 
-private:
 	void Start();
+	void AddMesh(Mesh* mesh) { m_pD3D12App->AddMesh(mesh); }
+private:
+	
 	void Update();
 	void Render();
 	void Destroy();

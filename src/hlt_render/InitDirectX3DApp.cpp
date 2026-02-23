@@ -22,10 +22,6 @@ bool InitDirectX3DApp::Initialize()
 	//Ajouter le mesh 
 	AddMesh(meshTest);
 
-	//Ajouter la position (transform)
-	m_pos._43 = 1;
-	AddMeshPosition(&m_pos);
-
 	return true;
 }
 

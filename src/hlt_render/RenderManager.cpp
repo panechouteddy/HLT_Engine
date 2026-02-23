@@ -8,56 +8,76 @@ RenderManager::RenderManager(ID3D12GraphicsCommandList* commandList, ID3D12Comma
     m_DirectCmdListAlloc = directCmdListAlloc;
 }
 
-void RenderManager::UpdateConstantBuffer(const std::vector<XMFLOAT4X4*>& objects)
+RenderManager::~RenderManager()
 {
+	for (Mesh* m : m_MeshToDrawList)
+	{
+		delete m;
+	}
+	for (ConstantBuffer* cb : m_ConstantBufferList)
+	{
+		delete cb;
+	}
+	for (hlt_Transform3D* mT : m_MeshTransform)
+	{
+		delete mT;
+	}
+
+}
+
+void RenderManager::UpdateRender(hlt_Camera* camera)
+{
+	UpdateColorBuffer();
+	UpdateConstantBuffer();
+	UpdateView(camera);
+}
+
+void RenderManager::UpdateColorBuffer()
+{
+	for (int i = 0; i <m_MeshToDrawList.size(); i++)
+	{
+		if (i >= m_ColorBufferList.size())
+			AddColorBuffer();
+
+		
+		XMVECTOR color =  XMLoadFloat4(m_MeshToDrawList[i]->GetColor());
+		ColorConstants colorConstants;
+		XMStoreFloat4(&colorConstants.ObjectColor, color);
+		m_ColorBufferList[i]->GetBuffer()->CopyData(0, colorConstants);
+	}
+}
+
+void RenderManager::UpdateConstantBuffer()
+{
+
     for (int i = 0; i < m_MeshToDrawList.size();i++)
     {
         if (i >= m_ConstantBufferList.size())
             AddConstantBuffer();
-		if (i >= objects.size())
+
+		if (i >= m_MeshTransform.size())
 			m_ConstantBufferList[i]->SetWorldMatrix(MathHelper::Identity4x4());
 		else
-        m_ConstantBufferList[i]->SetWorldMatrix(*objects[i]);
+			m_ConstantBufferList[i]->SetWorldMatrix(m_MeshTransform[i]->world);
     }
 }
 
-void RenderManager::UpdateView(XMFLOAT4X4 m_View)
+void RenderManager::UpdateView(hlt_Camera* camera)
 {
-	//m_MeshToDrawList.erase(std::remove(m_MeshToDrawList.begin(), m_MeshToDrawList.end(), nullptr), m_MeshToDrawList.end());
 
-    float Theta = 1.5f * XM_PI;
-    float Phi = XM_PIDIV4;
-    float Radius = 5.0f;
+	for (int i = 0; i < m_MeshToDrawList.size(); i++)
+	{
+		XMFLOAT4X4 CBworld = m_ConstantBufferList[i]->GetWorldMatrix();
+		XMMATRIX world = XMLoadFloat4x4(&CBworld);// objet
+		XMMATRIX view  = XMLoadFloat4x4(&camera->m_View);
+		XMMATRIX proj = XMLoadFloat4x4(&camera->m_Proj);
+		XMMATRIX worldViewProj = world * view * proj ;
 
-    // Convert Spherical to Cartesian coordinates.
-    float x = Radius * sinf(Phi) * cosf(Theta);
-    float z = Radius * sinf(Phi) * sinf(Theta);
-    float y = Radius * cosf(Phi) + 2;
-
-    XMVECTOR pos = XMVectorSet(x, y, z, 2.0f);
-    XMVECTOR target = XMVectorZero();
-    XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f); //cam
-
-    XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-
-
-    XMStoreFloat4x4(&m_View, view);
-    float fovY = DirectX::XM_PIDIV4; float nearPlane = 0.01f; float farPlane = 100.f;
-    
-    DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(fovY,D3DApp::GetApp()->GetWindowRatio(), nearPlane, farPlane);
-    DirectX::XMStoreFloat4x4(&m_View, proj);
-
-    for (int i  = 0 ; i< m_MeshToDrawList.size() ; i ++)
-    {
-        XMFLOAT4X4 CBworld = m_ConstantBufferList[i]->GetWorldMatrix();
-        XMMATRIX world = XMLoadFloat4x4(&CBworld);// objet
-        XMMATRIX worldViewProj = world * view * proj;
-
-        // Update the constant buffer with the latest worldViewProj matrix.
-        ObjectConstant objConstants;
-        XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
-        m_ConstantBufferList[i]->GetBuffer()->CopyData(0, objConstants);
-    }
+		// Update the constant buffer with the latest worldViewProj matrix.
+		ObjectConstant objConstants;
+		XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
+		m_ConstantBufferList[i]->GetBuffer()->CopyData(0, objConstants);
+	}
 }
 
 void RenderManager::Draw()
@@ -84,6 +104,7 @@ void RenderManager::Draw()
 
 		m_CommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
+		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());
 
 		m_CommandList->DrawIndexedInstanced(
 			m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount,
@@ -96,6 +117,12 @@ void RenderManager::AddConstantBuffer()
 {
     ConstantBuffer* cb = D3DApp::GetApp()->CreateConstantBufferObject();
     m_ConstantBufferList.push_back(cb);
+}
+
+void RenderManager::AddColorBuffer()
+{
+	ColorBuffer* colorB = D3DApp::GetApp()->CreateColorBufferObject();
+	m_ColorBufferList.push_back(colorB);
 }
 
 
@@ -113,14 +140,14 @@ void RenderManager::BuildDescriptorHeaps(ID3D12Device* device)
 void RenderManager::BuildRootSignature(ID3D12Device* device)
 {
 	// Root parameter can be a table, root descriptor or root constants.
-	CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
 
 	// Create a single descriptor table of CBVs.
 
 	slotRootParameter[0].InitAsConstantBufferView(0); // 0 <- bo 
-
+	slotRootParameter[1].InitAsConstantBufferView(1); // b1
 	// A root signature is an array of root parameters.
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0, nullptr,
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer

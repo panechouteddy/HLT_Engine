@@ -6,20 +6,21 @@
 
 #include "D3DApp.h"
 #include "d3dUtil.h"
+#include "ColorBuffer.h"
 using namespace DirectX;
 
 struct Vertex
 {
 	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
 };
+
 
 void Mesh::SetMesh(std::string meshName)
 {
 	std::transform(meshName.begin(), meshName.end(), meshName.begin(), std::tolower);
 
-	m_Mesh = D3DApp::GetApp()->GetMeshBox()->GetMesh(meshName);
-	if (m_Mesh == nullptr)
+	m_pMesh = D3DApp::GetApp()->GetMeshBox()->GetMesh(meshName);
+	if (m_pMesh == nullptr)
 		m_MeshName = "nullptr";
 }
 
@@ -31,7 +32,7 @@ void Mesh::InitPyramidMesh()
 
 MeshGeometry* Mesh::GetGeometry()
 {
-	return m_Mesh;
+	return m_pMesh;
 }
 
 
@@ -49,11 +50,11 @@ void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* com
 {
 	std::array<Vertex, 5> vertices =
 	{
-		Vertex({ XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT4(Colors::White) }),//A
-		Vertex({ XMFLOAT3(1.0f, 0.0f, -1.0f), XMFLOAT4(Colors::Black) }), //B
-		Vertex({ XMFLOAT3(0.0f, +2.0f, 0.0f), XMFLOAT4(Colors::Red) }),//C
-		Vertex({ XMFLOAT3(-1.0f, 0.0f, +1.0f), XMFLOAT4(Colors::Green) }),//D
-		Vertex({ XMFLOAT3(+1.0f, 0.0f, +1.0f), XMFLOAT4(Colors::Blue) }),//E
+		Vertex({ XMFLOAT3(-1.0f, 0.0f, -1.0f)}),//A
+		Vertex({ XMFLOAT3(1.0f, 0.0f, -1.0f)}), //B
+		Vertex({ XMFLOAT3(0.0f, +2.0f, 0.0f)}),//C
+		Vertex({ XMFLOAT3(-1.0f, 0.0f, +1.0f)}),//D
+		Vertex({ XMFLOAT3(+1.0f, 0.0f, +1.0f)}),//E
 
 	};
 	std::array<std::uint16_t, 18> indices =
