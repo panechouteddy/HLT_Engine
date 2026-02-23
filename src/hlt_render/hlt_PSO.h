@@ -19,5 +19,6 @@ public:
 	void CreateOpaquePsoDesc(DXGI_FORMAT m_BackBufferFormat, bool m_4xMsaaState, UINT m_4xMsaaQuality, DXGI_FORMAT m_DepthStencilFormat, ComPtr<ID3D12Device> m_Device);
 	void CreateTransparentPsoDesc(ComPtr<ID3D12Device> m_Device);
 	void CreateAlphaTestedPsoDesc(ComPtr<ID3D12Device> m_Device);
+
 };
 

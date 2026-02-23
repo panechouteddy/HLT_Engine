@@ -1,15 +1,18 @@
 #pragma once
-
-class hlt_UI : public hlt_D2DResource
+class hlt_SplashScreen : public hlt_D2DResource
 {
 public:
-	hlt_UI() = default;
-	
+	hlt_SplashScreen() = default;
+
 	void Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC,
 		ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers) override;
-	void Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers, float WindowWidthMiddle, std::wstring stats);
+	
+	void Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers);
+	void DrawButton(D2D1_RECT_F rect, std::wstring label, bool isHovered);
 
 public:
+	bool m_Start = false;
+
 	ComPtr<ID3D11Device> m_d3d11Device;
 	ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
 	ComPtr<ID3D11On12Device> m_d3d11On12Device;
@@ -18,3 +21,4 @@ public:
 	ComPtr<IDWriteTextFormat> m_textFormatBody;
 	ComPtr<ID2D1SolidColorBrush> m_textBrush;
 };
+

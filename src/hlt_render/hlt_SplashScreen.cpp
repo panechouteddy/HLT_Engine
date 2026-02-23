@@ -1,7 +1,6 @@
 #include "pch.h"
 
-void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC,
-	ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
+void hlt_SplashScreen::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC, ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
 	ThrowIfFailed(D3D11On12CreateDevice(
 		device.Get(),
@@ -53,12 +52,14 @@ void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> 
 		20.0f, L"en-us", &m_textFormatBody
 	));
 
-	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_textBrush));
-
+	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &m_textBrush));
 }
 
-void hlt_UI::Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers, float WindowWidthMiddle, std::wstring stats)
+void hlt_SplashScreen::Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
+	if (m_Start)
+		return;
+
 	ComPtr<IDXGISurface> surface;
 	ThrowIfFailed(wrappedBackBuffers[m_CurrBackBuffer].As(&surface));
 
@@ -77,15 +78,34 @@ void hlt_UI::Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resour
 
 	m_d2dContext->BeginDraw();
 
-	// Dessin du texte
-	m_d2dContext->DrawText(stats.c_str(), (UINT32)stats.length(), m_textFormatBody.Get(),
-		D2D1::RectF(WindowWidthMiddle, 0, WindowWidthMiddle*2, 0), m_textBrush.Get());
+	D2D1_RECT_F rect = D2D1::RectF(
+		500,
+		2 - 500.0f,
+		2 + 500.0f,
+		2 + 500.0f
+	);
+	std::wstring stats = L"FPS: ";
+	DrawButton(rect, stats, false);
+}
 
-	m_d2dContext->EndDraw();
+void hlt_SplashScreen::DrawButton(D2D1_RECT_F rect, std::wstring label, bool isHovered)
+{
+	auto color = isHovered ? D2D1::ColorF(0.4f, 0.4f, 0.4f) : D2D1::ColorF(0.2f, 0.2f, 0.2f);
 
-	// On libère (Le pont repasse la ressource de RENDER_TARGET à PRESENT)
-	m_d3d11On12Device->ReleaseWrappedResources(wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
+	ComPtr<ID2D1SolidColorBrush> buttonBrush;
+	m_d2dContext->CreateSolidColorBrush(color, &buttonBrush);
 
-	m_d2dContext->SetTarget(nullptr);
-	m_d3d11DeviceContext->Flush(); // Important pour envoyer les commandes D2D au GPU
+	m_d2dContext->FillRectangle(rect, buttonBrush.Get());
+
+	buttonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
+	m_d2dContext->DrawRectangle(rect, buttonBrush.Get(), 2.0f);
+
+	m_d2dContext->DrawText(
+		label.c_str(),
+		(UINT32)label.length(),
+		m_textFormatBody.Get(),
+		rect,
+		m_textBrush.Get()
+	);
+
 }

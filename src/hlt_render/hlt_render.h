@@ -16,3 +16,4 @@
 #include "hlt_RenderItem.h"
 #include "hlt_UI.h"
 #include "hlt_PSO.h"
+#include "hlt_SplashScreen.h"
