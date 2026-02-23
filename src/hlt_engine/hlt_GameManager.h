@@ -21,8 +21,9 @@ public:
 	int CreateEntity();
 	void DeleteEntity(int ID);
 
-private:
 	void Start();
+private:
+	
 	void Update();
 	void Render();
 	void Destroy();

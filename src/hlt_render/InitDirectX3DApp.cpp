@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "InitDirectX3DApp.h"
 
 InitDirectX3DApp::InitDirectX3DApp(hlt_Window* window)
 	: D3DApp(window)
@@ -20,10 +21,6 @@ bool InitDirectX3DApp::Initialize()
 	meshTest->InitPyramidMesh();
 	//Ajouter le mesh 
 	AddMesh(meshTest);
-
-	//Ajouter la position (transform)
-	m_pos._43 = 1;
-	AddMeshPosition(&m_pos);
 
 	return true;
 }

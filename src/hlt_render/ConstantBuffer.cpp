@@ -4,17 +4,18 @@
 
 ConstantBuffer::ConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device>  Device)
 {
-	m_bufferConstats = new UploadBuffer<ObjectConstant>(Device.Get(), 1, true);
+	m_pBufferConstants = new UploadBuffer<ObjectConstant>(Device.Get(), 1, true);
 }
 
 ConstantBuffer::~ConstantBuffer()
 {
-	delete m_bufferConstats;
+	delete m_pBufferConstants;
 }
+
 
 ID3D12Resource* ConstantBuffer::GetResource()
 {
-	return m_bufferConstats->Resource();
+	return m_pBufferConstants->Resource();
 }
 
 

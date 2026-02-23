@@ -5,6 +5,8 @@ namespace hlt_Component
 {
 	struct Mesh
 	{
+		static const int ID = 5;
+
 		::Mesh mesh;
 	};
 }

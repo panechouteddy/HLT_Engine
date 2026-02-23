@@ -114,9 +114,7 @@ bool D3DApp::Initialize()
 }
 void D3DApp::Update()
 {
-    m_RenderManager->UpdateConstantBuffer(m_MeshPosition);
-    m_RenderManager->UpdateView(m_Camera->m_View);
-
+    m_RenderManager->UpdateRender(m_Camera);
 }
 
 void D3DApp::Draw()
@@ -685,6 +683,14 @@ ConstantBuffer* D3DApp::CreateConstantBufferObject() const
     return cb;
 }
 
+ColorBuffer* D3DApp::CreateColorBufferObject() const
+{
+    ColorBuffer* colorB = new ColorBuffer(m_Device.Get());
+
+    return colorB;
+
+}
+
 float D3DApp::GetWindowRatio() const
 {
     XMINT2 clientSize = m_pWindow->GetWndSize();
@@ -774,13 +780,12 @@ void D3DApp::CreateMeshBox()
     m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
 }
 
-void D3DApp::AddMeshPosition(XMFLOAT4X4* pos)
+void D3DApp::AddMeshPosition(hlt_Transform3D* pos)
 {
-    m_MeshPosition.push_back(pos);
+    m_RenderManager->AddMeshTransform(pos);
 }
 
 void D3DApp::AddMesh(Mesh* mesh)
 {
-    mesh->SetMeshVisibility(true);
     m_RenderManager->AddMeshToDraw(mesh);
 }

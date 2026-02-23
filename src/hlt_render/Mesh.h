@@ -4,7 +4,7 @@
 #include "DirectXMath.h"
 
 struct MeshGeometry;
-
+class ColorBuffer;
 class MeshBox
 {
 
@@ -21,7 +21,9 @@ public:
 class Mesh
 {
 protected:
-    MeshGeometry* m_Mesh = nullptr;
+
+    XMFLOAT4 m_Color = { 1.f,1.f,1.f,1.f };
+    MeshGeometry* m_pMesh = nullptr;
     bool m_IsVisible = false ;
     std::string m_MeshName;
 
@@ -33,5 +35,6 @@ public :
     bool MeshIsVisible() { return m_IsVisible ;}
     void SetMeshVisibility(bool state) { m_IsVisible = state; }
     std::string GetMeshName() { return m_MeshName;}
+    XMFLOAT4* GetColor() { return &m_Color; }
 };
 

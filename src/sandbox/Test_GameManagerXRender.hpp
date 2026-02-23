@@ -9,10 +9,13 @@ inline void Test_GameManagerXRender()
 
 	hlt_GameManager& gm = HLT_GAMEMANAGER;
 
+	gm.Start();
+
 	std::vector<int> entityID;
 	int playerID = gm.CreateEntity();
 	entityID.push_back(playerID);
 
+	
 	gm.GetECS()->AddComponent<hlt_Component::Transform3D>(playerID);
 	hlt_Component::Mesh* playerMesh = gm.GetECS()->AddComponent<hlt_Component::Mesh>(playerID);
 
