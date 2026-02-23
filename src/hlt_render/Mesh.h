@@ -12,11 +12,12 @@ protected:
     std::unordered_map<std::string, MeshGeometry*> m_BoxOfMesh;
 public:
     MeshBox() {};
-    MeshGeometry* GetMesh(std::string form) { return m_BoxOfMesh[form]; }
+    MeshGeometry* GetMesh(std::string form) { return m_BoxOfMesh.contains(form) ? m_BoxOfMesh[form] : nullptr; }
     void CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
     void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 
 };
+
 class Mesh
 {
 protected:
@@ -26,6 +27,7 @@ protected:
 
 public :
     Mesh() {};
+    void SetMesh(std::string meshName);
     void InitPyramidMesh();
     MeshGeometry* GetGeometry();
     bool MeshIsVisible() { return m_IsVisible ;}

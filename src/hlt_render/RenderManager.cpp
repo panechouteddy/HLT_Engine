@@ -23,7 +23,7 @@ void RenderManager::UpdateConstantBuffer(const std::vector<XMFLOAT4X4*>& objects
 
 void RenderManager::UpdateView(XMFLOAT4X4 m_View)
 {
-	m_MeshToDrawList.erase(std::remove(m_MeshToDrawList.begin(), m_MeshToDrawList.end(), nullptr), m_MeshToDrawList.end());
+	//m_MeshToDrawList.erase(std::remove(m_MeshToDrawList.begin(), m_MeshToDrawList.end(), nullptr), m_MeshToDrawList.end());
 
     float Theta = 1.5f * XM_PI;
     float Phi = XM_PIDIV4;
@@ -70,6 +70,9 @@ void RenderManager::Draw()
 
 	for (int i = 0;i < m_MeshToDrawList.size();i++)
 	{
+		if (m_MeshToDrawList[i] == nullptr)
+			continue;
+
 		if (!m_MeshToDrawList[i]->MeshIsVisible())
 			continue;
 

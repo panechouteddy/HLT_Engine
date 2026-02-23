@@ -7,10 +7,10 @@ struct hlt_Transform3D
 {
 public:
 	// POSITION
-	XMFLOAT3 pos;
+	XMFLOAT3 pos{ 0, 0, 0 };
 
 	// SCALE
-	XMFLOAT3 sca;
+	XMFLOAT3 sca{ 1, 1, 1 };
 
 	// ROTATION
 	XMFLOAT3 front;

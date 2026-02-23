@@ -14,9 +14,15 @@ struct Vertex
 	XMFLOAT4 Color;
 };
 
+void Mesh::SetMesh(std::string meshName)
+{
+	m_Mesh = D3DApp::GetApp()->GetMeshBox()->GetMesh(meshName);
+	if (m_Mesh == nullptr)
+		m_MeshName = "nullptr";
+}
+
 void Mesh::InitPyramidMesh()
 {
-	
 	m_Mesh = D3DApp::GetApp()->GetMeshBox()->GetMesh("Pyramid");
 	m_MeshName = "Pyramid";
 }

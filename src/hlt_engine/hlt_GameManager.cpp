@@ -79,7 +79,7 @@ void hlt_GameManager::Start()
 		m_IsRunning = false;
 
 	if(m_pD3D12App == nullptr)
-		m_pD3D12App = new InitDirectX3DApp(m_pWindow);
+		m_pD3D12App = new D3DApp(m_pWindow);
 	if (m_pD3D12App->Initialize() == false)
 		m_IsRunning = false;
 }
@@ -96,6 +96,14 @@ void hlt_GameManager::Update()
 
 void hlt_GameManager::Render()
 {
+	m_pD3D12App->Draw();
+	/*m_pD3D12App->StartRender();
+
+	for (Mesh* mesh : ECS.MESH)
+		m_pD3D12App->Render(mesh, transform);
+
+	m_pD3D12App->EndRender();*/
+
 	// TO DO
 }
 

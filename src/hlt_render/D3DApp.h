@@ -26,15 +26,11 @@ class RenderManager;
 
 class D3DApp
 {
-protected:
-
+public:
 	D3DApp(hlt_Window* window);
 	D3DApp(const D3DApp& rhs) = delete;
 	D3DApp& operator=(const D3DApp& rhs) = delete;
 	virtual ~D3DApp();
-	
-
-public:
 
 	static D3DApp* GetApp();
 
@@ -47,6 +43,14 @@ public:
 
 	int Run();
 
+	virtual void OnResize();
+	virtual void Update();
+	virtual void Draw();
+
+	void StartRender();
+	void Render(hlt_Transform3D* transform, Mesh* mesh);
+	void EndRender();
+
 	virtual bool Initialize();
 	//virtual LRESULT MsgProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 	ConstantBuffer* CreateConstantBufferObject()const;
@@ -55,10 +59,7 @@ public:
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
-	virtual void OnResize();
-	virtual void Update();
-	virtual void Draw();
-
+	
 	// Convenience overrides for handling mouse input.
 	virtual void OnMouseDown(WPARAM btnState, int x, int y) {}
 	virtual void OnMouseUp(WPARAM btnState, int x, int y) {}

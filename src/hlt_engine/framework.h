@@ -29,6 +29,7 @@
 #include "hlt_ConstantMoveSystem.h"
 #include "hlt_InputSystem.h"
 #include "hlt_ColliderSystem.h"
+#include "hlt_MeshComponent.h"
 
 // GAME MANAGER
 #include "hlt_GameManager.h"
