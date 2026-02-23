@@ -22,6 +22,7 @@ public:
 	void DeleteEntity(int ID);
 
 	void Start();
+	void AddMesh(Mesh* mesh) { m_pD3D12App->AddMesh(mesh); }
 private:
 	
 	void Update();

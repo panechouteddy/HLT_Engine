@@ -114,6 +114,7 @@ bool D3DApp::Initialize()
 }
 void D3DApp::Update()
 {
+    m_Camera->Update();
     m_RenderManager->UpdateRender(m_Camera);
 }
 
@@ -780,12 +781,12 @@ void D3DApp::CreateMeshBox()
     m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
 }
 
-void D3DApp::AddMeshPosition(hlt_Transform3D* pos)
+void D3DApp::AddMeshPosition(hlt_Transform3D* pos) const
 {
     m_RenderManager->AddMeshTransform(pos);
 }
 
-void D3DApp::AddMesh(Mesh* mesh)
+void D3DApp::AddMesh(Mesh* mesh) const
 {
     m_RenderManager->AddMeshToDraw(mesh);
 }

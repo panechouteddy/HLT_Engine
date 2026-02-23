@@ -34,7 +34,7 @@ void RenderManager::UpdateRender(hlt_Camera* camera)
 
 void RenderManager::UpdateColorBuffer()
 {
-	for (int i = 0; i < m_MeshTransform.size(); i++)
+	for (int i = 0; i <m_MeshToDrawList.size(); i++)
 	{
 		if (i >= m_ColorBufferList.size())
 			AddColorBuffer();
@@ -50,7 +50,7 @@ void RenderManager::UpdateColorBuffer()
 void RenderManager::UpdateConstantBuffer()
 {
 
-    for (int i = 0; i < m_MeshTransform.size();i++)
+    for (int i = 0; i < m_MeshToDrawList.size();i++)
     {
         if (i >= m_ConstantBufferList.size())
             AddConstantBuffer();
@@ -147,7 +147,7 @@ void RenderManager::BuildRootSignature(ID3D12Device* device)
 	slotRootParameter[0].InitAsConstantBufferView(0); // 0 <- bo 
 	slotRootParameter[1].InitAsConstantBufferView(1); // b1
 	// A root signature is an array of root parameters.
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0, nullptr,
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer

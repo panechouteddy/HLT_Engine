@@ -20,6 +20,6 @@ inline void Test_GameManagerXRender()
 	hlt_Component::Mesh* playerMesh = gm.GetECS()->AddComponent<hlt_Component::Mesh>(playerID);
 
 	playerMesh->mesh.SetMesh("Pyramid");
-
+	gm.AddMesh(&playerMesh->mesh);
 	gm.Run();
 }
