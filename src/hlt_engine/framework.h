@@ -50,3 +50,9 @@
 
 #define HLT_MOUSE hlt_Input::MouseInput::GetInstance()
 #define HLT_KEYBOARD hlt_Input::KeyboardInput::GetInstance()
+
+
+// SETUP
+#define SETUP_APP_ONSTART(method) HLT_GAMEMANAGER.GetAppMainMethods().m_Start.Set(this, &App::method)
+#define SETUP_APP_ONUPDATE(method) HLT_GAMEMANAGER.GetAppMainMethods().m_Update.Set(this, &App::method)
+#define SETUP_APP_ONEXIT(method) HLT_GAMEMANAGER.GetAppMainMethods().m_Exit.Set(this, &App::method)

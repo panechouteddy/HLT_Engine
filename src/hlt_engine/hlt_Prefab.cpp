@@ -33,4 +33,15 @@ int hlt_Prefab::CreateCube(XMFLOAT3 pos, XMFLOAT3 sca)
 
 int hlt_Prefab::CreatePyramid()
 {
+	hlt_GameManager& gm = hlt_GameManager::GetInstance();
+
+	int pyramidID = gm.CreateEntity();
+	hlt_ECS* ecs = gm.GetECS();
+
+	ecs->AddComponent<hlt_Component::Transform3D>(pyramidID);
+	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(pyramidID);
+
+	mesh->mesh.SetMesh("pyramid");
+
+	return pyramidID;
 }

@@ -83,8 +83,8 @@ void hlt_GameManager::Start()
 	if (m_pD3D12App->Initialize() == false)
 		m_IsRunning = false;
 
-	if (m_AppFunctions.pStart.pFunction != nullptr && m_AppFunctions.pStart.instance != nullptr)
-		m_AppFunctions.pStart.instance;
+	if (m_AppToCall.m_Start.m_pWrapper != nullptr)
+		m_AppToCall.m_Start.Execute();
 }
 
 void hlt_GameManager::Update()
@@ -93,24 +93,15 @@ void hlt_GameManager::Update()
 
 	RefreshCore();
 
-	if (m_AppFunctions.pUpdate != nullptr)
-		m_AppFunctions.pUpdate();
+	if (m_AppToCall.m_Update.m_pWrapper != nullptr)
+		m_AppToCall.m_Update.Execute();
 
-	//m_pWindow->Update();
 	m_pD3D12App->Update();
 }
 
 void hlt_GameManager::Render()
 {
 	m_pD3D12App->Draw();
-	/*m_pD3D12App->StartRender();
-
-	for (Mesh* mesh : ECS.MESH)
-		m_pD3D12App->Render(mesh, transform);
-
-	m_pD3D12App->EndRender();*/
-
-	// TO DO
 }
 
 void hlt_GameManager::Destroy()
@@ -121,8 +112,8 @@ void hlt_GameManager::Destroy()
 	if (m_pD3D12App != nullptr)
 		delete m_pD3D12App;
 
-	if (m_AppFunctions.pExit != nullptr)
-		m_AppFunctions.pExit();
+	if (m_AppToCall.m_Exit.m_pWrapper != nullptr)
+		m_AppToCall.m_Exit.Execute();
 
 	if (DEBUG)
 		hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole();

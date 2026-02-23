@@ -1,6 +1,5 @@
 #pragma once
 
-
 class hlt_GameManager
 {
 private:
@@ -17,6 +16,7 @@ public:
 
 	LRESULT WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 
+	hlt_ToCall& GetAppMainMethods() { return m_AppToCall; }
 	hlt_ECS* GetECS() { return &m_ECS; }
 
 	int CreateEntity() { return m_EntityManager.CreateEntity(); }
@@ -35,7 +35,7 @@ private:
 	bool m_IsRunning = false;
 
 	// APP FUNCTIONS
-	hlt_ToCall m_AppFunctions;
+	hlt_ToCall m_AppToCall;
 	
 	// WINDOW
 	hlt_Window* m_pWindow = nullptr;

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "InitDirectX3DApp.h"
 
 InitDirectX3DApp::InitDirectX3DApp(hlt_Window* window)
 	: D3DApp(window)

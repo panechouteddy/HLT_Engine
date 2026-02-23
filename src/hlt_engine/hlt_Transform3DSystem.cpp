@@ -8,8 +8,6 @@ void hlt_System::hlt_Transform3DSystem::Update()
 	{
 		hlt_Transform3D& trans = transformComponent.transform;
 
-		XMMATRIX world = XMMatrixIdentity();
-
 		XMVECTOR vPos = XMLoadFloat3(&trans.pos);
 		XMVECTOR vSca = XMLoadFloat3(&trans.sca);
 		XMVECTOR vRot = XMLoadFloat4(&trans.quaternion);
