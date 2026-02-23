@@ -82,6 +82,9 @@ void hlt_GameManager::Start()
 		m_pD3D12App = new D3DApp(m_pWindow);
 	if (m_pD3D12App->Initialize() == false)
 		m_IsRunning = false;
+
+	if (m_AppFunctions.pStart.pFunction != nullptr && m_AppFunctions.pStart.instance != nullptr)
+		m_AppFunctions.pStart.instance;
 }
 
 void hlt_GameManager::Update()
@@ -89,6 +92,9 @@ void hlt_GameManager::Update()
 	m_ECS.Update();
 
 	RefreshCore();
+
+	if (m_AppFunctions.pUpdate != nullptr)
+		m_AppFunctions.pUpdate();
 
 	//m_pWindow->Update();
 	m_pD3D12App->Update();
@@ -114,6 +120,9 @@ void hlt_GameManager::Destroy()
 
 	if (m_pD3D12App != nullptr)
 		delete m_pD3D12App;
+
+	if (m_AppFunctions.pExit != nullptr)
+		m_AppFunctions.pExit();
 
 	if (DEBUG)
 		hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole();
@@ -244,43 +253,6 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 	}
 	//D3DApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
 	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
-
-///////////////////////////////////////////////////////
-///////////////////////////////////////////////////////
-///////////////////////////////////////////////////////
-
-int hlt_GameManager::CreateEntity()
-{
-	// OPTI POSSIBLE : INVALIDER LES ENTITY DETRUITE AVEC UNE VALEUR DEFINIE
-	// EXEMPLE : 0, 1, 2, -1, 4
-	int entityID;
-	if(m_PoolEntityID.size() == 0)
-	{
-		entityID = m_countEntityID;
-		m_EntityID.push_back(m_countEntityID);
-		m_countEntityID++;
-	}
-	else
-	{
-		entityID = m_PoolEntityID[0];
-		m_EntityID.push_back(entityID);
-		std::swap(m_PoolEntityID[0], m_PoolEntityID.back());
-		m_PoolEntityID.pop_back();
-	}
-	std::sort(m_EntityID.begin(), m_EntityID.end());
-	return entityID;
-}
-
-void hlt_GameManager::DeleteEntity(int ID)
-{
-	auto it = std::find(m_EntityID.begin(), m_EntityID.end(), ID);
-	if (it == m_EntityID.end())
-		return;
-	
-	m_ECS.RemoveEntity(*it);
-	m_PoolEntityID.push_back(*it);
-	m_EntityID.erase(it);
 }
 
 ///////////////////////////////////////////////////////

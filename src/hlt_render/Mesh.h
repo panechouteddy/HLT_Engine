@@ -14,8 +14,9 @@ public:
     MeshBox() {};
     MeshGeometry* GetMesh(std::string form) { return m_BoxOfMesh.contains(form) ? m_BoxOfMesh[form] : nullptr; }
     void CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
-    void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 
+    void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+    void CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 };
 
 class Mesh
