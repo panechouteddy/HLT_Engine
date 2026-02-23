@@ -6,8 +6,5 @@ inline void Test_GameManagerXRender()
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-
-	hlt_GameManager& gm = HLT_GAMEMANAGER;
-
-	gm.Run();
+	HLT::Run<App>();
 }

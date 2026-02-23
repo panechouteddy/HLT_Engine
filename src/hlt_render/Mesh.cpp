@@ -16,6 +16,8 @@ struct Vertex
 
 void Mesh::SetMesh(std::string meshName)
 {
+	std::transform(meshName.begin(), meshName.end(), meshName.begin(), std::tolower);
+
 	m_Mesh = D3DApp::GetApp()->GetMeshBox()->GetMesh(meshName);
 	if (m_Mesh == nullptr)
 		m_MeshName = "nullptr";
@@ -23,8 +25,8 @@ void Mesh::SetMesh(std::string meshName)
 
 void Mesh::InitPyramidMesh()
 {
-	m_Mesh = D3DApp::GetApp()->GetMeshBox()->GetMesh("Pyramid");
-	m_MeshName = "Pyramid";
+	m_Mesh = D3DApp::GetApp()->GetMeshBox()->GetMesh("pyramid");
+	m_MeshName = "pyramid";
 }
 
 MeshGeometry* Mesh::GetGeometry()
@@ -76,7 +78,7 @@ void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* com
 	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
 	MeshGeometry* boxGeomety = new MeshGeometry;
-	boxGeomety->Name = "Pyramid";
+	boxGeomety->Name = "pyramid";
 	//ThrowIfFailed(D3DCreateBlob(vbByteSize,&boxGeomety->VertexBufferCPU));
 	//CopyMemory(boxGeomety->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
 	//
@@ -97,9 +99,9 @@ void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* com
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs["Pyramid"] = submesh;
+	boxGeomety->DrawArgs["pyramid"] = submesh;
 
-	m_BoxOfMesh.insert(std::make_pair("Pyramid", boxGeomety));
+	m_BoxOfMesh.insert(std::make_pair("pyramid", boxGeomety));
 	//m_BoxMesh["pyramid"] = boxmesh;
 }
 
@@ -147,7 +149,7 @@ void MeshBox::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
 	MeshGeometry* boxGeomety = new MeshGeometry;
-	boxGeomety->Name = "Cube";
+	boxGeomety->Name = "cube";
 	//ThrowIfFailed(D3DCreateBlob(vbByteSize,&boxGeomety->VertexBufferCPU));
 	//CopyMemory(boxGeomety->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
 	//
@@ -168,7 +170,7 @@ void MeshBox::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs["Cube"] = submesh;
+	boxGeomety->DrawArgs["cube"] = submesh;
 
-	m_BoxOfMesh.insert(std::make_pair("Cube", boxGeomety));	
+	m_BoxOfMesh.insert(std::make_pair("cube", boxGeomety));	
 }

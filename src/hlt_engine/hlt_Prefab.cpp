@@ -11,7 +11,7 @@ int hlt_Prefab::CreateCube()
 	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
-	mesh->mesh.SetMesh("cube");
+	mesh->mesh.SetMesh("Cube");
 
 	return cubeID;
 }
