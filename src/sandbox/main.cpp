@@ -122,8 +122,8 @@ bool main::Initialize()
 
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
-	//m_ui.Initialize(m_Device, m_CommandQueue, SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
-	//m_SplashScreen.Initialize(m_Device, m_CommandQueue, SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+	m_ui.Initialize(m_Device, m_CommandQueue, SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+	m_SplashScreen.Initialize(m_Device, m_CommandQueue, SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
 	m_material.m_Color = { 1.0f, 0.0f, 0.0f, 1.0f };
 
@@ -411,10 +411,19 @@ void main::Draw(const GameTimer& gt)
 	FlushCommandQueue();
 
 	// --- PARTIE D2D ---
+	m_ui.StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+
+	
+	auto activeContext = m_ui.GetD2DDeviceContext();
+	m_SplashScreen.Draw(activeContext);
 
 	std::wstring stats = L"FPS: " + std::to_wstring(1.0f / gt.DeltaTime());
-	//m_ui.Draw(gt, m_CurrBackBuffer, m_wrappedBackBuffers, m_ClientWidth*0.5, stats);
-	//m_SplashScreen.Draw(gt, m_CurrBackBuffer, m_wrappedBackBuffers);
+	m_ui.Draw(activeContext, m_ClientWidth * 0.5, stats);
+	
+	m_ui.EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+
+	
+
 
 	// --- FIN ---
 	ThrowIfFailed(m_SwapChain->Present(0, 0));

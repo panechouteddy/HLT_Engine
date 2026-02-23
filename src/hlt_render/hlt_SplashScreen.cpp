@@ -55,52 +55,35 @@ void hlt_SplashScreen::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12Comm
 	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &m_textBrush));
 }
 
-void hlt_SplashScreen::Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
+void hlt_SplashScreen::Draw(ID2D1DeviceContext2* context)
 {
 	if (m_Start)
 		return;
 
-	ComPtr<IDXGISurface> surface;
-	ThrowIfFailed(wrappedBackBuffers[m_CurrBackBuffer].As(&surface));
-
-	D2D1_BITMAP_PROPERTIES1 bitmapProperties = D2D1::BitmapProperties1(
-		D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-		D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
-	);
-
-	ComPtr<ID2D1Bitmap1> d2dTargetBitmap;
-	ThrowIfFailed(m_d2dContext->CreateBitmapFromDxgiSurface(surface.Get(), &bitmapProperties, &d2dTargetBitmap));
-
-	m_d2dContext->SetTarget(d2dTargetBitmap.Get());
-
-	// On acquiert la ressource (Le pont la passe de PRESENT à RENDER_TARGET en interne)
-	m_d3d11On12Device->AcquireWrappedResources(wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
-
-	m_d2dContext->BeginDraw();
-
 	D2D1_RECT_F rect = D2D1::RectF(
-		500,
-		2 - 500.0f,
-		2 + 500.0f,
-		2 + 500.0f
+		50.0f, 50.0f, 300.0f, 300.0f
 	);
 	std::wstring stats = L"FPS: ";
-	DrawButton(rect, stats, false);
+	DrawButton(rect, stats, true);
+
 }
 
-void hlt_SplashScreen::DrawButton(D2D1_RECT_F rect, std::wstring label, bool isHovered)
+void hlt_SplashScreen::DrawButton(D2D1_RECT_F rect, std::wstring label, bool isHovered, ID2D1DeviceContext2* context)
 {
-	auto color = isHovered ? D2D1::ColorF(0.4f, 0.4f, 0.4f) : D2D1::ColorF(0.2f, 0.2f, 0.2f);
+	auto color = isHovered ? D2D1::ColorF(D2D1::ColorF::WhiteSmoke) : D2D1::ColorF(D2D1::ColorF::White);
 
 	ComPtr<ID2D1SolidColorBrush> buttonBrush;
-	m_d2dContext->CreateSolidColorBrush(color, &buttonBrush);
+	context->CreateSolidColorBrush(color, &buttonBrush);
 
-	m_d2dContext->FillRectangle(rect, buttonBrush.Get());
+	context->FillRectangle(rect, buttonBrush.Get());
 
 	buttonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
-	m_d2dContext->DrawRectangle(rect, buttonBrush.Get(), 2.0f);
+	context->DrawRectangle(rect, buttonBrush.Get(), 2.0f);
 
-	m_d2dContext->DrawText(
+	m_textFormatBody->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	m_textFormatBody->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+	context->DrawText(
 		label.c_str(),
 		(UINT32)label.length(),
 		m_textFormatBody.Get(),

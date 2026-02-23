@@ -7,13 +7,9 @@ public:
 	
 	void Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC,
 		ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers) override;
-	void Draw(const GameTimer& gt, int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers, float WindowWidthMiddle, std::wstring stats);
+	void Draw(ID2D1DeviceContext2* context, float WindowWidthMiddle, std::wstring stats);
 
 public:
-	ComPtr<ID3D11Device> m_d3d11Device;
-	ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
-	ComPtr<ID3D11On12Device> m_d3d11On12Device;
-	ComPtr<ID2D1DeviceContext2> m_d2dContext;
 
 	ComPtr<IDWriteTextFormat> m_textFormatBody;
 	ComPtr<ID2D1SolidColorBrush> m_textBrush;
