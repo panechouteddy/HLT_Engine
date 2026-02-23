@@ -3,9 +3,7 @@
 void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC,
 	ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
-#if defined(DEBUG) || defined(_DEBUG)
-	d3d11DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
+	UINT d3d11DeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 
 	ThrowIfFailed(D3D11On12CreateDevice(
 		device.Get(),
@@ -36,9 +34,6 @@ void hlt_UI::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> 
 
 
 	D2D1_FACTORY_OPTIONS options = {};
-#if defined(DEBUG) || defined(_DEBUG)
-	options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
-#endif
 
 	ComPtr<ID2D1Factory3> d2dFactory;
 	ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, &d2dFactory));

@@ -64,10 +64,8 @@ private:
 	ComPtr<ID3D12PipelineState> mPSO = nullptr;
 	std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> mPSOs;
 
-	//FrameResource* mCurrFrameResource = nullptr;
 	std::shared_ptr<hlt_D2DResource> m_DeviceResources;
 
-	// Ressources enveloppées (une par back buffer)
 	ComPtr<ID3D11Resource> m_wrappedBackBuffers[SwapChainBufferCount];
 
 	XMFLOAT4X4 mWorld = MathHelper::Identity4x4();
@@ -121,13 +119,11 @@ bool main::Initialize()
 	if (!D3DApp::Initialize())
 		return false;
 
-	// Réinitialiser la liste de commandes pour enregistrer les commandes d'initialisation (textures, etc.)
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
 
 	m_ui.Initialize(m_Device, m_CommandQueue, SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
-	// 6. Chargement de vos ressources 3D (votre code original)
 	m_material.m_Color = { 1.0f, 0.0f, 0.0f, 1.0f };
 
 	LoadTextures();
@@ -411,8 +407,6 @@ void main::Draw(const GameTimer& gt)
 	ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
 	m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-	// Synchronisation : On s'assure que DX12 a fini avant que D2D ne commence
-	// Dans un moteur optimisé, on utiliserait un Fence, ici Flush suffit pour tester
 	FlushCommandQueue();
 
 	// --- PARTIE D2D ---
