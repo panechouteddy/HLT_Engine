@@ -26,14 +26,9 @@ struct VertexOut
 
 VertexOut VS(VertexIn vin)
 {
-	VertexOut vout;
-	
-	// Transform to homogeneous clip space.
-    vout.PosH = float4(vin.PosL, 1.0f);
-	
-	// Just pass vertex color into the pixel shader.
-    vout.Color = gObjectColor;
-    
+    VertexOut vout;
+    vout.PosH = float4(vin.PosL, 1.0f); // PAS de matrice
+    vout.Color = float4(1, 0, 0, 1); // Rouge constant
     return vout;
 }
 
