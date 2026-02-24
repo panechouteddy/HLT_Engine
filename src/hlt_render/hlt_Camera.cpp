@@ -19,7 +19,7 @@ void hlt_Camera::Update()
     float z = Radius * sinf(Phi) * sinf(Theta);
     float y = Radius * cosf(Phi) + 2;
 
-    XMVECTOR pos = XMVectorSet(x, y, z, 2.0f);
+    XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
     XMVECTOR target = XMVectorZero();
     XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f); //cam
 
