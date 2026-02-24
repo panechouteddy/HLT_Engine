@@ -82,6 +82,10 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 
 void RenderManager::Draw()
 {
+	ColorConstants test;
+	test.ObjectColor = XMFLOAT4(1, 0, 0, 1);
+	
+
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_CbvHeap.Get() };
 	m_CommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
@@ -90,11 +94,13 @@ void RenderManager::Draw()
 
 	for (int i = 0;i < m_MeshToDrawList.size();i++)
 	{
+		m_ColorBufferList[i]->GetBuffer()->CopyData(0, test);
+
 		if (m_MeshToDrawList[i] == nullptr)
 			continue;
 
-		if (!m_MeshToDrawList[i]->MeshIsVisible())
-			continue;
+		//if (!m_MeshToDrawList[i]->MeshIsVisible())
+		//	continue;
 
 		D3D12_VERTEX_BUFFER_VIEW vertexBuffer = m_MeshToDrawList[i]->GetGeometry()->VertexBufferView();
 		m_CommandList->IASetVertexBuffers(0, 1, &vertexBuffer);
@@ -105,7 +111,6 @@ void RenderManager::Draw()
 		m_CommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());
-
 		m_CommandList->DrawIndexedInstanced(
 			m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount,
 			1, 0, 0, 0);
