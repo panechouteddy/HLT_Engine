@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "main.h"
 
-using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 

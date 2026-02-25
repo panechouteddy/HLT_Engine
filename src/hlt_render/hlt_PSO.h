@@ -14,9 +14,11 @@ public:
 	ComPtr<ID3D12RootSignature> m_RootSignature;
 	std::unordered_map<std::string, ComPtr<ID3DBlob>> m_Shaders;
 	std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> m_PSOs;
+	ComPtr<ID3D12PipelineState> mOpaquePSO = nullptr;
 
 	void CreateOpaquePsoDesc(DXGI_FORMAT m_BackBufferFormat, bool m_4xMsaaState, UINT m_4xMsaaQuality, DXGI_FORMAT m_DepthStencilFormat, ComPtr<ID3D12Device> m_Device);
 	void CreateTransparentPsoDesc(ComPtr<ID3D12Device> m_Device);
 	void CreateAlphaTestedPsoDesc(ComPtr<ID3D12Device> m_Device);
+
 };
 
