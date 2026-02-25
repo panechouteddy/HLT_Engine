@@ -108,7 +108,7 @@ void RenderManager::Draw()
 		m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->DrawIndexedInstanced(
-			m_MeshToDrawList[i]->GetGeometry()->DrawArgs["Pyramid"].IndexCount,
+			m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount,
 			1, 0, 0, 0);
 	}
 }

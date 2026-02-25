@@ -21,6 +21,7 @@
 #include <functional>
 #include <cmath>
 #include <emmintrin.h>
+#include "hlt_Color.h"
 
 // DIRECTX API
 #include <DirectXMath.h>

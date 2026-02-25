@@ -15,7 +15,7 @@ struct Vertex
 };
 
 
-void Mesh::SetMesh(std::string meshName)
+void Mesh::SetMesh(std::string meshName, XMFLOAT3 color)
 {
 	std::transform(meshName.begin(), meshName.end(), meshName.begin(), std::tolower);
 
@@ -24,6 +24,7 @@ void Mesh::SetMesh(std::string meshName)
 		m_MeshName = "nullptr";
 	else
 		m_MeshName = m_pMesh->Name;
+	SetColor(color);
 }
 
 void Mesh::InitPyramidMesh()
