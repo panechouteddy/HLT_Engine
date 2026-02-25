@@ -106,6 +106,9 @@ bool D3DApp::Initialize()
     if (!InitDirect3D())
         return false;
 
+    if (!InitD3D11On12())
+        return false;
+
     // Do the initial resize code.
     OnResize();
 
@@ -254,11 +257,16 @@ void D3DApp::OnResize()
     assert(m_DirectCmdListAlloc);
 
     FlushCommandQueue();
-
+    
     ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
-    for (int i = 0; i < SwapChainBufferCount; ++i)
+    if (m_d2dContext) m_d2dContext->SetTarget(nullptr);
+
+    for (int i = 0; i < SwapChainBufferCount; ++i) {
+        m_wrappedBackBuffers[i].Reset();
         m_SwapChainBuffer[i].Reset();
+    }
+
     m_DepthStencilBuffer.Reset();
 
     ThrowIfFailed(m_SwapChain->ResizeBuffers(SwapChainBufferCount,m_ClientWidth, m_ClientHeight,m_BackBufferFormat,DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
@@ -413,7 +421,33 @@ bool D3DApp::InitDirect3D()
 
     return true;
 }
+bool D3DApp::InitD3D11On12() 
+{
+    ThrowIfFailed(D3D11On12CreateDevice(
+        m_Device.Get(),
+        D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+        nullptr, 0,
+        reinterpret_cast<IUnknown**>(m_CommandQueue.GetAddressOf()),
+        1, 0,
+        &m_d3d11Device,
+        &m_d3d11DeviceContext,
+        nullptr
+    ));
+    ThrowIfFailed(m_d3d11Device.As(&m_d3d11On12Device));
 
+    ComPtr<IDXGIDevice> dxgiDevice;
+    ThrowIfFailed(m_d3d11On12Device.As(&dxgiDevice));
+
+    D2D1_FACTORY_OPTIONS options = {};
+    ComPtr<ID2D1Factory3> d2dFactory;
+    ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, &d2dFactory));
+
+    ComPtr<ID2D1Device2> d2dDevice;
+    ThrowIfFailed(d2dFactory->CreateDevice(dxgiDevice.Get(), &d2dDevice));
+    ThrowIfFailed(d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_d2dContext));
+
+    return true;
+}
 void D3DApp::CreateCommandObjects()
 {
     D3D12_COMMAND_QUEUE_DESC queueDesc = {};

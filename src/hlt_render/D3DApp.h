@@ -53,6 +53,7 @@ protected:
 
 	bool InitMainWindow();
 	bool InitDirect3D();
+	bool InitD3D11On12();
 	void CreateCommandObjects();
 	void CreateSwapChain();
 
@@ -125,6 +126,11 @@ protected:
 	D3D_DRIVER_TYPE m_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
 	DXGI_FORMAT m_DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-
+	//D3D11
+	ComPtr<ID3D11Device> m_d3d11Device;
+	ComPtr<ID3D11On12Device> m_d3d11On12Device;
+	ComPtr<ID2D1DeviceContext2> m_d2dContext;
+	ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
+	ComPtr<ID3D11Resource> m_wrappedBackBuffers[SwapChainBufferCount];
 };
 

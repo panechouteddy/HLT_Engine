@@ -1,46 +1,29 @@
 #include "pch.h"
 
-void hlt_SplashScreen::Initialize(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue, int swapChainBC, ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
+void hlt_SplashScreen::Initialize(ID3D11On12Device* d11On12,
+	ID2D1DeviceContext2* d2dCtx,
+	ID3D11DeviceContext* d11Ctx,
+	int swapChainBC,
+	ComPtr<ID3D12Resource>* swapChainBuffer,
+	ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
-	ThrowIfFailed(D3D11On12CreateDevice(
-		device.Get(),
-		d3d11DeviceFlags,
-		nullptr, 0,
-		reinterpret_cast<IUnknown**>(commandQueue.GetAddressOf()),
-		1,
-		0,
-		&m_d3d11Device,
-		&m_d3d11DeviceContext,
-		nullptr
-	));
-
-	ThrowIfFailed(m_d3d11Device.As(&m_d3d11On12Device));
+	m_d3d11On12Device = d11On12;
+	m_d2dContext = d2dCtx;
+	m_d3d11DeviceContext = d11Ctx;
 
 	D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
-
-	for (UINT i = 0; i < swapChainBC; i++)
+	for (UINT i = 0; i < (UINT)swapChainBC; i++)
 	{
-		ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(
-			swapChainBuffer[i].Get(),
-			&d3d11Flags,
-			D3D12_RESOURCE_STATE_PRESENT,
-			D3D12_RESOURCE_STATE_RENDER_TARGET,
-			IID_PPV_ARGS(&wrappedBackBuffers[i])
-		));
+		if (wrappedBackBuffers[i] == nullptr) {
+			ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(
+				swapChainBuffer[i].Get(),
+				&d3d11Flags,
+				D3D12_RESOURCE_STATE_PRESENT,
+				D3D12_RESOURCE_STATE_RENDER_TARGET,
+				IID_PPV_ARGS(&wrappedBackBuffers[i])
+			));
+		}
 	}
-
-
-	D2D1_FACTORY_OPTIONS options = {};
-
-	ComPtr<ID2D1Factory3> d2dFactory;
-	ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &options, &d2dFactory));
-
-	ComPtr<IDXGIDevice> dxgiDevice;
-	ThrowIfFailed(m_d3d11On12Device.As(&dxgiDevice));
-
-	ComPtr<ID2D1Device2> d2dDevice;
-	ThrowIfFailed(d2dFactory->CreateDevice(dxgiDevice.Get(), &d2dDevice));
-	ThrowIfFailed(d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_d2dContext));
 
 	ComPtr<IDWriteFactory> writeFactory;
 	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &writeFactory));

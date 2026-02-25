@@ -66,7 +66,6 @@ private:
 
 	std::shared_ptr<hlt_D2DResource> m_DeviceResources;
 
-	ComPtr<ID3D11Resource> m_wrappedBackBuffers[SwapChainBufferCount];
 
 	XMFLOAT4X4 mWorld = MathHelper::Identity4x4();
 
@@ -122,7 +121,8 @@ bool main::Initialize()
 
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
-	m_SplashScreen.Initialize(m_Device, m_CommandQueue, SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+	m_SplashScreen.Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers); ;
+	m_ui.Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
 	m_SplashScreen.m_Start = false;
 
@@ -338,15 +338,29 @@ void main::BuildPSO()
 
 void main::OnResize()
 {
+	m_SplashScreen.ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
+	m_ui.ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
+
 	D3DApp::OnResize();
 
 	// The window resized, so update the aspect ratio and recompute the projection matrix.
 	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 	XMStoreFloat4x4(&m_camera.m_Proj, P);
+
+	m_ui.Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+		SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+
+	m_SplashScreen.Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers); ;
 }
 
 void main::Update(const GameTimer& gt)
 {
+
+	if (GetAsyncKeyState('A') & 0x8000)
+		m_SplashScreen.m_Start = true;
+	if (GetAsyncKeyState('D') & 0x8000)
+		m_SplashScreen.m_Start = false;
+
 	// Convert Spherical to Cartesian coordinates.
 	m_camera.m_width = mRadius * sinf(mPhi) * cosf(mTheta);
 	m_camera.m_z = mRadius * sinf(mPhi) * sinf(mTheta);
@@ -422,9 +436,6 @@ void main::Draw(const GameTimer& gt)
 	}
 	else
 	{
-		if(m_ui.m_Initialize == false)
-			m_ui.Initialize(m_Device, m_CommandQueue, SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
-
 		m_ui.StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 
 		std::wstring stats = L"FPS: " + std::to_wstring(1.0f / gt.DeltaTime());

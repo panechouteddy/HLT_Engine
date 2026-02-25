@@ -2,6 +2,8 @@
 
 void hlt_D2DResource::StartDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
+	m_d2dContext->SetTarget(nullptr);
+
 	ComPtr<IDXGISurface> surface;
 	ThrowIfFailed(wrappedBackBuffers[m_CurrBackBuffer].As(&surface));
 
@@ -16,7 +18,6 @@ void hlt_D2DResource::StartDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wr
 	m_d2dContext->SetTarget(d2dTargetBitmap.Get());
 
 	m_d3d11On12Device->AcquireWrappedResources(wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
-
 	m_d2dContext->BeginDraw();
 }
 
@@ -24,8 +25,21 @@ void hlt_D2DResource::EndDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrap
 {
 	m_d2dContext->EndDraw();
 
+	m_d2dContext->SetTarget(nullptr);
 	m_d3d11On12Device->ReleaseWrappedResources(wrappedBackBuffers[m_CurrBackBuffer].GetAddressOf(), 1);
 
-	m_d2dContext->SetTarget(nullptr);
 	m_d3d11DeviceContext->Flush();
+}
+
+
+void hlt_D2DResource::ReleaseResources(int swapChainBC, ComPtr<ID3D11Resource>* wrappedBackBuffers)
+{
+	for (int i = 0; i < swapChainBC; i++)
+	{
+		wrappedBackBuffers[i].Reset();
+	}
+	if (m_d2dContext)
+	{
+		m_d2dContext->SetTarget(nullptr);
+	}
 }
