@@ -3,6 +3,8 @@
 #if defined(DEBUG) || defined(_DEBUG)
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+#include <d3d11on12.h>
+#include <d2d1_3.h>
 #endif
 
 //#include "d3dUtil.h"
