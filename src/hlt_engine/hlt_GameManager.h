@@ -25,7 +25,6 @@ public:
 	void Start();
 	void AddMesh(Mesh* mesh) { m_pD3D12App->AddMesh(mesh); }
 private:
-	
 	void Update();
 	void Render();
 	void Destroy();

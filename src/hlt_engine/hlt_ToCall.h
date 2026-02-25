@@ -7,13 +7,13 @@ struct Callable
 	virtual ~Callable() = default;
 };
 
-template <typename T>
+template <typename ownerType>
 struct CallableWrapper : public Callable
 {
-	T* m_pObject;
-	void (T::* m_pMethod)();
+	ownerType* m_pObject;
+	void (ownerType::* m_pMethod)();
 
-	CallableWrapper(T* obj, void (T::*m)()) : m_pObject(obj), m_pMethod(m) { }
+	CallableWrapper(ownerType* obj, void (ownerType::*m)()) : m_pObject(obj), m_pMethod(m) { }
 
 	void Call() override
 	{
@@ -25,11 +25,11 @@ struct hlt_Function
 {
 	Callable* m_pWrapper = nullptr;
 	
-	template <typename T>
-	void Set(T* obj, void(T::* m)())
+	template <typename ownerType>
+	void Set(ownerType* obj, void(ownerType::* m)())
 	{
 		if (m_pWrapper) delete m_pWrapper;
-		m_pWrapper = new CallableWrapper<T>(obj, m);
+		m_pWrapper = new CallableWrapper<ownerType>(obj, m);
 	}
 
 	void Execute()
