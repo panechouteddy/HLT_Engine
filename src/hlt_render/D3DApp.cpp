@@ -107,10 +107,17 @@ bool D3DApp::Initialize()
     if (!InitD3D11On12())
         return false;
 
+    m_UI = new hlt_UI;
+    m_SplashScreen = new hlt_SplashScreen;
+
     // Do the initial resize code.
     OnResize();
 
     m_Camera = new hlt_Camera;
+    m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+
+
     InitDirect3DDraw();
 
     Update();
@@ -135,7 +142,6 @@ void D3DApp::Draw()
     m_CommandList->RSSetViewports(1, &m_ScreenViewport);
     m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
 
-
     D3D12_CPU_DESCRIPTOR_HANDLE currentBackBufferView = CurrentBackBufferView();
     m_CommandList->ClearRenderTargetView(currentBackBufferView, Colors::LightSteelBlue, 0, nullptr);
 
@@ -155,6 +161,21 @@ void D3DApp::Draw()
     // Add the command list to the queue for execution.
     ID3D12CommandList* cmdsLists[] = { m_CommandList.Get()};
     m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+    FlushCommandQueue();
+    
+    m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+
+    m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
+
+    m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+
+    m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    
+    std::wstring stats = L"FPS: " + std::to_wstring(1.0f);
+    m_UI->Draw(m_pWindow->GetWndSize().x*0.5f, stats);
+
+    m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));
     m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
@@ -368,6 +389,9 @@ void D3DApp::EndRender()
 //}
 void D3DApp::OnResize()
 {
+    m_UI->ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
+    m_SplashScreen->ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
+
     assert(m_Device);
     assert(m_SwapChain);
     assert(m_DirectCmdListAlloc);
@@ -452,6 +476,11 @@ void D3DApp::OnResize()
     m_ScreenViewport.MaxDepth = 1.0f;
 
     m_ScissorRect = { 0, 0, clientSize.x, clientSize.y };
+
+    m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 }
 //bool D3DApp::InitMainWindow()
 //{
