@@ -1,5 +1,7 @@
 #pragma once
 
+#define ID_ICON 101
+
 class hlt_GameManager
 {
 private:
@@ -43,6 +45,9 @@ private:
 	hlt_Window* m_pWindow = nullptr;
 	D3DApp* m_pD3D12App = nullptr;
 	hlt_Camera* m_pCamera = nullptr;
+
+	// DEFAULT WINDOW ICON
+	HICON m_DefaultIcon;
 
 	// ENTITY MANAGER
 	hlt_EntityManager m_EntityManager;

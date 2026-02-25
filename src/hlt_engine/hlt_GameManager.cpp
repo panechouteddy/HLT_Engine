@@ -69,14 +69,17 @@ void hlt_GameManager::Run()
 
 void hlt_GameManager::Start()
 {
+	SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.Console.1.0");
 	if(DEBUG)
 		hlt_DebugTools::hlt_DebugConsole::CreateDebugConsole();
-
+	SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.MainWnd.1.0");
 	m_pWindow = &HLT_WINDOW;
 	m_pWindow->GetWndName() = L"hlt_Engine Window";
 	m_pWindow->SetWndSize(XMINT2(1080, 720));
-	if (m_pWindow->CreateWnd(MainWndProc) == false)
+	m_DefaultIcon = (HICON)LoadImage(NULL, L"../../res/hlt_engine_logo.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
+	if (m_pWindow->CreateWnd(MainWndProc, m_DefaultIcon) == false)
 		m_IsRunning = false;
+	
 	m_pWindow->SetCursorLock(true);
 	m_pWindow->SetCursorVisibility(true);
 	m_pWindow->Update();

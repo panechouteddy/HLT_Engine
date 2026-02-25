@@ -14,6 +14,7 @@ private:
 public:
 	static hlt_Window& GetInstance();
 	bool CreateWnd(WNDPROC lpfnWndProc);
+	bool CreateWnd(WNDPROC lpfnWndProc, HICON& windowIcon);
 
 	void Update();
 

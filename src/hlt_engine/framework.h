@@ -4,6 +4,9 @@
 #include <hlt_core/framework.h>
 #include <hlt_render/framework.h>
 
+ // FOR SetCurrentProcessExplicitAppUserModelID
+#include <shobjidl.h>
+
 // CONTAINERS
 #include <vector>
 #include <unordered_map>
