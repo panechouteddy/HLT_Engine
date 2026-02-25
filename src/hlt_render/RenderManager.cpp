@@ -82,9 +82,6 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 
 void RenderManager::Draw()
 {
-	ColorConstants test;
-	test.ObjectColor = XMFLOAT4(1, 0, 0, 1);
-	
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_CbvHeap.Get() };
 	m_CommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
@@ -94,7 +91,6 @@ void RenderManager::Draw()
 
 	for (int i = 0;i < m_MeshToDrawList.size();i++)
 	{
-		m_ColorBufferList[i]->GetBuffer()->CopyData(0, test);
 
 		if (m_MeshToDrawList[i] == nullptr)
 			continue;
@@ -112,7 +108,7 @@ void RenderManager::Draw()
 		m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->DrawIndexedInstanced(
-			m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount,
+			m_MeshToDrawList[i]->GetGeometry()->DrawArgs["Pyramid"].IndexCount,
 			1, 0, 0, 0);
 	}
 
@@ -150,7 +146,7 @@ void RenderManager::BuildRootSignature(ID3D12Device* device)
 	// Create a single descriptor table of CBVs.
 
 	slotRootParameter[0].InitAsConstantBufferView(0); // 0 <- bo 
-	slotRootParameter[1].InitAsConstantBufferView(1); // b1
+	slotRootParameter[1].InitAsConstantBufferView(1); // 1 <- b1
 	// A root signature is an array of root parameters.
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
