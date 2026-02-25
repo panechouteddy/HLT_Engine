@@ -20,6 +20,8 @@ void Mesh::SetMesh(std::string meshName)
 	m_pMesh = D3DApp::GetApp()->GetMeshBox()->GetMesh(meshName);
 	if (m_pMesh == nullptr)
 		m_MeshName = "nullptr";
+	else
+		m_MeshName = m_pMesh->Name;
 }
 
 void Mesh::InitPyramidMesh()

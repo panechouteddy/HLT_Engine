@@ -2,6 +2,7 @@
 #include <array>
 #include <unordered_map>
 #include "DirectXMath.h"
+#include "DirectXColors.h"
 
 struct MeshGeometry;
 class ColorBuffer;
@@ -22,7 +23,7 @@ class Mesh
 {
 protected:
 
-    XMFLOAT4 m_Color = { 1.f,1.f,1.f,1.f };
+    XMFLOAT4 m_Color = XMFLOAT4(Colors::White);
     MeshGeometry* m_pMesh = nullptr;
     bool m_IsVisible = false ;
     std::string m_MeshName;
