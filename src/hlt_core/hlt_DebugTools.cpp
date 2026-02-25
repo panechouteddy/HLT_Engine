@@ -44,6 +44,6 @@ void hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole()
 
 void hlt_DebugTools::hlt_DebugConsole::PrintVector(XMFLOAT3& v) 
 {
-    std::cout << "XMFLOAT3: " << v.x << "|" << v.y << "|" << v.z << std::endl;
+    std::cout << "XMFLOAT3: " << v.x << "|" << v.y << "|" << v.z;
 }
 #endif

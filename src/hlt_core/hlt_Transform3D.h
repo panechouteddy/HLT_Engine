@@ -40,4 +40,7 @@ public:
 	void SetYPR(FXMVECTOR ypr);
 
 	void OrbitAround();
+
+	// DX12 TRANSFORM
+	void UpdateWorld();
 };

@@ -9,21 +9,41 @@ hlt_Camera::hlt_Camera()
 }
 void hlt_Camera::Update()
 {
-    if (DEBUG)
-        DebugInput();
-
-    XMMATRIX view = XMMatrixIdentity();
-
-    view *= XMMatrixTranslation(m_Transform.pos.x, m_Transform.pos.y, m_Transform.pos.z);
-
-    XMVECTOR rotation = XMLoadFloat4(&m_Transform.quaternion);
-    view *= XMMatrixRotationQuaternion(rotation);
+    
 
     //XMVECTOR pos = XMVectorSet(1.5f, XM_PIDIV4, 5.f, 1.f);
     //XMVECTOR target = XMVectorZero();
     //XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f); //cam
 
     //XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+
+    //if (DEBUG)
+    //    DebugInput();
+
+    //XMMATRIX view = XMMatrixIdentity();
+
+    //view *= XMMatrixTranslation(m_Transform.pos.x, m_Transform.pos.y, m_Transform.pos.z);
+
+    //XMVECTOR rotation = XMLoadFloat4(&m_Transform.quaternion);
+    //view *= XMMatrixRotationQuaternion(rotation);
+    //
+    //XMVECTOR determinant;
+    //XMStoreFloat4x4(&m_View, XMMatrixInverse(&determinant, view));
+
+    if (DEBUG) DebugInput();
+
+    //XMVECTOR pos = XMLoadFloat3(&m_Transform.pos);
+    //XMVECTOR quat = XMLoadFloat4(&m_Transform.quaternion);
+
+    //// world of Camera
+    //XMMATRIX view = XMMatrixRotationQuaternion(quat) * XMMatrixTranslationFromVector(pos);
+
+    m_Transform.UpdateWorld();
+    XMMATRIX view = XMLoadFloat4x4(&m_Transform.world);
+
+    // View is inverse of world
+    XMVECTOR determinant;
+    view = XMMatrixInverse(&determinant, view);
 
     XMStoreFloat4x4(&m_View, view);
 
@@ -38,19 +58,45 @@ void hlt_Camera::DebugInput()
     hlt_Input::KeyboardInput& keyboardInput = HLT_KEYBOARD;
 
     if (keyboardInput.IsKey(VK_Z) || keyboardInput.IsKey(VK_W))
-        m_Transform.Move(-10.f * hlt_Time::GetInstance().GetDeltaTime());
-    if (keyboardInput.IsKey(VK_S))
         m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime());
+    if (keyboardInput.IsKey(VK_S))
+        m_Transform.Move(-10.f * hlt_Time::GetInstance().GetDeltaTime());
     if (keyboardInput.IsKey(VK_Q) || keyboardInput.IsKey(VK_A))
-        m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
-    if (keyboardInput.IsKey(VK_D))
         m_Transform.Move(-10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
+    if (keyboardInput.IsKey(VK_D))
+        m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
     if (keyboardInput.IsKey(VK_SPACE))
-        m_Transform.Move(-10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.up);
+        m_Transform.pos.y += 10.f * hlt_Time::GetInstance().GetDeltaTime();
+        //m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.up);
     if (keyboardInput.IsKey(VK_LCONTROL))
-        m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.up);
+        m_Transform.pos.y -= 10.f * hlt_Time::GetInstance().GetDeltaTime();
+        //m_Transform.Move(-10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.up);
 
     // ROTATION TO DO
+    hlt_Input::MouseInput& mouse = hlt_Input::MouseInput::GetInstance();
+
+    // On récupère le delta de mouvement de la souris
+    XMINT2 delta = mouse.GetDeltaPos();
+
+    if (delta.x != 0 || delta.y != 0)
+    {
+        float sensitivity = 0.005f; // Ajuste la sensibilité ici
+
+        // x de la souris = Yaw (rotation autour de l'axe Up)
+        // y de la souris = Pitch (rotation autour de l'axe Right)
+        float yaw = static_cast<float>(delta.x) * sensitivity;
+        float pitch = static_cast<float>(delta.y) * sensitivity;
+
+        // On utilise ta fonction existante dans hlt_Transform3D
+        // AddYPR(yaw, pitch, roll)
+        m_Transform.AddYPR(0.f, pitch, yaw);
+    }
+
+    if (keyboardInput.IsKey(VK_A))
+        m_Transform.ResetRotation();
+
+    std::cout << "pos: "; hlt_DebugConsole::PrintVector(m_Transform.pos);
+    std::cout << " / up: "; hlt_DebugConsole::PrintVector(m_Transform.up); std::cout << std::endl;
 }
 
 //{

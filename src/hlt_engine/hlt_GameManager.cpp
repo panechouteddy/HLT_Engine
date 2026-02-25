@@ -74,9 +74,12 @@ void hlt_GameManager::Start()
 
 	m_pWindow = &HLT_WINDOW;
 	m_pWindow->GetWndName() = L"hlt_Engine Window";
-	m_pWindow->GetWndSize() = XMINT2(1080, 720);
+	m_pWindow->SetWndSize(XMINT2(1080, 720));
 	if (m_pWindow->CreateWnd(MainWndProc) == false)
 		m_IsRunning = false;
+	m_pWindow->SetCursorLock(true);
+	m_pWindow->SetCursorVisibility(true);
+	m_pWindow->Update();
 
 	if(m_pD3D12App == nullptr)
 		m_pD3D12App = new D3DApp(m_pWindow);
@@ -90,16 +93,25 @@ void hlt_GameManager::Start()
 
 void hlt_GameManager::Update()
 {
-	m_ECS.Update();
-
+	// ENGINE CORE UPDATE
 	RefreshCore();
 
+	// ECS SYSTEMS UPDATE
+	m_ECS.Update();
+
+	// APP UPDATE
 	if (m_AppToCall.m_Update.m_pWrapper != nullptr)
 		m_AppToCall.m_Update.Execute();
 
-	RefreshTransformsMatrix();
+	// WINDOW UPDATE
+	m_pWindow->Update();
 
+	// DX12 UPDATES
+	RefreshTransformsMatrix();
 	m_pD3D12App->Update();
+
+	// MOUSE DELTA UPDATE
+	*HLT_MOUSE.GetLastPos() = *HLT_MOUSE.GetPos();
 }
 
 void hlt_GameManager::Render()
@@ -128,11 +140,11 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 	{
 	case WM_MOUSEMOVE:
 		HLT_MOUSE.SetMouseMove(lParam);
-		break;
+		return 0;
 
 	case WM_MOUSEWHEEL:
 		HLT_MOUSE.SetMouseWheel(wParam);
-		break;
+		return 0;
 
 	case WM_ACTIVATE: // PAUSE THE WINDOW
 		if (LOWORD(wParam) == WA_INACTIVE)
@@ -145,7 +157,7 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 			m_pWindow->IsPaused() = false;
 			//m_Timer.Start();
 		}
-		break;
+		return 0;
 
 	case WM_SIZING: // TO KEEP A WINDOW RATIO OR A MIN/MAX
 		m_pWindow->IsPaused() = true;
@@ -204,13 +216,14 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 					m_pD3D12App->OnResize();
 			}
 		}
+		return 0;
 
 	case WM_CLOSE:
 		if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
 		{
 			m_IsRunning = false;
 		}
-		break;
+		return 0;
 
 	case WM_ENTERSIZEMOVE:
 		m_pWindow->IsPaused() = true;
@@ -245,7 +258,7 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 	default:
 		break;
 	}
-	//D3DApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
+
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
@@ -266,18 +279,8 @@ void hlt_GameManager::RefreshTransformsMatrix()
 
 	for (hlt_Component::Transform3D& transformComponent : transforms->component)
 	{
-		hlt_Transform3D& trans = transformComponent.transform;
-
-		XMVECTOR vPos = XMLoadFloat3(&trans.pos);
-		XMVECTOR vSca = XMLoadFloat3(&trans.sca);
-		XMVECTOR vRot = XMLoadFloat4(&trans.quaternion);
-
-		XMMATRIX pos = XMMatrixTranslationFromVector(vPos);
-		XMMATRIX sca = XMMatrixScalingFromVector(vSca);
-		XMMATRIX rot = XMMatrixRotationQuaternion(vRot);
-
-		XMMATRIX world = sca * rot * pos;
-
-		XMStoreFloat4x4(&trans.world, world);
+		transformComponent.transform.UpdateWorld();
+		hlt_DebugConsole::PrintVector(transformComponent.transform.pos);
+		std::cout << " / cube: " << std::endl;
 	}
 }

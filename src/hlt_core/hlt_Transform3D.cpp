@@ -97,3 +97,18 @@ void hlt_Transform3D::SetYPR(FXMVECTOR ypr)
 void hlt_Transform3D::OrbitAround()
 {
 }
+
+void hlt_Transform3D::UpdateWorld()
+{
+	XMVECTOR vPos = XMLoadFloat3(&pos);
+	XMVECTOR vSca = XMLoadFloat3(&sca);
+	XMVECTOR vRot = XMLoadFloat4(&quaternion);
+
+	XMMATRIX pos = XMMatrixTranslationFromVector(vPos);
+	XMMATRIX sca = XMMatrixScalingFromVector(vSca);
+	XMMATRIX rot = XMMatrixRotationQuaternion(vRot);
+
+	XMMATRIX newWorld = sca * rot * pos;
+
+	XMStoreFloat4x4(&world, newWorld);
+}

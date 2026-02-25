@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "hlt_Window.h"
+#include "hlt_Input.h"
 
 hlt_Window* hlt_Window::s_pInstance = nullptr;
 
@@ -34,6 +35,9 @@ bool hlt_Window::CreateWnd(WNDPROC lpfnWndProc)
 	m_IsMaximized = false;
 	m_IsResizing = false;
 	m_IsFullscreen = false;
+
+	m_IsCursorLocked = false;
+	m_IsCursorVisible = false;
 
 	WNDCLASS wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -79,6 +83,40 @@ bool hlt_Window::CreateWnd(WNDPROC lpfnWndProc)
 
 	return true;
 }
+
+void hlt_Window::Update()
+{
+	if (m_IsCursorLocked == true)
+	{
+		RECT window;
+		if (GetClientRect(m_MainWindow, &window))
+		{
+			POINT center{ (window.right - window.left) / 2, (window.bottom - window.top) / 2 };
+			*HLT_MOUSE.GetLastPos() = XMINT2(center.x, center.y);
+			ClientToScreen(m_MainWindow, &center);
+			SetCursorPos(center.x, center.y);
+		}
+	}
+}
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+
+void hlt_Window::SetCursorVisibility(bool isVisible)
+{
+	m_IsCursorVisible = isVisible;	
+	ShowCursor(m_IsCursorVisible);
+}
+
+void hlt_Window::SetCursorLock(bool isLocked)
+{
+	m_IsCursorLocked = isLocked;
+}
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
 void hlt_Window::SetWndSize(XMINT2 newSize)
 {

@@ -12,7 +12,7 @@ void App::OnStart()
 {
 	m_PlayerID = hlt_Prefab::CreateCube();
 	m_EntityID.push_back(m_PlayerID);
-	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos.x = 5.f;
+	//HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos.x = 5.f;
 }
 
 void App::OnUpdate()
