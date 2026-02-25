@@ -82,6 +82,7 @@ void hlt_GameManager::Start()
 		m_pD3D12App = new D3DApp(m_pWindow);
 	if (m_pD3D12App->Initialize() == false)
 		m_IsRunning = false;
+	m_pCamera = m_pD3D12App->GetCamera();
 
 	if (m_AppToCall.m_Start.m_pWrapper != nullptr)
 		m_AppToCall.m_Start.Execute();
@@ -95,6 +96,8 @@ void hlt_GameManager::Update()
 
 	if (m_AppToCall.m_Update.m_pWrapper != nullptr)
 		m_AppToCall.m_Update.Execute();
+
+	RefreshTransformsMatrix();
 
 	m_pD3D12App->Update();
 }
@@ -255,4 +258,26 @@ void hlt_GameManager::RefreshCore()
 	HLT_KEYBOARD.Update();
 	HLT_MOUSE.Update();
 	HLT_TIME.Update();
+}
+
+void hlt_GameManager::RefreshTransformsMatrix()
+{
+	hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_ECS.GetComponent<hlt_Component::Transform3D>();
+
+	for (hlt_Component::Transform3D& transformComponent : transforms->component)
+	{
+		hlt_Transform3D& trans = transformComponent.transform;
+
+		XMVECTOR vPos = XMLoadFloat3(&trans.pos);
+		XMVECTOR vSca = XMLoadFloat3(&trans.sca);
+		XMVECTOR vRot = XMLoadFloat4(&trans.quaternion);
+
+		XMMATRIX pos = XMMatrixTranslationFromVector(vPos);
+		XMMATRIX sca = XMMatrixScalingFromVector(vSca);
+		XMMATRIX rot = XMMatrixRotationQuaternion(vRot);
+
+		XMMATRIX world = sca * rot * pos;
+
+		XMStoreFloat4x4(&trans.world, world);
+	}
 }

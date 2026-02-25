@@ -8,7 +8,7 @@ inline void Test_GameManagerXRender()
 #endif
 	HLT::Run<App>();
 
-	hlt_GameManager& gm = HLT_GAMEMANAGER;
+	/*hlt_GameManager& gm = HLT_GAMEMANAGER;
 
 	gm.Start();
 
@@ -22,5 +22,5 @@ inline void Test_GameManagerXRender()
 
 	playerMesh->mesh.SetMesh("Pyramid");
 	gm.AddMesh(&playerMesh->mesh);
-	gm.Run();
+	gm.Run();*/
 }
