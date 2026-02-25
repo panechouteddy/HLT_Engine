@@ -18,6 +18,8 @@ public:
 
     void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
     void CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+    void  CreateRock(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+    void CreateGround(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 };
 
 class Mesh
@@ -34,7 +36,6 @@ public :
     void SetMesh(std::string meshName , XMFLOAT3 color);
     void SetColor(XMFLOAT4 color) { m_Color = color;}
     void SetColor(XMFLOAT3 color) { m_Color = { color.x,color.y,color.z ,1 };}
-    void InitPyramidMesh();
     MeshGeometry* GetGeometry();
     bool MeshIsVisible() { return m_IsVisible ;}
     void SetMeshVisibility(bool state) { m_IsVisible = state; }

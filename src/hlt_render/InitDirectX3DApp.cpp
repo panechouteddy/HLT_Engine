@@ -17,11 +17,6 @@ bool InitDirectX3DApp::Initialize()
 	if (!D3DApp::Initialize())
 		return false;
 
-	Mesh* meshTest = new Mesh;
-	meshTest->InitPyramidMesh();
-	//Ajouter le mesh 
-	AddMesh(meshTest);
-
 	return true;
 }
 
