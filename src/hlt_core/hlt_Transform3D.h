@@ -18,6 +18,6 @@ public:
 	XMFLOAT4X4 rotation;
 
 	// DX12 TRANSFORM
-	bool isWorldUpdated;
+	bool isWorldUpdated = false;
 	XMFLOAT4X4 world;
 };

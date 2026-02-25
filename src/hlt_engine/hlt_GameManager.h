@@ -1,30 +1,30 @@
 #pragma once
 
-
 class hlt_GameManager
 {
 private:
 	static hlt_GameManager* s_pInstance;
 
 private:
-	hlt_GameManager();
+	
 	~hlt_GameManager();
 
 public:
+	hlt_GameManager();
 	static hlt_GameManager& GetInstance();
 	void Run();
 
 	LRESULT WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 
+	hlt_ToCall& GetAppMainMethods() { return m_AppToCall; }
 	hlt_ECS* GetECS() { return &m_ECS; }
 
-	int CreateEntity();
-	void DeleteEntity(int ID);
+	int CreateEntity() { return m_EntityManager.CreateEntity(); }
+	void DeleteEntity(int ID) { return m_EntityManager.DeleteEntity(ID); }
 
 	void Start();
 	void AddMesh(Mesh* mesh) { m_pD3D12App->AddMesh(mesh); }
 private:
-	
 	void Update();
 	void Render();
 	void Destroy();
@@ -35,14 +35,18 @@ private:
 	// RUN
 	bool m_IsRunning = false;
 
+	// APP FUNCTIONS
+	hlt_ToCall m_AppToCall;
+	
 	// WINDOW
 	hlt_Window* m_pWindow = nullptr;
 	D3DApp* m_pD3D12App = nullptr;
 
 	// ENTITY MANAGER
-	int m_countEntityID = 0;
+	hlt_EntityManager m_EntityManager;
+	/*int m_countEntityID = 0;
 	std::vector<int> m_EntityID;
-	std::vector<int> m_PoolEntityID;
+	std::vector<int> m_PoolEntityID;*/
 
 	// ECS
 	hlt_ECS m_ECS;

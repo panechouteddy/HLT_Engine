@@ -110,6 +110,8 @@ bool D3DApp::Initialize()
     m_Camera = new hlt_Camera;
     InitDirect3DDraw();
 
+    Update();
+
     return true;
 }
 void D3DApp::Update()

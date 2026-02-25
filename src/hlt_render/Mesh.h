@@ -15,8 +15,9 @@ public:
     MeshBox() {};
     MeshGeometry* GetMesh(std::string form) { return m_BoxOfMesh.contains(form) ? m_BoxOfMesh[form] : nullptr; }
     void CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
-    void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 
+    void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+    void CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 };
 
 class Mesh
@@ -25,7 +26,7 @@ protected:
 
     XMFLOAT4 m_Color = XMFLOAT4(Colors::White);
     MeshGeometry* m_pMesh = nullptr;
-    bool m_IsVisible = false ;
+    bool m_IsVisible = true ;
     std::string m_MeshName;
 
 public :

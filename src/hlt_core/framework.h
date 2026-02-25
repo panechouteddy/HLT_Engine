@@ -44,6 +44,10 @@ using namespace hlt_DebugTools;
 #include <crtdbg.h>
 #endif
 
+/// HLT CORE CLASS DEFINE
+#define HLT_MOUSE hlt_Input::MouseInput::GetInstance()
+#define HLT_KEYBOARD hlt_Input::KeyboardInput::GetInstance()
+
 /// INPUTS DEFINE
 #define VK_Z 0x5A
 #define VK_Q 0x51

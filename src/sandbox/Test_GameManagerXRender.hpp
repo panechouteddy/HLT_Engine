@@ -6,6 +6,7 @@ inline void Test_GameManagerXRender()
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
+	HLT::Run<App>();
 
 	hlt_GameManager& gm = HLT_GAMEMANAGER;
 

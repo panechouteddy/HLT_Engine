@@ -111,7 +111,6 @@ void RenderManager::Draw()
 			m_MeshToDrawList[i]->GetGeometry()->DrawArgs["Pyramid"].IndexCount,
 			1, 0, 0, 0);
 	}
-
 }
 
 void RenderManager::AddConstantBuffer()

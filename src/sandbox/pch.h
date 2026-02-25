@@ -7,6 +7,12 @@
 
 #include <hlt_engine/framework.h>
 
+// UTILITY
+#include <hlt_engine/hlt_Prefab.h>
+
+// APP 
+#include "App.h"
+
 // TEST FILES
 
 #include "Test_ECS.hpp"
