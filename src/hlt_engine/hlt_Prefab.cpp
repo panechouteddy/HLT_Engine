@@ -12,6 +12,7 @@ int hlt_Prefab::CreateCube()
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
 	mesh->mesh.SetMesh("Cube");
+	gm.AddMesh(&mesh->mesh);
 
 	return cubeID;
 }
@@ -27,6 +28,7 @@ int hlt_Prefab::CreateCube(XMFLOAT3 pos, XMFLOAT3 sca)
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
 	mesh->mesh.SetMesh("cube");
+	gm.AddMesh(&mesh->mesh);
 
 	return cubeID;
 }
@@ -42,6 +44,7 @@ int hlt_Prefab::CreatePyramid()
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(pyramidID);
 
 	mesh->mesh.SetMesh("pyramid");
+	gm.AddMesh(&mesh->mesh);
 
 	return pyramidID;
 }

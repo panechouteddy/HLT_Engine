@@ -110,7 +110,6 @@ void RenderManager::Draw()
 			m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount,
 			1, 0, 0, 0);
 	}
-
 }
 
 void RenderManager::AddConstantBuffer()

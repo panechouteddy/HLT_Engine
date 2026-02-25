@@ -25,7 +25,7 @@ protected:
 
     XMFLOAT4 m_Color = { 1.f,1.f,1.f,1.f };
     MeshGeometry* m_pMesh = nullptr;
-    bool m_IsVisible = false ;
+    bool m_IsVisible = true ;
     std::string m_MeshName;
 
 public :

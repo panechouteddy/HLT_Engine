@@ -22,11 +22,13 @@ void Mesh::SetMesh(std::string meshName)
 	m_pMesh = D3DApp::GetApp()->GetMeshBox()->GetMesh(meshName);
 	if (m_pMesh == nullptr)
 		m_MeshName = "nullptr";
+	else
+		m_MeshName = m_pMesh->Name;
 }
 
 void Mesh::InitPyramidMesh()
 {
-	m_Mesh = D3DApp::GetApp()->GetMeshBox()->GetMesh("pyramid");
+	m_pMesh = D3DApp::GetApp()->GetMeshBox()->GetMesh("pyramid");
 	m_MeshName = "pyramid";
 }
 
@@ -110,14 +112,14 @@ void MeshBox::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 {
 	std::array<Vertex, 8> vertices =
 	{
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) }),
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) })
+		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f) }),
+		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f) }),
+		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f) }),
+		Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f) }),
+		Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f) }),
+		Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f) }),
+		Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f) }),
+		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f) })
 	};
 
 	std::array<std::uint16_t, 36> indices =

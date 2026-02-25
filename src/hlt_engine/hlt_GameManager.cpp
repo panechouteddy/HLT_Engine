@@ -41,7 +41,7 @@ void hlt_GameManager::Run()
 		Destroy();
 
 	m_IsRunning = true;
-	//Start();
+	Start();
 	MSG msg = { 0 };
 
 	while (m_IsRunning && msg.message != WM_QUIT)
