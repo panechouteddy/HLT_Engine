@@ -107,9 +107,12 @@ void RenderManager::Draw()
 		m_CommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());
-		m_CommandList->DrawIndexedInstanced(
-			m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount,
-			1, 0, 0, 0);
+		for (int t = 0;t < m_MeshToDrawList[i]->GetGeometry()->DrawArgs.size();t++)
+		{
+			m_CommandList->DrawIndexedInstanced(
+				m_MeshToDrawList[i]->GetGeometry()->DrawArgs[t].IndexCount,
+				1, 0, 0, 0);
+		}
 	}
 }
 

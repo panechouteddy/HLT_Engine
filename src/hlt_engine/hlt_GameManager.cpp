@@ -87,6 +87,11 @@ void hlt_GameManager::Start()
 		m_AppToCall.m_Start.Execute();
 }
 
+void hlt_GameManager::CreateMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
+{
+	m_pD3D12App->CreateOriginalMesh(name,vertexList,indexList);
+}
+
 void hlt_GameManager::Update()
 {
 	m_ECS.Update();

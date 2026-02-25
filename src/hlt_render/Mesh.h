@@ -6,6 +6,12 @@
 
 struct MeshGeometry;
 class ColorBuffer;
+
+struct Vertex
+{
+    XMFLOAT3 Pos;
+};
+
 class MeshBox
 {
 
@@ -13,9 +19,11 @@ protected:
     std::unordered_map<std::string, MeshGeometry*> m_BoxOfMesh;
 public:
     MeshBox() {};
+    bool IsAllreadyCreated(std::string form) { return m_BoxOfMesh.contains(form);}
     MeshGeometry* GetMesh(std::string form) { return m_BoxOfMesh.contains(form) ? m_BoxOfMesh[form] : nullptr; }
     void CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 
+    void CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
     void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
     void CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
     void  CreateRock(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);

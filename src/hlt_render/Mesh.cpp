@@ -9,10 +9,7 @@
 #include "ColorBuffer.h"
 using namespace DirectX;
 
-struct Vertex
-{
-	XMFLOAT3 Pos;
-};
+
 
 
 void Mesh::SetMesh(std::string meshName, XMFLOAT3 color)
@@ -44,6 +41,43 @@ void MeshBox::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* com
 
 
 
+
+void MeshBox::CreateOriginalMesh(std::string name ,std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
+{
+	if (IsAllreadyCreated(name))
+		return;
+
+	const UINT vbByteSize = (UINT)vertexList.size() * sizeof(Vertex);
+	const UINT ibByteSize = (UINT)indexList.size() * sizeof(std::uint16_t);
+
+	ID3D12GraphicsCommandList * commandList = D3DApp::GetApp()->GetCommandList();
+	ID3D12Device * device = D3DApp::GetApp()->GetDevice();
+	MeshGeometry* boxGeomety = new MeshGeometry;
+	boxGeomety->Name = name;
+	//ThrowIfFailed(D3DCreateBlob(vbByteSize,&boxGeomety->VertexBufferCPU));
+	//CopyMemory(boxGeomety->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+	//
+	//ThrowIfFailed(D3DCreateBlob(ibByteSize,&boxGeomety->IndexBufferCPU));
+	//CopyMemory(boxGeomety->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
+
+	boxGeomety->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(device, commandList, vertexList.data(), vbByteSize, boxGeomety->VertexBufferUploader);
+
+	boxGeomety->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(device, commandList, indexList.data(), ibByteSize, boxGeomety->IndexBufferUploader);
+
+	boxGeomety->VertexByteStride = sizeof(Vertex);
+	boxGeomety->VertexBufferByteSize = vbByteSize;
+	boxGeomety->IndexFormat = DXGI_FORMAT_R16_UINT;
+	boxGeomety->IndexBufferByteSize = ibByteSize;
+
+	SubmeshGeometry submesh;
+	submesh.IndexCount = (UINT)indexList.size();
+	submesh.StartIndexLocation = 0;
+	submesh.BaseVertexLocation = 0;
+
+	boxGeomety->DrawArgs.push_back(submesh);
+
+	m_BoxOfMesh.insert(std::make_pair(name, boxGeomety));
+}
 
 void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
@@ -99,7 +133,7 @@ void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* com
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs["pyramid"] = submesh;
+	boxGeomety->DrawArgs.push_back(submesh);
 
 	m_BoxOfMesh.insert(std::make_pair("pyramid", boxGeomety));
 	//m_BoxMesh["pyramid"] = boxmesh;
@@ -170,7 +204,7 @@ void MeshBox::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs["cube"] = submesh;
+	boxGeomety->DrawArgs.push_back(submesh);
 
 	m_BoxOfMesh.insert(std::make_pair("cube", boxGeomety));	
 }
@@ -243,7 +277,7 @@ void MeshBox::CreateRock(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs["rock"] = submesh;
+	boxGeomety->DrawArgs.push_back(submesh);
 
 	m_BoxOfMesh.insert(std::make_pair("rock", boxGeomety));
 }
@@ -313,7 +347,7 @@ void MeshBox::CreateGround(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs["ground"] = submesh;
+	boxGeomety->DrawArgs.push_back(submesh);
 
 	m_BoxOfMesh.insert(std::make_pair("ground", boxGeomety));
 }
