@@ -25,6 +25,7 @@ public:
 	void Start();
 	void AddMesh(Mesh* mesh) { m_pD3D12App->AddMesh(mesh); }
 	void CreateMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
+	void CreateMap(Map_Mesh* map);
 private:
 	void Update();
 	void Render();

@@ -42,7 +42,7 @@ void MeshBox::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* com
 
 
 
-void MeshBox::CreateOriginalMesh(std::string name ,std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
+void MeshBox::CreateMesh(std::string name ,std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
 {
 	if (IsAllreadyCreated(name))
 		return;
@@ -74,7 +74,7 @@ void MeshBox::CreateOriginalMesh(std::string name ,std::vector<Vertex>& vertexLi
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs.push_back(submesh);
+	boxGeomety->DrawArgs[name] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair(name, boxGeomety));
 }
@@ -133,7 +133,7 @@ void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* com
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs.push_back(submesh);
+	boxGeomety->DrawArgs["pyramid"] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair("pyramid", boxGeomety));
 	//m_BoxMesh["pyramid"] = boxmesh;
@@ -204,7 +204,7 @@ void MeshBox::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs.push_back(submesh);
+	boxGeomety->DrawArgs["cube"] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair("cube", boxGeomety));	
 }
@@ -277,7 +277,7 @@ void MeshBox::CreateRock(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs.push_back(submesh);
+	boxGeomety->DrawArgs["rock"] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair("rock", boxGeomety));
 }
@@ -347,7 +347,7 @@ void MeshBox::CreateGround(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 	submesh.StartIndexLocation = 0;
 	submesh.BaseVertexLocation = 0;
 
-	boxGeomety->DrawArgs.push_back(submesh);
+	boxGeomety->DrawArgs["ground"] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair("ground", boxGeomety));
 }

@@ -91,6 +91,10 @@ void hlt_GameManager::CreateMesh(std::string name, std::vector<Vertex>& vertexLi
 {
 	m_pD3D12App->CreateOriginalMesh(name,vertexList,indexList);
 }
+void hlt_GameManager::CreateMap(Map_Mesh* map)
+{
+	m_pD3D12App->AddMap(map);
+}
 
 void hlt_GameManager::Update()
 {

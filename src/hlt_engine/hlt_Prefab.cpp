@@ -2,7 +2,7 @@
 #include "hlt_Prefab.h"
 #include "DirectXColors.h"
 
-int hlt_Prefab::CreateCube()
+int hlt_Prefab::GameObject::CreateCube()
 {
 	hlt_GameManager& gm = hlt_GameManager::GetInstance();
 
@@ -18,7 +18,7 @@ int hlt_Prefab::CreateCube()
 	return cubeID;
 }
 
-int hlt_Prefab::CreateCube(XMFLOAT3 pos, XMFLOAT3 sca)
+int hlt_Prefab::GameObject::CreateCube(XMFLOAT3 pos, XMFLOAT3 sca)
 {
 	hlt_GameManager& gm = hlt_GameManager::GetInstance();
 
@@ -35,7 +35,7 @@ int hlt_Prefab::CreateCube(XMFLOAT3 pos, XMFLOAT3 sca)
 	return cubeID;
 }
 
-int hlt_Prefab::CreateRock()
+int hlt_Prefab::GameObject::CreateRock()
 {
 	hlt_GameManager& gm = hlt_GameManager::GetInstance();
 
@@ -52,7 +52,7 @@ int hlt_Prefab::CreateRock()
 	return cubeID;
 }
 
-int hlt_Prefab::CreateGround()
+int hlt_Prefab::GameObject::CreateGround()
 {
 	hlt_GameManager& gm = hlt_GameManager::GetInstance();
 
@@ -107,7 +107,7 @@ int hlt_Prefab::CreateGround()
 	return cubeID;
 }
 
-int hlt_Prefab::CreatePyramid()
+int hlt_Prefab::GameObject::CreatePyramid()
 {
 	hlt_GameManager& gm = hlt_GameManager::GetInstance();
 
@@ -117,8 +117,37 @@ int hlt_Prefab::CreatePyramid()
 	ecs->AddComponent<hlt_Component::Transform3D>(pyramidID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(pyramidID);
 
-	mesh->mesh.SetMesh("pyramid", hlt_Color::Blue);
+	mesh->mesh.SetMesh("pyramid", hlt_Color::Yellow);
 	gm.AddMesh(&mesh->mesh);
 
 	return pyramidID;
+}
+Mesh* hlt_Prefab::MeshObject::CreateCube()
+{
+	hlt_GameManager& gm = hlt_GameManager::GetInstance();
+	Mesh* m = new Mesh;
+	m->SetMesh("cube", hlt_Color::Blue);
+	return m;
+}
+Mesh* hlt_Prefab::MeshObject::CreatePyramid()
+{
+	hlt_GameManager& gm = hlt_GameManager::GetInstance();
+	Mesh* m = new Mesh;
+	m->SetMesh("pyramid", hlt_Color::Yellow);
+	return m;
+}
+Mesh* hlt_Prefab::MeshObject::CreateGround()
+{
+	hlt_GameManager& gm = hlt_GameManager::GetInstance();
+	Mesh* m = new Mesh;
+	m->SetMesh("ground", hlt_Color::Green);
+	return m;
+}
+
+Mesh* hlt_Prefab::MeshObject::CreateRock()
+{
+	hlt_GameManager& gm = hlt_GameManager::GetInstance();
+	Mesh* m = new Mesh;
+	m->SetMesh("rock", hlt_Color::Gray);
+	return m;
 }

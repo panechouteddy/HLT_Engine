@@ -62,6 +62,7 @@ public:
 
 	void AddMeshPosition(hlt_Transform3D* pos) const;
 	void AddMesh(Mesh* pos) const;
+	void AddMap(Map_Mesh* map);
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();

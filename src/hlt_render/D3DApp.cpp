@@ -752,7 +752,7 @@ void D3DApp::CreateMeshBox()
 }
 void D3DApp::CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
 {
-    m_Box->CreateOriginalMesh(name, vertexList, indexList);
+    m_Box->CreateMesh(name, vertexList, indexList);
 }
 void D3DApp::AddMeshPosition(hlt_Transform3D* pos) const
 {
@@ -762,4 +762,9 @@ void D3DApp::AddMeshPosition(hlt_Transform3D* pos) const
 void D3DApp::AddMesh(Mesh* mesh) const
 {
     m_RenderManager->AddMeshToDraw(mesh);
+}
+
+void D3DApp::AddMap(Map_Mesh* map)
+{
+    m_RenderManager->AddMapToRender(map);
 }

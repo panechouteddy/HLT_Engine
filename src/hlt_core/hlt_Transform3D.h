@@ -13,7 +13,7 @@ public:
 	XMFLOAT3 sca{ 1, 1, 1 };
 
 	// ROTATION
-	XMFLOAT3 front;
+	XMFLOAT3 front ;
 	XMFLOAT4 quaternion;
 	XMFLOAT4X4 rotation;
 
