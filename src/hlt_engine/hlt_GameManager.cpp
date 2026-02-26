@@ -24,7 +24,7 @@ hlt_GameManager& hlt_GameManager::GetInstance()
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 
-hlt_GameManager::hlt_GameManager()
+hlt_GameManager::hlt_GameManager() : m_DefaultIcon(NULL)
 {
 }
 hlt_GameManager::~hlt_GameManager()

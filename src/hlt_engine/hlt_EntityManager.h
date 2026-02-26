@@ -10,6 +10,10 @@ private:
 
 	hlt_ECS* m_pECS = nullptr;
 
+	std::vector<std::pair<hlt_Transform3D*, Mesh*>> m_pPosXpMesh;
+	std::vector<hlt_Transform3D*> m_pTransforms;
+	std::vector<Mesh*> m_pMeshs;
+
 public:
 	hlt_EntityManager() = default;
 	hlt_EntityManager(hlt_ECS* ecs) { m_pECS = ecs; }
@@ -17,5 +21,9 @@ public:
 
 	int CreateEntity();
 	void DeleteEntity(int ID);
+
+	void UpdateMeshTransform();
+	std::vector<hlt_Transform3D*>& GetTransforms() { return m_pTransforms; }
+	std::vector<Mesh*>& GetMeshs() { return m_pMeshs; }
 };
 

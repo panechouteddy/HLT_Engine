@@ -42,12 +42,13 @@ int hlt_Prefab::GameObject::CreateRock()
 	int cubeID = gm.CreateEntity();
 	hlt_ECS* ecs = gm.GetECS();
 
-	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	
+	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
 
 	mesh->mesh.SetMesh("rock", hlt_Color::Gray);
-	gm.AddMesh(&mesh->mesh);
+	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return cubeID;
 }
@@ -97,12 +98,12 @@ int hlt_Prefab::GameObject::CreateGround()
 		4, 3, 7
 	};
 	gm.CreateMesh("ground", vertices, indices);
-	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
 
 	mesh->mesh.SetMesh("ground", hlt_Color::Green);
-	gm.AddMesh(&mesh->mesh);
+	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return cubeID;
 }

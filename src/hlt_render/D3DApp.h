@@ -46,8 +46,8 @@ public:
 	int Run();
 
 	virtual void OnResize();
-	virtual void Update();
-	virtual void Draw();
+	virtual void Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
+	virtual void Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
 
 	ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList.Get();}
 	ID3D12Device* GetDevice() { return m_Device.Get(); }
@@ -63,7 +63,6 @@ public:
 
 	/*void AddMeshPosition(hlt_Transform3D* pos) const;
 	void AddMesh(Mesh* pos) const;*/
-	void AddMeshTransform(hlt_Transform3D* transform, Mesh* mesh) { m_RenderManager->AddMeshTransform(transform, mesh); }
 	void AddMap(Map_Mesh* map);
 
 protected:

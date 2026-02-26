@@ -12,7 +12,7 @@ void App::OnStart()
 {
 	hlt_ECS* ecs = HLT_GAMEMANAGER.GetECS();
 
-	m_PlayerID = hlt_Prefab::CreateCube();
+	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
 	m_EntityID.push_back(m_PlayerID);
 
 	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { -5, 0, 15 };
@@ -22,7 +22,7 @@ void App::OnStart()
 	hlt_Component::BoxCollider3D* pBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
 	pBox->boxType = pBox->AABB;
 
-	m_OtherID = hlt_Prefab::CreateCube();
+	m_OtherID = hlt_Prefab::GameObject::CreateCube();
 	m_EntityID.push_back(m_OtherID);
 
 	ecs->GetComponent<hlt_Component::Transform3D>(m_OtherID)->transform.pos = { 5, 0, 15 };
@@ -62,7 +62,7 @@ void App::CreateMap()
 		0.f, 0.f, 1.f, 0.f,
 		0.f, 0.f, 0.f, 1.f,
 	};
-	UpdateTransform(transform1);
+	transform1->UpdateWorld();
 	object1.second = transform1;
 	//map->MeshContainer.push_back(object1);
 	std::pair<Mesh*, hlt_Transform3D*> object2;
@@ -78,7 +78,7 @@ void App::CreateMap()
 	};
 	transform2->pos.x = 2;
 	transform2->pos.z = 1;
-	UpdateTransform(transform2);
+	transform2->UpdateWorld();
 	object2.second = transform2;
 	//map->MeshContainer.push_back(object2);
 	std::pair<Mesh*, hlt_Transform3D*> object3;
@@ -95,31 +95,16 @@ void App::CreateMap()
 	};
 	transform3->pos.x = -2;
 	transform3->pos.z = 1;
-	UpdateTransform(transform3);
+	transform3->UpdateWorld();
 	object3.second = transform3;
 	//map->MeshContainer.push_back(object3);
 
-	HLT_GAMEMANAGER.AddMesh(object1.first);
-	HLT_GAMEMANAGER.AddMesh(object2.first);
-	HLT_GAMEMANAGER.AddMesh(object3.first);
+	HLT_GAMEMANAGER.AddMesh(object1.second, object1.first);
+	HLT_GAMEMANAGER.AddMesh(object2.second, object2.first);
+	HLT_GAMEMANAGER.AddMesh(object3.second, object3.first);
 
-	HLT_GAMEMANAGER.AddTransform(object1.second);
+	/*HLT_GAMEMANAGER.AddTransform(object1.second);
 	HLT_GAMEMANAGER.AddTransform(object2.second);
-	HLT_GAMEMANAGER.AddTransform(object3.second);
+	HLT_GAMEMANAGER.AddTransform(object3.second);*/
 		
-}
-
-void App::UpdateTransform(hlt_Transform3D* transform)
-{
-	XMVECTOR vPos = XMLoadFloat3(&transform->pos);
-	XMVECTOR vSca = XMLoadFloat3(&transform->sca);
-	XMVECTOR vRot = XMLoadFloat4(&transform->quaternion);
-
-	XMMATRIX pos = XMMatrixTranslationFromVector(vPos);
-	XMMATRIX sca = XMMatrixScalingFromVector(vSca);
-	XMMATRIX rot = XMMatrixRotationQuaternion(vRot);
-
-	XMMATRIX newWorld = sca * rot * pos;
-
-	XMStoreFloat4x4(&transform->world, newWorld);
 }

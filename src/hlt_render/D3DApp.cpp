@@ -117,13 +117,13 @@ bool D3DApp::Initialize()
 
     return true;
 }
-void D3DApp::Update()
+void D3DApp::Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
 {
     m_Camera->Update();
     m_RenderManager->UpdateRender(m_Camera);
 }
 
-void D3DApp::Draw()
+void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
 {
     ThrowIfFailed(m_DirectCmdListAlloc->Reset());
 
