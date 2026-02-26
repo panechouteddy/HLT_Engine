@@ -17,7 +17,7 @@ void App::OnStart()
 
 	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { -5, 0, 15 };
 	hlt_Component::ConstantMove* pCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_PlayerID);
-	pCMove->dir = { 0.f, 0.f, 1.f };
+	pCMove->dir = { 1.f, 0.f, 0.f };
 	pCMove->move = 10.f;
 	hlt_Component::BoxCollider3D* pBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
 	pBox->boxType = pBox->AABB;
@@ -27,7 +27,7 @@ void App::OnStart()
 
 	ecs->GetComponent<hlt_Component::Transform3D>(m_OtherID)->transform.pos = { 5, 0, 15 };
 	hlt_Component::ConstantMove* oCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_OtherID);
-	oCMove->dir = { 0.f, 0.f, 1.f };
+	oCMove->dir = { 1.f, 0.f, 0.f };
 	oCMove->move = -10.f;
 	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_OtherID);
 	oBox->boxType = oBox->AABB;

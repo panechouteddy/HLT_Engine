@@ -141,7 +141,7 @@ void RenderManager::Draw(std::vector<Mesh*>& meshs)
 		if (!meshs[i]->MeshIsVisible())
 			continue;
 
-		if (m_MeshToDrawList.size() > m_ColorBufferList.size() && m_MeshToDrawList.size() > m_ConstantBufferList.size())
+		if (meshs.size() > m_ColorBufferList.size() && meshs.size() > m_ConstantBufferList.size())
 			continue;
 
 		D3D12_VERTEX_BUFFER_VIEW vertexBuffer = meshs[i]->GetGeometry()->VertexBufferView();
