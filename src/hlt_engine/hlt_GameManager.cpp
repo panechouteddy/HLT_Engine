@@ -76,6 +76,9 @@ void hlt_GameManager::Start()
 		SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.Console.1.0");
 	}
 
+	// ENTITY MANAGER
+	m_EntityManager.SetECS(&m_ECS);
+
 	// WINDOW
 	SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.MainWnd.1.0");
 	m_pWindow = &HLT_WINDOW;
@@ -128,7 +131,9 @@ void hlt_GameManager::Update()
 
 	// DX12 UPDATES
 	RefreshTransformsMatrix();
-	m_pD3D12App->Update();
+	m_EntityManager.UpdateMeshTransform();
+
+	m_pD3D12App->Update(m_EntityManager.GetMeshs(), m_EntityManager.GetTransforms());
 
 	// MOUSE DELTA UPDATE
 	*HLT_MOUSE.GetLastPos() = *HLT_MOUSE.GetPos();
@@ -136,7 +141,7 @@ void hlt_GameManager::Update()
 
 void hlt_GameManager::Render()
 {
-	m_pD3D12App->Draw();
+	m_pD3D12App->Draw(m_EntityManager.GetMeshs(), m_EntityManager.GetTransforms());
 }
 
 void hlt_GameManager::Destroy()

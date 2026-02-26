@@ -43,8 +43,6 @@ public:
 	bool Get4xMsaaState()const;
 	void Set4xMsaaState(bool value);
 
-	int Run();
-
 	virtual void OnResize();
 	virtual void Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
 	virtual void Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);

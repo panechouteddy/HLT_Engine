@@ -9,11 +9,10 @@ int hlt_Prefab::GameObject::CreateCube()
 	int cubeID = gm.CreateEntity();
 	hlt_ECS* ecs = gm.GetECS();
 
-	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
 	mesh->mesh.SetMesh("Cube", hlt_Color::Blue);
-	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return cubeID;
 }
@@ -25,12 +24,10 @@ int hlt_Prefab::GameObject::CreateCube(XMFLOAT3 pos, XMFLOAT3 sca)
 	int cubeID = gm.CreateEntity();
 	hlt_ECS* ecs = gm.GetECS();
 
-	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
-	
 	mesh->mesh.SetMesh("cube", hlt_Color::Blue);
-	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return cubeID;
 }
@@ -42,13 +39,10 @@ int hlt_Prefab::GameObject::CreateRock()
 	int cubeID = gm.CreateEntity();
 	hlt_ECS* ecs = gm.GetECS();
 
-	
-	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
-
 	mesh->mesh.SetMesh("rock", hlt_Color::Gray);
-	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return cubeID;
 }
@@ -98,12 +92,10 @@ int hlt_Prefab::GameObject::CreateGround()
 		4, 3, 7
 	};
 	gm.CreateMesh("ground", vertices, indices);
-	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
-
 	mesh->mesh.SetMesh("ground", hlt_Color::Green);
-	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return cubeID;
 }
@@ -115,11 +107,10 @@ int hlt_Prefab::GameObject::CreatePyramid()
 	int pyramidID = gm.CreateEntity();
 	hlt_ECS* ecs = gm.GetECS();
 
-	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(pyramidID);
+	ecs->AddComponent<hlt_Component::Transform3D>(pyramidID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(pyramidID);
 
 	mesh->mesh.SetMesh("pyramid", hlt_Color::Yellow);
-	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return pyramidID;
 }

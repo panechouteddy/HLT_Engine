@@ -99,9 +99,9 @@ void App::CreateMap()
 	object3.second = transform3;
 	//map->MeshContainer.push_back(object3);
 
-	HLT_GAMEMANAGER.AddMesh(object1.second, object1.first);
-	HLT_GAMEMANAGER.AddMesh(object2.second, object2.first);
-	HLT_GAMEMANAGER.AddMesh(object3.second, object3.first);
+	//HLT_GAMEMANAGER.AddMesh(object1.second, object1.first);
+	//HLT_GAMEMANAGER.AddMesh(object2.second, object2.first);
+	//HLT_GAMEMANAGER.AddMesh(object3.second, object3.first);
 
 	/*HLT_GAMEMANAGER.AddTransform(object1.second);
 	HLT_GAMEMANAGER.AddTransform(object2.second);

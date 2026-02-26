@@ -19,6 +19,8 @@ public:
 	hlt_EntityManager(hlt_ECS* ecs) { m_pECS = ecs; }
 	~hlt_EntityManager() = default;
 
+	void SetECS(hlt_ECS* newECS) { m_pECS = newECS; }
+
 	int CreateEntity();
 	void DeleteEntity(int ID);
 
