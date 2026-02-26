@@ -9,6 +9,9 @@ namespace hlt_System
 		class hlt_Keyboard : public hlt_SystemClass
 		{
 		public:
+			static const int ID = 2;
+
+		public:
 			hlt_Keyboard(hlt_ECS* ecs) : hlt_SystemClass(ecs) { ; }
 
 			void Update() override;
@@ -19,6 +22,9 @@ namespace hlt_System
 
 		class hlt_Mouse : public hlt_SystemClass
 		{
+		public:
+			static const int ID = 3;
+
 		public:
 			hlt_Mouse(hlt_ECS* ecs) : hlt_SystemClass(ecs) { ; }
 
