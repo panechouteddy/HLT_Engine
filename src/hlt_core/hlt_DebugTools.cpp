@@ -5,6 +5,7 @@
 void hlt_DebugTools::hlt_DebugConsole::CreateDebugConsole() {}
 
 void hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole() {}
+void hlt_DebugTools::hlt_DebugConsole::PrintVector(XMFLOAT3& v) {}
 #else
 void hlt_DebugTools::hlt_DebugConsole::CreateDebugConsole()
 {
@@ -39,5 +40,10 @@ void hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole()
     std::fclose(stderr);
     std::fclose(stdin);
     FreeConsole();
+}
+
+void hlt_DebugTools::hlt_DebugConsole::PrintVector(XMFLOAT3& v) 
+{
+    std::cout << "XMFLOAT3: " << v.x << "|" << v.y << "|" << v.z;
 }
 #endif

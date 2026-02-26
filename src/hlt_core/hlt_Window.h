@@ -14,6 +14,11 @@ private:
 public:
 	static hlt_Window& GetInstance();
 	bool CreateWnd(WNDPROC lpfnWndProc);
+	bool CreateWnd(WNDPROC lpfnWndProc, HICON& windowIcon);
+
+	void OnStart();
+	void OnUpdate();
+	void OnExit();
 
 	std::wstring& GetWndName() { return m_WindowName; }
 	HWND& GetWnd() { return m_MainWindow; }
@@ -25,7 +30,11 @@ public:
 	bool& IsResizing() { return m_IsResizing; }
 	bool& IsFullscreen() { return m_IsFullscreen; }
 
-	DirectX::XMINT2& GetWndSize() { return m_WindowSize; }
+	void SetCursorVisibility(bool isVisible);
+	bool IsCursorLocked() { return m_IsCursorLocked; }
+	void SetCursorLock(bool isLocked);
+
+	DirectX::XMINT2 GetWndSize() { return m_WindowSize; }
 	void SetWndSize(DirectX::XMINT2 newSize);
 	void ResizeWnd(LPARAM& lParam);
 
@@ -40,5 +49,8 @@ private:
 	bool      m_IsMaximized = false;  // is the application maximized?
 	bool      m_IsResizing = false;   // are the resize bars being dragged?
 	bool      m_IsFullscreen = false;// fullscreen enabled
+
+	bool m_IsCursorLocked = false;
+	bool m_IsCursorVisible = true;
 };
 

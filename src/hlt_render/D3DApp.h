@@ -60,6 +60,7 @@ public:
 	float GetWindowRatio()const;
 
 	MeshBox* GetMeshBox() const;
+	hlt_Camera* GetCamera() { return m_Camera; }
 
 	void AddMeshPosition(hlt_Transform3D* pos) const;
 	void AddMesh(Mesh* pos) const;

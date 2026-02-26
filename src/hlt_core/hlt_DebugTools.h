@@ -13,5 +13,7 @@ namespace hlt_DebugTools
         void CreateDebugConsole();
 
         void DestroyDebugConsole();
+
+        void PrintVector(XMFLOAT3& v);
     }
 }

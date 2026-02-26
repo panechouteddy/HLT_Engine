@@ -30,6 +30,7 @@ private:
 	void Destroy();
 
 	void RefreshCore();
+	void RefreshTransformsMatrix();
 
 private:
 	// RUN
@@ -41,12 +42,13 @@ private:
 	// WINDOW
 	hlt_Window* m_pWindow = nullptr;
 	D3DApp* m_pD3D12App = nullptr;
+	hlt_Camera* m_pCamera = nullptr;
+
+	// DEFAULT WINDOW ICON
+	HICON m_DefaultIcon;
 
 	// ENTITY MANAGER
 	hlt_EntityManager m_EntityManager;
-	/*int m_countEntityID = 0;
-	std::vector<int> m_EntityID;
-	std::vector<int> m_PoolEntityID;*/
 
 	// ECS
 	hlt_ECS m_ECS;
