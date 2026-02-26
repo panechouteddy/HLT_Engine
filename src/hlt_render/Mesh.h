@@ -53,7 +53,7 @@ public:
 
 struct Map_Mesh
 {
-    std::vector<std::pair<Mesh*, hlt_Transform3D>> MeshContainer;
+    std::vector<std::pair<Mesh*, hlt_Transform3D*>> MeshContainer;
     std::vector<ColorBuffer*> MapMesh_ColorBuffer;
     std::vector<ConstantBuffer*> MapMesh_ConstantBuffer;
 };

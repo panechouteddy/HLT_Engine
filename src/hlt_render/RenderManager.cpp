@@ -88,7 +88,7 @@ void RenderManager::UpdateConstantBuffer()
 				if (i >= m_MapMesh->MapMesh_ConstantBuffer.size())
 					m_MapMesh->MapMesh_ConstantBuffer.push_back(AddConstantBuffer());
 
-				m_MapMesh->MapMesh_ConstantBuffer[i]->SetWorldMatrix(m_MapMesh->MeshContainer[i].second.world);
+				m_MapMesh->MapMesh_ConstantBuffer[i]->SetWorldMatrix(m_MapMesh->MeshContainer[i].second->world);
 			}
 		}
 	}
@@ -142,6 +142,8 @@ void RenderManager::Draw()
 		if (m_MeshToDrawList[i] == nullptr)
 			continue;
 
+		if (m_MeshToDrawList.size() > m_ColorBufferList.size() && m_MeshToDrawList.size() > m_ConstantBufferList.size())
+			continue;
 		//if (!m_MeshToDrawList[i]->MeshIsVisible())
 		//	continue;
 
