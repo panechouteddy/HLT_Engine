@@ -35,6 +35,7 @@ public:
 	void ResetRotation();
 	void Identity();
 	void SetRotation(hlt_Transform3D& transform);
+	void SetRotationFromQuaternion();
 	void AddYPR(FXMVECTOR ypr);
 	void AddYPR(float yaw, float pitch, float raw);
 	void SetYPR(FXMVECTOR ypr);

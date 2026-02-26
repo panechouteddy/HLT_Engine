@@ -69,9 +69,14 @@ void hlt_GameManager::Run()
 
 void hlt_GameManager::Start()
 {
-	SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.Console.1.0");
+	// DEBUG CONSOLE
 	if(DEBUG)
+	{
 		hlt_DebugTools::hlt_DebugConsole::CreateDebugConsole();
+		SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.Console.1.0");
+	}
+
+	// WINDOW
 	SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.MainWnd.1.0");
 	m_pWindow = &HLT_WINDOW;
 	m_pWindow->GetWndName() = L"hlt_Engine Window";
@@ -82,14 +87,17 @@ void hlt_GameManager::Start()
 	
 	m_pWindow->SetCursorLock(true);
 	m_pWindow->SetCursorVisibility(true);
-	m_pWindow->Update();
+	m_pWindow->OnUpdate();
 
+	// DX12 INIT
 	if(m_pD3D12App == nullptr)
 		m_pD3D12App = new D3DApp(m_pWindow);
 	if (m_pD3D12App->Initialize() == false)
 		m_IsRunning = false;
 	m_pCamera = m_pD3D12App->GetCamera();
+	m_pCamera->m_Transform.ResetRotation();
 
+	// START USER APP
 	if (m_AppToCall.m_Start.m_pWrapper != nullptr)
 		m_AppToCall.m_Start.Execute();
 }
@@ -107,7 +115,7 @@ void hlt_GameManager::Update()
 		m_AppToCall.m_Update.Execute();
 
 	// WINDOW UPDATE
-	m_pWindow->Update();
+	m_pWindow->OnUpdate();
 
 	// DX12 UPDATES
 	RefreshTransformsMatrix();

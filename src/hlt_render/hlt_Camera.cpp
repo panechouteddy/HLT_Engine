@@ -80,96 +80,16 @@ void hlt_Camera::DebugInput()
 
     if (delta.x != 0 || delta.y != 0)
     {
-        float sensitivity = 0.005f; // Ajuste la sensibilité ici
-
         // x de la souris = Yaw (rotation autour de l'axe Up)
         // y de la souris = Pitch (rotation autour de l'axe Right)
-        float yaw = static_cast<float>(delta.x) * sensitivity;
-        float pitch = static_cast<float>(delta.y) * sensitivity;
+        float yaw = static_cast<float>(delta.x) * CAMERA_SENSIBILITY;
+        float pitch = static_cast<float>(delta.y) * CAMERA_SENSIBILITY;
 
         // On utilise ta fonction existante dans hlt_Transform3D
         // AddYPR(yaw, pitch, roll)
-        m_Transform.AddYPR(0.f, pitch, yaw);
+        m_Transform.AddYPR(yaw, pitch, 0.f);
     }
 
     if (keyboardInput.IsKey(VK_A))
         m_Transform.ResetRotation();
-
-    std::cout << "pos: "; hlt_DebugConsole::PrintVector(m_Transform.pos);
-    std::cout << " / up: "; hlt_DebugConsole::PrintVector(m_Transform.up); std::cout << std::endl;
 }
-
-//{
-//
-//    // Get Datas
-//    XMMATRIX viewMatrix = XMLoadFloat4x4(&cameraViewMat);
-//
-//    //Move Up and bottom
-//    if (GetAsyncKeyState('Z')) {
-//        viewMatrix *= XMMatrixTranslation(0.0f, -0.0001f, 0.0f);
-//    }
-//    else if (GetAsyncKeyState('S')) {
-//        viewMatrix *= XMMatrixTranslation(0.0f, 0.0001f, 0.0f);
-//    }
-//
-//    //Move Right and Left
-//    if (GetAsyncKeyState('Q')) {
-//        viewMatrix *= XMMatrixTranslation(0.0001f, 0.0f, 0.0f);
-//    }
-//    else if (GetAsyncKeyState('D')) {
-//        viewMatrix *= XMMatrixTranslation(-0.0001f, 0.0f, 0.0f);
-//    }
-//
-//    //Move forward/Backward
-//    if (GetAsyncKeyState('P')) {
-//        viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.0001f);
-//    }
-//    else if (GetAsyncKeyState('M')) {
-//        viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, 0.0001f);
-//    }
-//
-//    //Rotate Y axis
-//    if (GetAsyncKeyState('A')) {
-//        viewMatrix *= XMMatrixRotationY(0.0001f);
-//    }
-//    else if (GetAsyncKeyState('E')) {
-//        viewMatrix *= XMMatrixRotationY(-0.0001f);
-//    }
-//
-//    //Rotate X axis
-//    if (GetAsyncKeyState('R')) {
-//        viewMatrix *= XMMatrixRotationX(0.0001f);
-//    }
-//    else if (GetAsyncKeyState('T')) {
-//        viewMatrix *= XMMatrixRotationX(-0.0001f);
-//    }
-//
-//    //Rotate Z axis
-//    if (GetAsyncKeyState('F')) {
-//        viewMatrix *= XMMatrixRotationZ(0.0001f);
-//    }
-//    else if (GetAsyncKeyState('G')) {
-//        viewMatrix *= XMMatrixRotationZ(-0.0001f);
-//    }
-//
-//    //Update View Matrix of Camera
-//    XMStoreFloat4x4(&cameraViewMat, viewMatrix);
-//}
-
-//
-//void hlt_Camera::Update(float aspectRatio)
-//{
-//	XMVECTOR pos = XMVectorSet(m_width, m_height, m_z, 1.0f);
-//	XMVECTOR target = XMVectorZero();
-//	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-//
-//	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-//	XMStoreFloat4x4(&m_View, view);
-//
-//	XMMATRIX proj = XMMatrixPerspectiveFovLH(0.25f * PI , aspectRatio, 1.0f, 1000.0f);
-//	XMStoreFloat4x4(&m_Proj, proj);
-//
-//	XMMATRIX viewProj = proj * view;
-//	XMStoreFloat4x4(&m_ViewProj,viewProj);
-//}
-

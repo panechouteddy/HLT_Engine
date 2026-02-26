@@ -49,28 +49,9 @@ void hlt_Transform3D::SetRotation(hlt_Transform3D& transform)
 	XMStoreFloat4x4(&rotation, XMLoadFloat4x4(&transform.rotation));
 }
 
-void hlt_Transform3D::AddYPR(FXMVECTOR ypr)
+void hlt_Transform3D::SetRotationFromQuaternion()
 {
-	XMFLOAT3 yprVector;
-	XMStoreFloat3(&yprVector, ypr);
-	XMVECTOR frontAxis = XMLoadFloat3(&front);
-	XMVECTOR rightAxis = XMLoadFloat3(&right);
-	XMVECTOR upAxis = XMLoadFloat3(&up);
-
-	XMVECTOR qRot = XMLoadFloat4(&quaternion);
-	if (yprVector.x)
-		qRot = XMQuaternionMultiply(qRot, XMQuaternionRotationAxis(frontAxis, yprVector.x));
-	if (yprVector.y)
-		qRot = XMQuaternionMultiply(qRot, XMQuaternionRotationAxis(rightAxis, yprVector.y));
-	if (yprVector.z)
-		qRot = XMQuaternionMultiply(qRot, XMQuaternionRotationAxis(upAxis, yprVector.z));
-
-	qRot = XMQuaternionNormalize(qRot);
-	XMStoreFloat4(&quaternion, qRot);
-
-	XMMATRIX mRot = XMMatrixRotationQuaternion(qRot);
-	XMStoreFloat4x4(&rotation, mRot);
-
+	XMStoreFloat4x4(&rotation, XMMatrixRotationQuaternion(XMLoadFloat4(&quaternion)));
 	right.x = rotation._11;
 	right.y = rotation._12;
 	right.z = rotation._13;
@@ -80,6 +61,30 @@ void hlt_Transform3D::AddYPR(FXMVECTOR ypr)
 	front.x = rotation._31;
 	front.y = rotation._32;
 	front.z = rotation._33;
+}
+
+void hlt_Transform3D::AddYPR(FXMVECTOR ypr)
+{
+	XMFLOAT3 yprVector;
+	XMStoreFloat3(&yprVector, ypr);
+
+	XMVECTOR axisDir = XMLoadFloat3(&front);
+	XMVECTOR axisRight = XMLoadFloat3(&right);
+	//XMVECTOR axisUp = XMLoadFloat3(&up);
+	XMVECTOR axisUp = XMVectorSet(0, 1, 0, 0);
+
+	XMVECTOR qRot = XMLoadFloat4(&quaternion);
+	if (yprVector.z)
+		qRot = XMQuaternionMultiply(qRot, XMQuaternionRotationAxis(axisDir, yprVector.z));
+	if (yprVector.y)
+		qRot = XMQuaternionMultiply(qRot, XMQuaternionRotationAxis(axisRight, yprVector.y));
+	if (yprVector.x)
+		qRot = XMQuaternionMultiply(qRot, XMQuaternionRotationAxis(axisUp, yprVector.x));
+
+	qRot = XMQuaternionNormalize(qRot);
+	XMStoreFloat4(&quaternion, qRot);
+
+	SetRotationFromQuaternion();
 }
 
 void hlt_Transform3D::AddYPR(float yaw, float pitch, float raw)

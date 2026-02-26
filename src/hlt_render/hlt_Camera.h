@@ -1,4 +1,6 @@
 #pragma once
+#define CAMERA_SENSIBILITY 0.005f
+
 class hlt_Camera
 {
 public:

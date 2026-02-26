@@ -53,7 +53,7 @@ using namespace hlt_DebugTools;
 #define VK_S 0x53
 #define VK_D 0x44
 #define VK_A 0x41
-#define VK_W 0x59
+#define VK_W 0x57
 
 // CONST VALUE
 const float PI = 3.1415926535f;

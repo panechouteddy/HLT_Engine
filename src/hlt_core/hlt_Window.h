@@ -16,7 +16,9 @@ public:
 	bool CreateWnd(WNDPROC lpfnWndProc);
 	bool CreateWnd(WNDPROC lpfnWndProc, HICON& windowIcon);
 
-	void Update();
+	void OnStart();
+	void OnUpdate();
+	void OnExit();
 
 	std::wstring& GetWndName() { return m_WindowName; }
 	HWND& GetWnd() { return m_MainWindow; }

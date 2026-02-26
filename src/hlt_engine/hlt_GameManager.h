@@ -1,7 +1,5 @@
 #pragma once
 
-#define ID_ICON 101
-
 class hlt_GameManager
 {
 private:
