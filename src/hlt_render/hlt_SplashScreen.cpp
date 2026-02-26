@@ -39,29 +39,15 @@ void hlt_SplashScreen::Initialize(ID3D11On12Device* d11On12,
 
 void hlt_SplashScreen::Draw(float WindowWidthMiddle, float WindowHightMiddle)
 {
-	m_d2dContext->Clear(D2D1::ColorF(D2D1::ColorF::Red, 0.2f));
+	DrawRect(0, 0, WindowWidthMiddle * 2, WindowHightMiddle * 2, D2D1::ColorF(D2D1::ColorF::DarkRed), D2D1::ColorF(D2D1::ColorF::DarkRed));
 	
-	D2D1_RECT_F rect = D2D1::RectF(
-		WindowWidthMiddle - 150, WindowHightMiddle - 50, WindowWidthMiddle + 150, WindowHightMiddle + 50
-	);
+	D2D1_RECT_F rect = DrawRect(WindowWidthMiddle - 150, WindowHightMiddle - 50, WindowWidthMiddle + 150, WindowHightMiddle + 50, D2D1::ColorF(D2D1::ColorF::Coral), D2D1::ColorF(D2D1::ColorF::White));
 	std::wstring label = L"FPS: ";
-	ComPtr<ID2D1SolidColorBrush> RectangleColor;
-
-	auto color = D2D1::ColorF(D2D1::ColorF::Coral);
-	m_d2dContext->CreateSolidColorBrush(color, &RectangleColor);
-
-	RectangleColor->SetOpacity(1.f);
-
-	m_d2dContext->FillRectangle(rect, RectangleColor.Get());
-
-	RectangleColor->SetColor(D2D1::ColorF(D2D1::ColorF::White));
-	m_d2dContext->DrawRectangle(rect, RectangleColor.Get(), 2.0f);
 
 	m_textFormatBody->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 	m_textFormatBody->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	
-	
-	m_textBrush->SetOpacity(1);
+	m_textBrush->SetOpacity(m_Opacity);
 
 	m_d2dContext->DrawText(
 		label.c_str(),
@@ -70,4 +56,27 @@ void hlt_SplashScreen::Draw(float WindowWidthMiddle, float WindowHightMiddle)
 		rect,
 		m_textBrush.Get()
 	);
+}
+
+D2D1_RECT_F hlt_SplashScreen::DrawRect(float left, float top, float right, float bottom, D2D1::ColorF colorBrush, D2D1::ColorF colorRectEdge)
+{
+	D2D1_RECT_F rect = D2D1::RectF(
+		left, top, right, bottom
+	);
+	ComPtr<ID2D1SolidColorBrush> RectangleColor;
+
+	auto color = colorBrush;
+	m_d2dContext->CreateSolidColorBrush(color, &RectangleColor);
+
+	RectangleColor->SetOpacity(m_Opacity);
+
+	m_d2dContext->FillRectangle(rect, RectangleColor.Get());
+
+	RectangleColor->SetColor(colorRectEdge);
+
+	RectangleColor->SetOpacity(m_Opacity);
+
+	m_d2dContext->DrawRectangle(rect, RectangleColor.Get(), 2.0f);
+
+	return rect;
 }

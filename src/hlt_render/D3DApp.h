@@ -112,7 +112,7 @@ protected:
 	//bool      m_FullscreenState = false;// fullscreen enabled
 	hlt_Window* m_pWindow = nullptr;
 	bool m_IsLoading = true;
-
+	bool m_IsOpacity = true;
 	bool m_4xMsaaState = false;
 	UINT m_4xMsaaQuality = 0;
 

@@ -121,7 +121,7 @@ bool D3DApp::Initialize()
 
     InitDirect3DDraw();
 
-    //m_IsLoading = false;
+    m_IsLoading = false;
 
     Update();
 
@@ -173,15 +173,12 @@ void D3DApp::Draw()
     FlushCommandQueue();
     
     ///.....2D.....///
-    if (m_IsLoading)
-    {
-        m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    if (!m_IsLoading && m_SplashScreen->m_Opacity > 0)
+        m_SplashScreen->m_Opacity -= 0.01f;
+    else if (m_IsOpacity && m_SplashScreen->m_Opacity <= 0)
+        m_IsOpacity = false;
 
-        m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
-
-        m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-    }
-    else
+    if (!m_IsLoading)
     {
         m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 
@@ -190,6 +187,16 @@ void D3DApp::Draw()
 
         m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
     }
+
+    if (m_IsOpacity)
+    {
+        m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+
+        m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
+
+        m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    }
+
     ///.....2D.....///
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));

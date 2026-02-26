@@ -12,9 +12,10 @@ public:
 		ComPtr<ID3D11Resource>* wrappedBackBuffers) override;
 	
 	void Draw(float WindowWidthMiddle, float WindowHightMiddle);
+	D2D1_RECT_F DrawRect(float left, float top, float right, float bottom, D2D1::ColorF colorBrush, D2D1::ColorF colorRectEdge);
 
 public:
-
+	float m_Opacity = 1.f;
 	ComPtr<IDWriteTextFormat> m_textFormatBody;
 	ComPtr<ID2D1SolidColorBrush> m_textBrush;
 };
