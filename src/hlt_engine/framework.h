@@ -35,6 +35,7 @@
 #include "hlt_InputSystem.h"
 #include "hlt_ColliderSystem.h"
 #include "hlt_HierarchySystem.h"
+#include "hlt_RepulseSystem.h"
 
 // ENTITY MANAGER
 #include "hlt_EntityManager.h"

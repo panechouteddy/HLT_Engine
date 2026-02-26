@@ -12,7 +12,7 @@ void hlt_System::ConstantMove::Update()
 
         std::vector<int>& cMovesOwners = cMoves->GetComponentOwnersID();
         
-		float dt = hlt_Time::GetInstance().GetDeltaTime();
+		float dt = HLT_TIME.GetDeltaTime();
 
         for (int i = 0; i < cMovesOwners.size(); i++)
         {

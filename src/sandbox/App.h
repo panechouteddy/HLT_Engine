@@ -15,6 +15,7 @@ public:
 private:
 	std::vector<int> m_EntityID;
 	int m_PlayerID = -1;
+	int m_TestID = -1;
 	int m_OtherID = -1;
 
 	bool* pIsColliding = nullptr;

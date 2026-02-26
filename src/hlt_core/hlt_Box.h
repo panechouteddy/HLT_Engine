@@ -37,6 +37,8 @@ namespace hlt_Box
 		bool Contains(Box3D_OBB obb);
 		bool Contains(Box3D_AABB aabb);
 
+		Box3D_OBB operator+(hlt_Transform3D boxPos);
+
 	public:
 		DirectX::BoundingOrientedBox m_Box;
 	};

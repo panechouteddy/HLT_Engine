@@ -16,7 +16,7 @@ void hlt_System::BoxCollider::Update()
 		else if(boxCollider->component[i]->boxType == hlt_Component::BoxCollider3D::AABB)
 			boxCollider->component[i]->boxAABB = boxCollider->component[i]->boxAABB + myTransform->transform;
 		else if(boxCollider->component[i]->boxType == hlt_Component::BoxCollider3D::OBB)
-			boxCollider->component[i]->boxAABB = boxCollider->component[i]->boxAABB + myTransform->transform;
+			boxCollider->component[i]->boxOBB = boxCollider->component[i]->boxOBB + myTransform->transform;
 
 		boxCollider->component[i]->isColliding = false;
 		
@@ -42,7 +42,7 @@ void hlt_System::BoxCollider::Update()
 			}
 			else if (boxCollider->component[j]->boxType == hlt_Component::BoxCollider3D::OBB)
 			{
-				boxCollider->component[j]->boxAABB = boxCollider->component[j]->boxAABB + otherTransform->transform;
+				boxCollider->component[j]->boxOBB = boxCollider->component[j]->boxOBB + otherTransform->transform;
 
 				if (boxCollider->component[i]->boxType == hlt_Component::BoxCollider3D::AABB && boxCollider->component[i]->boxAABB.Contains(boxCollider->component[j]->boxOBB))
 					boxCollider->component[i]->isColliding = true;
