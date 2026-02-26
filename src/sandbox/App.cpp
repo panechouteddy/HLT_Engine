@@ -18,9 +18,10 @@ void App::OnStart()
 	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { -5, 0, 15 };
 	hlt_Component::ConstantMove* pCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_PlayerID);
 	pCMove->dir = { 1.f, 0.f, 0.f };
-	pCMove->move = 10.f;
+	pCMove->move = 2.f;
 	hlt_Component::BoxCollider3D* pBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
 	pBox->boxType = pBox->AABB;
+	pIsColliding = &pBox->isColliding;
 
 	m_OtherID = hlt_Prefab::GameObject::CreateCube();
 	m_EntityID.push_back(m_OtherID);
@@ -28,11 +29,12 @@ void App::OnStart()
 	ecs->GetComponent<hlt_Component::Transform3D>(m_OtherID)->transform.pos = { 5, 0, 15 };
 	hlt_Component::ConstantMove* oCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_OtherID);
 	oCMove->dir = { 1.f, 0.f, 0.f };
-	oCMove->move = -10.f;
+	oCMove->move = -2.f;
 	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_OtherID);
 	oBox->boxType = oBox->AABB;
+	oIsColliding = &oBox->isColliding;
 	
-	ecs->AddComponent<hlt_System::BoxCollider>();
+	ecs->AddSystem<hlt_System::BoxCollider>();
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	
 	// HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos.z = 5.f;
@@ -42,6 +44,10 @@ void App::OnStart()
 
 void App::OnUpdate()
 {
+	if (*pIsColliding)
+		std::cout << "PLAYER COLLIDE !" << std::endl;
+	if (*oIsColliding)
+		std::cout << "OTHER COLLIDE !" << std::endl;
 }
 
 void App::OnExit()

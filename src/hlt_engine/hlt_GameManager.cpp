@@ -302,10 +302,8 @@ void hlt_GameManager::RefreshTransformsMatrix()
 {
 	hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_ECS.GetComponent<hlt_Component::Transform3D>();
 
-	for (hlt_Component::Transform3D& transformComponent : transforms->component)
+	for (hlt_Component::Transform3D* transformComponent : transforms->component)
 	{
-		transformComponent.transform.UpdateWorld();
-		hlt_DebugConsole::PrintVector(transformComponent.transform.pos);
-		std::cout << " / cube: " << std::endl;
+		transformComponent->transform.UpdateWorld();
 	}
 }

@@ -46,7 +46,7 @@ void hlt_EntityManager::UpdateMeshTransform()
 		Mesh* mesh = &meshs->Get(transforms->componentOwnerID[i])->mesh;
 		if (mesh != nullptr)
 		{
-			m_pTransforms.push_back(&transforms->component[i].transform);
+			m_pTransforms.push_back(&transforms->component[i]->transform);
 			m_pMeshs.push_back(mesh);
 		}
 	}
