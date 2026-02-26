@@ -789,6 +789,7 @@ void D3DApp::LogAdapterOutputs(IDXGIAdapter* adapter)
 
 void D3DApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 {
+
     UINT count = 0;
     UINT flags = 0;
 
@@ -816,14 +817,4 @@ void D3DApp::CreateMeshBox()
 {
     m_Box = new MeshBox;
     m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
-}
-
-void D3DApp::AddMeshPosition(hlt_Transform3D* pos) const
-{
-    m_RenderManager->AddMeshTransform(pos);
-}
-
-void D3DApp::AddMesh(Mesh* mesh) const
-{
-    m_RenderManager->AddMeshToDraw(mesh);
 }

@@ -113,6 +113,12 @@ void RenderManager::Draw()
 	}
 }
 
+void RenderManager::AddMeshTransform(hlt_Transform3D* transform, Mesh* mesh)
+{
+	m_MeshToDrawList.push_back(mesh);
+	m_MeshTransform.push_back(transform);
+}
+
 void RenderManager::AddConstantBuffer()
 {
     ConstantBuffer* cb = D3DApp::GetApp()->CreateConstantBufferObject();

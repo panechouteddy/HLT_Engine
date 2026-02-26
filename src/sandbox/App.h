@@ -13,6 +13,6 @@ public:
 
 private:
 	std::vector<int> m_EntityID;
-	int m_PlayerID;
+	int m_PlayerID = -1;
 };
 

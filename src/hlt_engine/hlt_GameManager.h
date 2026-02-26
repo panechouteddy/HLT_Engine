@@ -23,7 +23,7 @@ public:
 	void DeleteEntity(int ID) { return m_EntityManager.DeleteEntity(ID); }
 
 	void Start();
-	void AddMesh(Mesh* mesh) { m_pD3D12App->AddMesh(mesh); }
+	void AddMesh(hlt_Transform3D* transform, Mesh* mesh) { m_pD3D12App->AddMeshTransform(transform, mesh); }
 private:
 	void Update();
 	void Render();

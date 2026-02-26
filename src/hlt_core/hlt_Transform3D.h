@@ -17,7 +17,12 @@ public:
 	XMFLOAT3 right{ 1, 0, 0 };
 	XMFLOAT3 up{ 0, 1, 0 };
 	XMFLOAT4 quaternion{ 0.f, 0.f, 0.f, 1.f };
-	XMFLOAT4X4 rotation;
+	XMFLOAT4X4 rotation = {
+		1.f, 0.f, 0.f, 0.f,
+		0.f, 1.f, 0.f, 0.f,
+		0.f, 0.f, 1.f, 0.f,
+		0.f, 0.f, 0.f, 1.f,
+	};
 
 	// DX12 TRANSFORM
 	bool isWorldUpdated = false;

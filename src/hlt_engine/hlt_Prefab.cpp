@@ -9,11 +9,11 @@ int hlt_Prefab::CreateCube()
 	int cubeID = gm.CreateEntity();
 	hlt_ECS* ecs = gm.GetECS();
 
-	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
 	mesh->mesh.SetMesh("Cube", hlt_Color::Blue);
-	gm.AddMesh(&mesh->mesh);
+	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return cubeID;
 }
@@ -25,12 +25,12 @@ int hlt_Prefab::CreateCube(XMFLOAT3 pos, XMFLOAT3 sca)
 	int cubeID = gm.CreateEntity();
 	hlt_ECS* ecs = gm.GetECS();
 
-	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
 	
 	mesh->mesh.SetMesh("cube", hlt_Color::Blue);
-	gm.AddMesh(&mesh->mesh);
+	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return cubeID;
 }
@@ -42,11 +42,11 @@ int hlt_Prefab::CreatePyramid()
 	int pyramidID = gm.CreateEntity();
 	hlt_ECS* ecs = gm.GetECS();
 
-	ecs->AddComponent<hlt_Component::Transform3D>(pyramidID);
+	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(pyramidID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(pyramidID);
 
 	mesh->mesh.SetMesh("pyramid", hlt_Color::Blue);
-	gm.AddMesh(&mesh->mesh);
+	gm.AddMesh(&transform->transform, &mesh->mesh);
 
 	return pyramidID;
 }
