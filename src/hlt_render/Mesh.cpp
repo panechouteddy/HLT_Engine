@@ -213,7 +213,7 @@ void MeshBox::CreateRock(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 {
 	std::array<Vertex, 9> vertices =
 	{
-		Vertex({ XMFLOAT3(-2.0f, -1.0f, -2.0f) }),
+		Vertex({ XMFLOAT3(-2.0f, -0.0f, -2.0f) }),
 		Vertex({ XMFLOAT3(-2.0f,  0.0f, -1.0f) }),
 		Vertex({ XMFLOAT3(+2.0f, +1.0f, -1.0f) }),
 		Vertex({ XMFLOAT3(+2.0f, -1.0f, -1.0f) }),
@@ -286,14 +286,14 @@ void MeshBox::CreateGround(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 {
 	std::array<Vertex, 8> vertices =
 	{
-		Vertex({ XMFLOAT3(-3.0f, -1.0f, -3.0f) }),
-		Vertex({ XMFLOAT3(-3.0f, +1.0f, -3.0f) }),
-		Vertex({ XMFLOAT3(+3.0f, +1.0f, -3.0f) }),
-		Vertex({ XMFLOAT3(+3.0f, -1.0f, -3.0f) }),
-		Vertex({ XMFLOAT3(-3.0f, -1.0f, +3.0f) }),
-		Vertex({ XMFLOAT3(-3.0f, +1.0f, +3.0f) }),
-		Vertex({ XMFLOAT3(+3.0f, +1.0f, +3.0f) }),
-		Vertex({ XMFLOAT3(+3.0f, -1.0f, +3.0f) })
+		Vertex({ XMFLOAT3(-10.0f, -2.0f, -10.0f) }),
+		Vertex({ XMFLOAT3(-10.0f,  0.f , -10.0f) }),
+		Vertex({ XMFLOAT3(+10.0f,  0.f , -10.0f) }),
+		Vertex({ XMFLOAT3(+10.0f, -2.0f, -10.0f) }),
+		Vertex({ XMFLOAT3(-10.0f, -2.0f, +10.0f) }),
+		Vertex({ XMFLOAT3(-10.0f,  0.f , +10.0f) }),
+		Vertex({ XMFLOAT3(+10.0f,  0.f , +10.0f) }),
+		Vertex({ XMFLOAT3(+10.0f, -2.0f, +10.0f) })
 	};
 
 	std::array<std::uint16_t, 36> indices =
