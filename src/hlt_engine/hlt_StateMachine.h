@@ -1,17 +1,19 @@
-//#pragma once
-//
+#pragma once
+
 //template <typename T>
 //struct hlt_StateMachineComponent
 //{
 //	struct StateLogic
 //	{
+//		void (ownerType::* m_pMethod)();
+//
 //		hlt_Function pEnter;
 //		hlt_Function pUpdate;
 //		hlt_Function pExit;
 //	};
 //
 //	// DIFFERENT STATES METHODS
-//	static inline std::vector<hlt_StateLogic> m_StatesFunctions;
+//	static inline std::vector<StateLogic> m_StatesFunctions;
 //
 //	// STATE
 //	T m_CurrentState;

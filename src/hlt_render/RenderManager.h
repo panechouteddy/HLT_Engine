@@ -4,8 +4,11 @@ using Microsoft::WRL::ComPtr;
 class RenderManager
 {
 private:
+    Map_Mesh* m_MapMesh = nullptr;
+
     std::vector<Mesh*> m_MeshToDrawList;
     std::vector<hlt_Transform3D*> m_MeshTransform;
+
     std::vector<ConstantBuffer*> m_ConstantBufferList;
     std::vector<ColorBuffer*> m_ColorBufferList;
 protected:
@@ -32,13 +35,13 @@ public:
     void UpdateConstantBuffer();
     void UpdateView(hlt_Camera* camera);
     void Draw();
-    void AddMeshToDraw(Mesh* mesh) { m_MeshToDrawList.push_back(mesh); }
-    void AddMeshTransform(hlt_Transform3D* transform) { m_MeshTransform.push_back(transform);}
-    void AddConstantBuffer();
-    void AddColorBuffer();
+    void AddMeshTransform(hlt_Transform3D* transform, Mesh* mesh);
+    ConstantBuffer* AddConstantBuffer();
+    ColorBuffer* AddColorBuffer();
     void BuildDescriptorHeaps(ID3D12Device* device);
     void BuildRootSignature(ID3D12Device* device);
     void BuildShadersAndInputLayout();
     void BuildPSO(ID3D12Device* device, bool _4xMsaaState, UINT _4xMsaaQuality);
+    void AddMapToRender(Map_Mesh* Map) { m_MapMesh = Map; }
 };
 
