@@ -95,8 +95,8 @@ void RenderManager::Draw()
 		if (m_MeshToDrawList[i] == nullptr)
 			continue;
 
-		//if (!m_MeshToDrawList[i]->MeshIsVisible())
-		//	continue;
+		if (!m_MeshToDrawList[i]->MeshIsVisible())
+			continue;
 
 		D3D12_VERTEX_BUFFER_VIEW vertexBuffer = m_MeshToDrawList[i]->GetGeometry()->VertexBufferView();
 		m_CommandList->IASetVertexBuffers(0, 1, &vertexBuffer);
