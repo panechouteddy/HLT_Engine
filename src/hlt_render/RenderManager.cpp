@@ -86,7 +86,7 @@ void RenderManager::UpdateConstantBuffer(std::vector<Mesh*>& meshs, std::vector<
 				if (i >= m_MapMesh->MapMesh_ConstantBuffer.size())
 					m_MapMesh->MapMesh_ConstantBuffer.push_back(AddConstantBuffer());
 
-				m_MapMesh->MapMesh_ConstantBuffer[i]->SetWorldMatrix(m_MapMesh->MeshContainer[i].second.world);
+				m_MapMesh->MapMesh_ConstantBuffer[i]->SetWorldMatrix(m_MapMesh->MeshContainer[i].second->world);
 			}
 		}
 	}
@@ -139,6 +139,9 @@ void RenderManager::Draw(std::vector<Mesh*>& meshs)
 			continue;
 
 		if (!meshs[i]->MeshIsVisible())
+			continue;
+
+		if (m_MeshToDrawList.size() > m_ColorBufferList.size() && m_MeshToDrawList.size() > m_ConstantBufferList.size())
 			continue;
 
 		D3D12_VERTEX_BUFFER_VIEW vertexBuffer = meshs[i]->GetGeometry()->VertexBufferView();
