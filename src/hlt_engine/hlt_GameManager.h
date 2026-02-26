@@ -23,7 +23,11 @@ public:
 	void DeleteEntity(int ID) { return m_EntityManager.DeleteEntity(ID); }
 
 	void Start();
+
 	void AddMesh(hlt_Transform3D* transform, Mesh* mesh) { m_pD3D12App->AddMeshTransform(transform, mesh); }
+	void CreateMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
+	void CreateMap(Map_Mesh* map);
+	
 private:
 	void Update();
 	void Render();
