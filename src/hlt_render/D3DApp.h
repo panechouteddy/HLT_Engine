@@ -111,6 +111,7 @@ protected:
 	//bool      m_Resizing = false;   // are the resize bars being dragged?
 	//bool      m_FullscreenState = false;// fullscreen enabled
 	hlt_Window* m_pWindow = nullptr;
+	bool m_IsLoading = true;
 
 	bool m_4xMsaaState = false;
 	UINT m_4xMsaaQuality = 0;

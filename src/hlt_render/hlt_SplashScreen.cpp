@@ -39,11 +39,8 @@ void hlt_SplashScreen::Initialize(ID3D11On12Device* d11On12,
 
 void hlt_SplashScreen::Draw(float WindowWidthMiddle, float WindowHightMiddle)
 {
-	if (m_Start)
-		return;
-
 	m_d2dContext->Clear(D2D1::ColorF(D2D1::ColorF::Red, 0.2f));
-
+	
 	D2D1_RECT_F rect = D2D1::RectF(
 		WindowWidthMiddle - 150, WindowHightMiddle - 50, WindowWidthMiddle + 150, WindowHightMiddle + 50
 	);
@@ -53,6 +50,8 @@ void hlt_SplashScreen::Draw(float WindowWidthMiddle, float WindowHightMiddle)
 	auto color = D2D1::ColorF(D2D1::ColorF::Coral);
 	m_d2dContext->CreateSolidColorBrush(color, &RectangleColor);
 
+	RectangleColor->SetOpacity(1.f);
+
 	m_d2dContext->FillRectangle(rect, RectangleColor.Get());
 
 	RectangleColor->SetColor(D2D1::ColorF(D2D1::ColorF::White));
@@ -60,6 +59,9 @@ void hlt_SplashScreen::Draw(float WindowWidthMiddle, float WindowHightMiddle)
 
 	m_textFormatBody->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 	m_textFormatBody->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	
+	
+	m_textBrush->SetOpacity(1);
 
 	m_d2dContext->DrawText(
 		label.c_str(),

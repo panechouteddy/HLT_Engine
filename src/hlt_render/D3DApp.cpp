@@ -117,8 +117,11 @@ bool D3DApp::Initialize()
     m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
     m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
+    Draw();
 
     InitDirect3DDraw();
+
+    //m_IsLoading = false;
 
     Update();
 
@@ -136,6 +139,8 @@ void D3DApp::Draw()
 
     ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
+    FlushCommandQueue();
+
     auto barrierToRT = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
     m_CommandList->ResourceBarrier(1, &barrierToRT);
 
@@ -150,7 +155,10 @@ void D3DApp::Draw()
     // Specify the buffers we are going to render to.
     m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
 
-    m_RenderManager->Draw();
+    if (!m_IsLoading)
+    {
+        m_RenderManager->Draw();
+    }
 
     auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
     m_CommandList->ResourceBarrier(1, &barrierToPresent);
@@ -164,18 +172,25 @@ void D3DApp::Draw()
 
     FlushCommandQueue();
     
-    m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    ///.....2D.....///
+    if (m_IsLoading)
+    {
+        m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 
-    m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
+        m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
 
-    m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+        m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    }
+    else
+    {
+        m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 
-    m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-    
-    std::wstring stats = L"FPS: " + std::to_wstring(1.0f);
-    m_UI->Draw(m_pWindow->GetWndSize().x*0.5f, stats);
+        std::wstring stats = L"FPS: " + std::to_wstring(1.0f);
+        m_UI->Draw(m_pWindow->GetWndSize().x * 0.5f, stats);
 
-    m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+        m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    }
+    ///.....2D.....///
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));
     m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;

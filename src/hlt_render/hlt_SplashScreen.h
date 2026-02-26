@@ -14,7 +14,6 @@ public:
 	void Draw(float WindowWidthMiddle, float WindowHightMiddle);
 
 public:
-	bool m_Start = false;
 
 	ComPtr<IDWriteTextFormat> m_textFormatBody;
 	ComPtr<ID2D1SolidColorBrush> m_textBrush;
