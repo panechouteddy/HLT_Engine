@@ -51,7 +51,9 @@ public:
 
 	virtual void OnResize();
 	virtual void Update();
-	virtual void Draw();
+	virtual void DrawRender();
+	virtual void Draw3D();
+	virtual void Draw2D();
 
 	ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList.Get();}
 	ID3D12Device* GetDevice() { return m_Device.Get(); }
@@ -104,13 +106,6 @@ protected:
 protected:
 	static D3DApp* m_App;
 
-	//HINSTANCE m_hAppInst = nullptr; // application instance handle
-	//HWND      m_hMainWnd = nullptr; // main window handle
-	//bool      m_AppPaused = false;  // is the application paused?
-	//bool      m_Minimized = false;  // is the application minimized?
-	//bool      m_Maximized = false;  // is the application maximized?
-	//bool      m_Resizing = false;   // are the resize bars being dragged?
-	//bool      m_FullscreenState = false;// fullscreen enabled
 	hlt_Window* m_pWindow = nullptr;
 	bool m_IsLoading = true;
 	bool m_IsOpacity = true;

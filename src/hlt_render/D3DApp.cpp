@@ -85,7 +85,7 @@ int D3DApp::Run()
             {
                 CalculateFrameStats();
                 Update();
-                Draw();
+                DrawRender();
             }
             else
             {
@@ -117,7 +117,7 @@ bool D3DApp::Initialize()
     m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
     m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
-    Draw();
+    DrawRender();
 
     InitDirect3DDraw();
 
@@ -133,7 +133,16 @@ void D3DApp::Update()
     m_RenderManager->UpdateRender(m_Camera);
 }
 
-void D3DApp::Draw()
+void D3DApp::DrawRender()
+{
+   // if renderIs3D
+    Draw3D();
+    // else if renderIs2D*
+    Draw2D();
+
+}
+
+void D3DApp::Draw3D()
 {
     ThrowIfFailed(m_DirectCmdListAlloc->Reset());
 
@@ -167,12 +176,14 @@ void D3DApp::Draw()
     ThrowIfFailed(m_CommandList->Close());
 
     // Add the command list to the queue for execution.
-    ID3D12CommandList* cmdsLists[] = { m_CommandList.Get()};
+    ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
     m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
     FlushCommandQueue();
-    
-    ///.....2D.....///
+}
+
+void D3DApp::Draw2D()
+{
     if (!m_IsLoading && m_SplashScreen->m_Opacity > 0)
         m_SplashScreen->m_Opacity -= 0.01f;
     else if (m_IsOpacity && m_SplashScreen->m_Opacity <= 0)
@@ -197,7 +208,6 @@ void D3DApp::Draw()
         m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
     }
 
-    ///.....2D.....///
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));
     m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;

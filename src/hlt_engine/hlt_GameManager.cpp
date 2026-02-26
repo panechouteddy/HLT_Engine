@@ -136,7 +136,7 @@ void hlt_GameManager::Update()
 
 void hlt_GameManager::Render()
 {
-	m_pD3D12App->Draw();
+	m_pD3D12App->DrawRender();
 }
 
 void hlt_GameManager::Destroy()
