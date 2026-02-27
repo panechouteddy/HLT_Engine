@@ -74,7 +74,7 @@ inline void hlt_ECS::ComponentPool<T>::Remove(int ID)
 template<typename T>
 inline T* hlt_ECS::AddComponent(int ID)
 {
-	if (m_Components.contains(T::ID) == false)
+	if (m_ActiveComponents.contains(T::ID) == false)
 		AddComponent<T>();
 
 	ComponentPool<T>* componentPool = GetComponent<T>();
@@ -84,7 +84,7 @@ inline T* hlt_ECS::AddComponent(int ID)
 template<typename T>
 inline T* hlt_ECS::GetComponent(int ID)
 {
-	if (m_Components.contains(T::ID) == false)
+	if (m_ActiveComponents.contains(T::ID) == false)
 		return nullptr;
 
 	ComponentPool<T>* componentPool = GetComponent<T>();
@@ -94,7 +94,7 @@ inline T* hlt_ECS::GetComponent(int ID)
 template<typename T>
 inline void hlt_ECS::RemoveComponent(int ID)
 {
-	if (m_Components.contains(T::ID) == false)
+	if (m_ActiveComponents.contains(T::ID) == false)
 		return;
 
 	ComponentPool<T>* componentPool = GetComponent<T>();
@@ -105,29 +105,29 @@ inline void hlt_ECS::RemoveComponent(int ID)
 template<typename T>
 inline void hlt_ECS::AddComponent()
 {
-	if (m_Components.contains(T::ID))
+	if (m_ActiveComponents.contains(T::ID))
 		return;
 
-	m_Components[T::ID] = new ComponentPool<T>();
+	m_ActiveComponents[T::ID] = new ComponentPool<T>();
 }
 
 template<typename T>
 inline hlt_ECS::ComponentPool<T>* hlt_ECS::GetComponent()
 {
-	if (m_Components.contains(T::ID) == false)
+	if (m_ActiveComponents.contains(T::ID) == false)
 		return nullptr;
 
-	ComponentPool<T>* componentPool = dynamic_cast<ComponentPool<T>*>(m_Components[T::ID]);
+	ComponentPool<T>* componentPool = dynamic_cast<ComponentPool<T>*>(m_ActiveComponents[T::ID]);
 	return componentPool;
 }
 
 template<typename T>
 inline void hlt_ECS::RemoveComponent()
 {
-	if (m_Components.contains(T::ID))
+	if (m_ActiveComponents.contains(T::ID))
 		return;
 
-	m_Components.erase(T::ID);
+	m_ActiveComponents.erase(T::ID);
 }
 
 ///////////////////////////////////////////////////////////////

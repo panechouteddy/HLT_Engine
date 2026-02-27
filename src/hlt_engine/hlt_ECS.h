@@ -19,9 +19,9 @@ public:
 	template <typename T>
 	struct ComponentPool : public CPool
 	{
-		std::vector<int> entityID; // INDEX = entityID; VALUE = componentIndex; MISS_COMPONENT si l'entity n'a pas le component
+		std::vector<int> entityID;			 // INDEX = entityID; VALUE = componentIndex; MISS_COMPONENT si l'entity n'a pas le component
 		std::vector<T*> component;
-		std::vector<int> componentOwnerID; // INDEX = componentIndex; VALUE = entityID
+		std::vector<int> componentOwnerID;	 // INDEX = componentIndex; VALUE = entityID
 
 		~ComponentPool();
 
@@ -36,7 +36,8 @@ public:
 
 
 private:
-	std::unordered_map<int, CPool*> m_Components;
+	std::unordered_map<int, CPool*> m_ActiveComponents;
+	std::unordered_map<int, CPool*> m_InactiveComponents;
 	std::vector<hlt_System::hlt_SystemClass*> m_pSystems;
 
 public:
@@ -56,6 +57,12 @@ public:
 
 	 template <typename T>
 	 T* GetComponent(int ID);
+
+	 template <typename T>
+	 void SetActiveComponent(int ID) { ; }
+
+	 template <typename T>
+	 bool IsComponentActive(int ID) { ; }
 	
 	template <typename T>
 	void RemoveComponent(int ID);

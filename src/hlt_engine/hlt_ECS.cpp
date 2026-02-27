@@ -8,8 +8,12 @@ void hlt_ECS::Update()
 
 hlt_ECS::~hlt_ECS()
 {
-	m_Components.clear();
-	m_Components.rehash(0);
+	Destroy();
+
+	m_ActiveComponents.clear();
+	m_ActiveComponents.rehash(0);
+	m_InactiveComponents.clear();
+	m_InactiveComponents.rehash(0);
 
 	for (int i = 0; i < m_pSystems.size(); i++)
 		delete m_pSystems[i];
@@ -18,7 +22,11 @@ hlt_ECS::~hlt_ECS()
 
 void hlt_ECS::Destroy()
 {
-	for (auto& comp : m_Components)
+	for (auto& comp : m_ActiveComponents)
+	{
+		delete comp.second;
+	}
+	for (auto& comp : m_InactiveComponents)
 	{
 		delete comp.second;
 	}
@@ -31,7 +39,11 @@ void hlt_ECS::Destroy()
 
 void hlt_ECS::RemoveEntity(int ID)
 {
-	for (auto& compPool : m_Components)
+	for (auto& compPool : m_ActiveComponents)
+	{
+		compPool.second->Remove(ID);
+	}
+	for (auto& compPool : m_InactiveComponents)
 	{
 		compPool.second->Remove(ID);
 	}
