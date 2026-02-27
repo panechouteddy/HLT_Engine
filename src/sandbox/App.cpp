@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "App.h"
 
+App* App::s_pInstance = nullptr;
+
+App* App::GetInstance()
+{
+	if (s_pInstance == nullptr)
+		s_pInstance = this;
+	return s_pInstance;
+}
+
 App::App()
 {
 	SETUP_APP_ONSTART(OnStart);
