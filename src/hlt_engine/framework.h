@@ -48,12 +48,13 @@
 // HLT GLOBAL
 #include "HLT.inl"
 
-
 // HLT ENGINE CLASS DEFINE
 #define HLT_TIME hlt_Time::GetInstance()
 #define HLT_WINDOW hlt_Window::GetInstance()
 #define HLT_GAMEMANAGER hlt_GameManager::GetInstance()
 #define HLT_CAMERA HLT_GAMEMANAGER.GetCamera()
+#define HLT_D3DAPP HLT_GAMEMANAGER.GetD3DApp()
+#define HLT_RENDERMANAGER HLT_D3DAPP->GetRenderManager()
 
 // SETUP
 #define SETUP_APP_ONSTART(method) HLT_GAMEMANAGER.GetAppMainMethods().m_Start.Set(this, &App::method)

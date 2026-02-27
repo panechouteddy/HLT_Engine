@@ -11,6 +11,8 @@ public:
 	float m_width;
 	float m_z;
 
+	bool m_IsMouseCamera = false;
+
 	XMFLOAT4X4 m_View;
 	XMFLOAT4X4 m_Proj;
 	XMFLOAT4X4 m_ViewProj;
@@ -19,6 +21,7 @@ public:
 	hlt_Camera();
 
 	void Update();
+	void MouseCamera();
 
 private:
 	void DebugInput();

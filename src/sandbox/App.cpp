@@ -13,6 +13,12 @@ void App::OnStart()
 	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
 	m_EntityID.push_back(m_PlayerID);
 	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos.z = 5.f;
+	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos.y = 0.5f;
+	m_pCamera = HLT_CAMERA;
+
+	XMFLOAT3 pos = { 0,0.5f,5.f };
+	m_pCamera->m_Transform.pos = pos;
+	m_pCamera->m_IsMouseCamera = true;
 
 	CreateMap();
 }
@@ -35,7 +41,7 @@ void App::CreateMap()
 	object1.second = transform1;
 	map->MeshContainer.push_back(object1);
 
-	std::pair<Mesh*, hlt_Transform3D*> object2;
+	/*std::pair<Mesh*, hlt_Transform3D*> object2;
 	object2.first = hlt_Prefab::MeshObject::CreateRock();
 	hlt_Transform3D* transform2 = new hlt_Transform3D;
 	transform2->pos.x = 2;
@@ -52,7 +58,7 @@ void App::CreateMap()
 	transform3->UpdateWorld();
 	object3.second = transform3;
 	map->MeshContainer.push_back(object3);
-	
+	*/
 	HLT_GAMEMANAGER.CreateMap(map);
 }
 
