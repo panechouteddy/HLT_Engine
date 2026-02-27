@@ -37,10 +37,10 @@ void hlt_UI::Initialize(ID3D11On12Device* d11On12,
 	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_textBrush));
 }
 
-void hlt_UI::Draw(float WindowWidthMiddle, std::wstring stats)
+void hlt_UI::Draw(float WindowWidth, float WindowHeight, std::wstring stats)
 {
-	D2D1_RECT_F layoutRect = D2D1::RectF(WindowWidthMiddle - 50, 50.0f, WindowWidthMiddle + 50, 300.0f);
-	
+	D2D1_RECT_F layoutRect = D2D1::RectF(WindowWidth - 50, 50.0f, WindowHeight + 50, 300.0f);
+
 	m_d2dContext->DrawText(
 		stats.c_str(),
 		(UINT32)stats.length(),
@@ -48,4 +48,9 @@ void hlt_UI::Draw(float WindowWidthMiddle, std::wstring stats)
 		layoutRect,
 		m_textBrush.Get()
 	);
+}
+
+void hlt_UI::Draw(float WindowWidth, std::wstring stats)
+{
+	
 }
