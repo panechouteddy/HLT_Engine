@@ -184,20 +184,19 @@ void D3DApp::Draw3D()
 
 void D3DApp::Draw2D()
 {
-    if (!m_IsLoading && m_SplashScreen->m_Opacity > 0)
+    if ( m_SplashScreen->m_Opacity > 0)
         m_SplashScreen->m_Opacity -= 0.01f;
     else if (m_IsOpacity && m_SplashScreen->m_Opacity <= 0)
         m_IsOpacity = false;
 
-    if (!m_IsLoading)
-    {
         m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-
-        std::wstring stats = L"FPS: " + std::to_wstring(1.0f);
-        m_UI->Draw(m_pWindow->GetWndSize().x * 0.5f, stats);
-
+        for (int i = 0; i < m_TextToDraw.size(); i++)
+        {
+            m_UI->Draw(m_TextToDraw[i]);
+        }
         m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-    }
+
+        m_TextToDraw.clear();
 
     if (m_IsOpacity)
     {
@@ -729,6 +728,17 @@ float D3DApp::GetWindowRatio() const
     return ((float)clientSize.x / (float)clientSize.y);
 }
 
+//float D3DApp::GetWindowWidth() const
+//{
+//    XMINT2 clientSize = m_pWindow->GetWndSize();
+//
+//    return (float)clientSize.x;
+//}
+//float D3DApp::GetWindowHeight() const
+//{
+//    XMINT2 clientSize = m_pWindow->GetWndSize();
+//    return (float)clientSize.y;
+//}
 
 
 void D3DApp::LogAdapters()
@@ -812,6 +822,7 @@ void D3DApp::CreateMeshBox()
     m_Box = new MeshBox;
     m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
 }
+
 void D3DApp::CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
 {
     m_Box->CreateMesh(name, vertexList, indexList);

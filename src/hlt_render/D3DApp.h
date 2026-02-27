@@ -62,7 +62,8 @@ public:
 	ConstantBuffer* CreateConstantBufferObject()const;
 	ColorBuffer* CreateColorBufferObject()const;
 	float GetWindowRatio()const;
-
+	//float GetWindowWidth()const;
+	//float GetWindowHeight()const;
 	void CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
 	MeshBox* GetMeshBox() const;
 	hlt_Camera* GetCamera() { return m_Camera; }
@@ -72,6 +73,8 @@ public:
 	void AddMeshTransform(hlt_Transform3D* transform, Mesh* mesh) { m_RenderManager->AddMeshTransform(transform, mesh); }
 	void AddMap(Map_Mesh* map);
 
+	void AddTextToDraw(std::wstring text, XMFLOAT2 position) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, position}); }
+	void AddTextToDraw(std::wstring text, float x, float y) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, XMFLOAT2{x,y}});}
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
 	
@@ -82,7 +85,6 @@ protected:
 
 protected:
 
-	//bool InitMainWindow();
 	bool InitDirect3D();
 	void InitDirect3DDraw();
 	bool InitD3D11On12();
@@ -155,6 +157,7 @@ protected:
 	MeshBox* m_Box;
 
 	//Ui
+	std::vector<std::pair<std::wstring, XMFLOAT2>> m_TextToDraw;
 	hlt_UI* m_UI;
 	hlt_SplashScreen* m_SplashScreen;
 

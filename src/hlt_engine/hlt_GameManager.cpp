@@ -291,6 +291,9 @@ void hlt_GameManager::RefreshCore()
 	HLT_KEYBOARD.Update();
 	HLT_MOUSE.Update();
 	HLT_TIME.Update();
+	std::wstring fps = L"FPS: " + std::to_wstring((int)HLT_TIME.GetTotalTime());
+	
+	m_pD3D12App->AddTextToDraw(fps, m_pWindow->GetWndSize().x, 0);
 }
 
 void hlt_GameManager::RefreshTransformsMatrix()

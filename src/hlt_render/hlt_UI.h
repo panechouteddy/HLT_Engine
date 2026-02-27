@@ -11,7 +11,7 @@ public:
 		int swapChainBC,
 		ComPtr<ID3D12Resource>* swapChainBuffer,
 		ComPtr<ID3D11Resource>* wrappedBackBuffers) override;
-	void Draw(float WindowWidth,float WindowHeight, std::wstring stats);
+	void Draw(std::pair<std::wstring, XMFLOAT2> text);
 
 public:
 	ComPtr<IDWriteTextFormat> m_textFormatBody;
