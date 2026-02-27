@@ -54,4 +54,5 @@ public:
 
 	// DX12 TRANSFORM
 	void UpdateWorld();
+	void UpdateWorld(FXMVECTOR offset);
 };

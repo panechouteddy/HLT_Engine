@@ -298,9 +298,34 @@ void hlt_GameManager::RefreshCore()
 void hlt_GameManager::RefreshTransformsMatrix()
 {
 	hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_ECS.GetComponent<hlt_Component::Transform3D>();
+	hlt_ECS::ComponentPool<hlt_Component::Hierarchy>* hierarchys = m_ECS.GetComponent<hlt_Component::Hierarchy>();
 
-	for (hlt_Component::Transform3D* transformComponent : transforms->component)
+	if (transforms == nullptr)
+		return;
+
+	if(hierarchys == nullptr)
 	{
-		transformComponent->transform.UpdateWorld();
+		for (hlt_Component::Transform3D* transformComponent : transforms->component)
+		{
+			transformComponent->transform.UpdateWorld();
+		}
+		return;
+	}
+
+	for (int i = 0; i < transforms->componentOwnerID.size(); i++)
+	{
+		int currentEntityID = transforms->componentOwnerID[i];
+
+		hlt_Component::Transform3D* currentTransform = transforms->component[i];
+		hlt_Component::Hierarchy* currentHierarchy = hierarchys->Get(currentEntityID);
+
+		if (currentHierarchy == nullptr)
+			currentTransform->transform.UpdateWorld();
+		else
+		{
+			hlt_Component::Transform3D* parentTransform = transforms->Get(currentHierarchy->parentID);
+			if (parentTransform != nullptr)
+				currentTransform->transform.UpdateWorld(XMLoadFloat3(&parentTransform->transform.pos));
+		}
 	}
 }

@@ -46,10 +46,8 @@ void App::OnStart()
 		ecs->GetComponent<hlt_Component::Mesh>(m_TestID)->mesh.SetColor(hlt_Color::Red);
 
 		hlt_Component::Transform3D* pTransform = ecs->GetComponent<hlt_Component::Transform3D>(m_TestID);
-		pTransform->transform.pos = { -5, 0, 15 };
-		hlt_Component::ConstantMove* pCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_TestID);
-		pCMove->dir = { 1.f, 0.f, 0.f };
-		pCMove->move = 2.f;
+		hlt_Component::Hierarchy* pHierarchy = ecs->AddComponent<hlt_Component::Hierarchy>(m_TestID);
+		pHierarchy->parentID = m_PlayerID;
 	}
 	
 
@@ -69,14 +67,15 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::BoxCollider>();
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
+	ecs->AddSystem<hlt_System::Hierarchy>();
 
 	// CreateMap();
 }
 
 void App::OnUpdate()
 {
-	if (*pIsColliding == true)
-		HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
+	//if (*pIsColliding == true)
+	//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
 }
 
 void App::OnExit()
