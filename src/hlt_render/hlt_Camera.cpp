@@ -67,10 +67,8 @@ void hlt_Camera::DebugInput()
         m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
     if (keyboardInput.IsKey(VK_SPACE))
         m_Transform.pos.y += 10.f * hlt_Time::GetInstance().GetDeltaTime();
-        //m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.up);
     if (keyboardInput.IsKey(VK_LCONTROL))
         m_Transform.pos.y -= 10.f * hlt_Time::GetInstance().GetDeltaTime();
-        //m_Transform.Move(-10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.up);
 
     if (keyboardInput.IsKey(VK_A))
         m_Transform.ResetRotation();

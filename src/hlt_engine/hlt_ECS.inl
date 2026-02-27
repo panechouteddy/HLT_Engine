@@ -2,6 +2,16 @@
 
 // MANAGE INTERN COMPONENT POOL
 template<typename T>
+inline hlt_ECS::ComponentPool<T>::~ComponentPool()
+{
+	for (int i = 0; i < component.size(); i++)
+	{
+		delete component[i];
+	}
+	component.clear();
+}
+
+template<typename T>
 inline T* hlt_ECS::ComponentPool<T>::Add(int ID)
 {
 	if (Have(ID)) return nullptr;
@@ -9,13 +19,13 @@ inline T* hlt_ECS::ComponentPool<T>::Add(int ID)
 	if (ID >= entityID.capacity())
 		entityID.resize(ID + 1, MISS_COMPONENT);
 
-	component.push_back(T());
+	component.push_back(new T());
 	size_t componentIndex = component.size() - 1;
 	componentOwnerID.push_back(ID);
 
 	entityID[ID] = (int)componentIndex;
 
-	return &component[entityID[ID]];
+	return component[entityID[ID]];
 }
 
 template<typename T>
@@ -31,7 +41,7 @@ inline T* hlt_ECS::ComponentPool<T>::Get(int ID)
 {
 	if (Have(ID) == false) return nullptr;
 
-	return &component[entityID[ID]];
+	return component[entityID[ID]];
 }
 
 template<typename T>

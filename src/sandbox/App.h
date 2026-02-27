@@ -3,6 +3,11 @@
 
 class App
 {
+private:
+	static App* s_pInstance;
+public:
+	App* GetInstance();
+
 public:
 	App();
 	~App() = default;
@@ -11,12 +16,17 @@ public:
 	void OnUpdate();
 	void OnExit();
 	void CreateMap();
-	void UpdateTransform(hlt_Transform3D* transform);
 
 private:
 	std::vector<int> m_EntityID;
 	int m_PlayerID = -1;
 
 	hlt_Camera* m_pCamera;
+	
+	int m_TestID = -1;
+	int m_OtherID = -1;
+
+	bool* pIsColliding = nullptr;
+	bool* oIsColliding = nullptr;
 };
 

@@ -9,12 +9,12 @@ void hlt_System::hlt_Input::hlt_Keyboard::Update()
 
 	for (auto& comp : pKeyboardCPool->component)
 	{
-		SyncKeySize(comp);
-		for (int i = 0; i < comp.keys.size(); i++)
+		SyncKeySize(*comp);
+		for (int i = 0; i < comp->keys.size(); i++)
 		{
-			comp.isKey[i] = keyboard.IsKey(comp.keys[i]);
-			comp.isDown[i] = keyboard.IsKeyDown(comp.keys[i]);
-			comp.isUp[i] = keyboard.IsKeyUp(comp.keys[i]);
+			comp->isKey[i] = keyboard.IsKey(comp->keys[i]);
+			comp->isDown[i] = keyboard.IsKeyDown(comp->keys[i]);
+			comp->isUp[i] = keyboard.IsKeyUp(comp->keys[i]);
 		}
 	}
 }

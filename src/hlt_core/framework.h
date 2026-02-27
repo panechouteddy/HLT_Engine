@@ -44,8 +44,8 @@ constexpr bool DEBUG = true;
 #include "hlt_DebugTools.h"
 using namespace hlt_DebugTools;
 
-// COLORS
-#include "hlt_Color.h"
+// FUNCTIONS
+#include "hlt_Function.h"
 
 /// HLT CORE CLASS DEFINE
 #define HLT_MOUSE hlt_Input::MouseInput::GetInstance()

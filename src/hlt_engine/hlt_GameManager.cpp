@@ -24,7 +24,7 @@ hlt_GameManager& hlt_GameManager::GetInstance()
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 
-hlt_GameManager::hlt_GameManager()
+hlt_GameManager::hlt_GameManager() : m_DefaultIcon(NULL)
 {
 }
 hlt_GameManager::~hlt_GameManager()
@@ -76,6 +76,9 @@ void hlt_GameManager::Start()
 		SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.Console.1.0");
 	}
 
+	// ENTITY MANAGER
+	m_EntityManager.SetECS(&m_ECS);
+
 	// WINDOW
 	SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.MainWnd.1.0");
 	m_pWindow = &HLT_WINDOW;
@@ -98,8 +101,7 @@ void hlt_GameManager::Start()
 	m_pCamera->m_Transform.ResetRotation();
 
 	// START USER APP
-	if (m_AppToCall.m_Start.m_pWrapper != nullptr)
-		m_AppToCall.m_Start.Execute();
+	m_AppToCall.m_Start.Execute();
 }
 
 void hlt_GameManager::CreateMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
@@ -120,15 +122,16 @@ void hlt_GameManager::Update()
 	m_ECS.Update();
 
 	// APP UPDATE
-	if (m_AppToCall.m_Update.m_pWrapper != nullptr)
-		m_AppToCall.m_Update.Execute();
+	m_AppToCall.m_Update.Execute();
 
 	// WINDOW UPDATE
 	m_pWindow->OnUpdate();
 
 	// DX12 UPDATES
 	RefreshTransformsMatrix();
-	m_pD3D12App->Update();
+	m_EntityManager.UpdateMeshTransform();
+
+	m_pD3D12App->Update(m_EntityManager.GetMeshs(), m_EntityManager.GetTransforms());
 
 	// MOUSE DELTA UPDATE
 	*HLT_MOUSE.GetLastPos() = *HLT_MOUSE.GetPos();
@@ -136,7 +139,7 @@ void hlt_GameManager::Update()
 
 void hlt_GameManager::Render()
 {
-	m_pD3D12App->Draw();
+	m_pD3D12App->Draw(m_EntityManager.GetMeshs(), m_EntityManager.GetTransforms());
 }
 
 void hlt_GameManager::Destroy()
@@ -147,8 +150,7 @@ void hlt_GameManager::Destroy()
 	if (m_pD3D12App != nullptr)
 		delete m_pD3D12App;
 
-	if (m_AppToCall.m_Exit.m_pWrapper != nullptr)
-		m_AppToCall.m_Exit.Execute();
+	m_AppToCall.m_Exit.Execute();
 
 	if (DEBUG)
 		hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole();
@@ -297,10 +299,8 @@ void hlt_GameManager::RefreshTransformsMatrix()
 {
 	hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_ECS.GetComponent<hlt_Component::Transform3D>();
 
-	for (hlt_Component::Transform3D& transformComponent : transforms->component)
+	for (hlt_Component::Transform3D* transformComponent : transforms->component)
 	{
-		transformComponent.transform.UpdateWorld();
-		hlt_DebugConsole::PrintVector(transformComponent.transform.pos);
-		std::cout << " / cube: " << std::endl;
+		transformComponent->transform.UpdateWorld();
 	}
 }

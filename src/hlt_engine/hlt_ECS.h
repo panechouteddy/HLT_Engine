@@ -20,8 +20,10 @@ public:
 	struct ComponentPool : public CPool
 	{
 		std::vector<int> entityID; // INDEX = entityID; VALUE = componentIndex; MISS_COMPONENT si l'entity n'a pas le component
-		std::vector<T> component;
+		std::vector<T*> component;
 		std::vector<int> componentOwnerID; // INDEX = componentIndex; VALUE = entityID
+
+		~ComponentPool();
 
 		T* Add(int ID);
 
@@ -39,7 +41,7 @@ private:
 
 public:
 	hlt_ECS() = default;
-	~hlt_ECS() = default;
+	~hlt_ECS();
 
 	void Destroy();
 

@@ -65,37 +65,6 @@ void D3DApp::Set4xMsaaState(bool value)
         CreateSwapChain();
     }
 }
-
-int D3DApp::Run()
-{
-    MSG msg = { 0 };
-
-    while (msg.message != WM_QUIT)
-    {
-        // If there are Window messages then process them.
-        if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-        // Otherwise, do animation/game stuff.
-        else
-        {
-            if (!m_pWindow->IsPaused())
-            {
-                CalculateFrameStats();
-                Update();
-                Draw();
-            }
-            else
-            {
-                Sleep(100);
-            }
-        }
-    }
-
-    return (int)msg.wParam;
-}
 bool D3DApp::Initialize()
 {
     //if (!InitMainWindow())
@@ -127,13 +96,13 @@ bool D3DApp::Initialize()
 
     return true;
 }
-void D3DApp::Update()
+void D3DApp::Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
 {
     m_Camera->Update();
-    m_RenderManager->UpdateRender(m_Camera);
+    m_RenderManager->UpdateRender(m_Camera, meshs, transforms);
 }
 
-void D3DApp::Draw()
+void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
 {
     ThrowIfFailed(m_DirectCmdListAlloc->Reset());
 
@@ -157,7 +126,7 @@ void D3DApp::Draw()
 
     if (!m_IsLoading)
     {
-        m_RenderManager->Draw();
+        m_RenderManager->Draw(meshs);
     }
 
     auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
