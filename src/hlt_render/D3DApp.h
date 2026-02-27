@@ -57,6 +57,7 @@ public:
 
 	ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList.Get();}
 	ID3D12Device* GetDevice() { return m_Device.Get(); }
+	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return m_SrvDescriptorHeap.Get();}
 	virtual bool Initialize();
 	//virtual LRESULT MsgProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 	ConstantBuffer* CreateConstantBufferObject()const;
@@ -139,6 +140,7 @@ protected:
 	// DescriptorHead
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_RtvHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DsvHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_SrvDescriptorHeap ;
 
 	UINT m_RtvDescriptorSize = 0;
 	UINT m_DsvDescriptorSize = 0;

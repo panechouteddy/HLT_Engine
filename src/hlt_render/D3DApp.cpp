@@ -565,8 +565,8 @@ void D3DApp::InitDirect3DDraw()
     m_RenderManager->BuildDescriptorHeaps(m_Device.Get());
     m_RenderManager->BuildRootSignature(m_Device.Get());
     m_RenderManager->BuildShadersAndInputLayout();
-    m_RenderManager->BuildPSO(m_Device.Get(),m_4xMsaaState,m_4xMsaaQuality);
-
+    m_RenderManager->BuildPSO(m_BackBufferFormat,m_Device.Get(),m_4xMsaaState,m_4xMsaaQuality, m_DepthStencilFormat);
+    
     ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
     m_DirectCmdListAlloc->Reset();
 

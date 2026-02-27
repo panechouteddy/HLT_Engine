@@ -1,6 +1,7 @@
 #pragma once
 
 using Microsoft::WRL::ComPtr;
+struct hlt_PSO;
 class RenderManager
 {
 private:
@@ -25,6 +26,8 @@ protected:
     std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
 
     ComPtr<ID3D12PipelineState> m_Pso = nullptr;
+    hlt_PSO* m_PsoManager = nullptr;
+    std::unordered_map<std::string, ComPtr<ID3DBlob>> mShaders;
 
 
 public:
@@ -41,7 +44,7 @@ public:
     void BuildDescriptorHeaps(ID3D12Device* device);
     void BuildRootSignature(ID3D12Device* device);
     void BuildShadersAndInputLayout();
-    void BuildPSO(ID3D12Device* device, bool _4xMsaaState, UINT _4xMsaaQuality);
+    void BuildPSO(DXGI_FORMAT BackBufferFormat ,ID3D12Device* device, bool _4xMsaaState, UINT _4xMsaaQuality , DXGI_FORMAT DepthStencilFormat);
     void AddMapToRender(Map_Mesh* Map) { m_MapMesh = Map; }
 };
 

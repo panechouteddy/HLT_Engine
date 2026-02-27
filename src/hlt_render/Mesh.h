@@ -6,6 +6,7 @@
 
 struct MeshGeometry;
 class ColorBuffer;
+struct Texture;
 struct Vertex
 {
     XMFLOAT3 Pos;
@@ -19,7 +20,7 @@ protected:
     MeshGeometry* m_pMesh = nullptr;
     bool m_IsVisible = true;
     std::string m_MeshName;
-
+    Texture m_Texture;
 public:
     Mesh() {};
     void SetMesh(std::string meshName, XMFLOAT3 color);

@@ -214,19 +214,24 @@ void RenderManager::BuildDescriptorHeaps(ID3D12Device* device)
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
 	ThrowIfFailed(device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&m_CbvHeap)));
+
 }
 
 void RenderManager::BuildRootSignature(ID3D12Device* device)
 {
 	// Root parameter can be a table, root descriptor or root constants.
-	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+	const int count = 3;
+	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
 
 	// Create a single descriptor table of CBVs.
-
-	slotRootParameter[0].InitAsConstantBufferView(0); // 0 <- bo 
-	slotRootParameter[1].InitAsConstantBufferView(1); // 1 <- b1
+	for (int i = 0; i < count; i++)
+	{
+		slotRootParameter[i].InitAsConstantBufferView(0); // 0 <- bo 
+	}
+	// 1 <- b1
+	// 2 <- b2
 	// A root signature is an array of root parameters.
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(count, slotRootParameter, 0, nullptr,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
@@ -254,35 +259,21 @@ void RenderManager::BuildRootSignature(ID3D12Device* device)
 	m_InputLayout =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	};
 }
 
- void RenderManager::BuildPSO(ID3D12Device* device, bool _4xMsaaState, UINT _4xMsaaQuality)
+ void RenderManager::BuildPSO(DXGI_FORMAT BackBufferFormat, ID3D12Device* device, bool _4xMsaaState, UINT _4xMsaaQuality, DXGI_FORMAT DepthStencilFormat)
 {
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
-	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	psoDesc.InputLayout = { m_InputLayout.data(), (UINT)m_InputLayout.size() };
-	psoDesc.pRootSignature = m_RootSignature.Get();
-	psoDesc.VS =
-	{
-		reinterpret_cast<BYTE*>(m_VsByteCode->GetBufferPointer()),
-		m_VsByteCode->GetBufferSize()
-	};
-	psoDesc.PS =
-	{
-		reinterpret_cast<BYTE*>(m_PsByteCode->GetBufferPointer()),
-		m_PsByteCode->GetBufferSize()
-	};
-	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	psoDesc.SampleMask = UINT_MAX;
-	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	psoDesc.NumRenderTargets = 1;
-	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-	psoDesc.SampleDesc.Count = _4xMsaaState ? 4 : 1;
-	psoDesc.SampleDesc.Quality = _4xMsaaState ? (_4xMsaaQuality - 1) : 0;
-	psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	ThrowIfFailed(device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_Pso)));
+
+
+	 m_PsoManager = new hlt_PSO;
+	m_PsoManager->m_InputLayout = m_InputLayout;
+	m_PsoManager->m_RootSignature = m_RootSignature;
+
+	m_PsoManager->CreateOpaquePsoDesc(BackBufferFormat, _4xMsaaState, _4xMsaaQuality, DepthStencilFormat,device);
+	m_PsoManager->CreateTransparentPsoDesc(device);
+	m_PsoManager->CreateAlphaTestedPsoDesc(device);
+
 }
