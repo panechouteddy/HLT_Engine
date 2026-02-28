@@ -30,6 +30,10 @@ void hlt_ECS::Destroy()
 	{
 		delete comp.second;
 	}
+	for (auto& comp : m_WastedComponents)
+	{
+		delete comp.second;
+	}
 
 	for (auto& system : m_pSystems)
 	{
@@ -41,10 +45,10 @@ void hlt_ECS::RemoveEntity(int ID)
 {
 	for (auto& compPool : m_ActiveComponents)
 	{
-		compPool.second->Remove(ID);
+		compPool.second->Recycle(ID, this);
 	}
 	for (auto& compPool : m_InactiveComponents)
 	{
-		compPool.second->Remove(ID);
+		compPool.second->Recycle(ID, this);
 	}
 }
