@@ -107,6 +107,7 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 		// Update the constant buffer with the latest worldViewProj matrix.
 		ObjectConstant objConstants;
 		XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
+		XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
 		m_ConstantBufferList[i]->GetBuffer()->CopyData(0, objConstants);
 	}
 	if (m_MapMesh != nullptr)
@@ -122,6 +123,7 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 			// Update the constant buffer with the latest worldViewProj matrix.
 			ObjectConstant objConstants;
 			XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
+			XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
 			m_MapMesh->MapMesh_ConstantBuffer[i]->GetBuffer()->CopyData(0, objConstants);
 		}
 	}
@@ -136,6 +138,7 @@ void RenderManager::Draw()
 	m_CommandList->SetGraphicsRootSignature(m_RootSignature.Get());
 	m_CommandList->SetPipelineState(m_Pso.Get());
 
+	UINT descriptorSize =D3DApp::GetApp()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	for (int i = 0;i < m_MeshToDrawList.size();i++)
 	{
 
@@ -152,16 +155,17 @@ void RenderManager::Draw()
 
 		D3D12_INDEX_BUFFER_VIEW indexBuffer = m_MeshToDrawList[i]->GetGeometry()->IndexBufferView();
 		m_CommandList->IASetIndexBuffer(&indexBuffer);
+		
+		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		tex.Offset(m_MeshToDrawList[i]->DiffuseSrvHeapIndex, mCbvSrvDescriptorSize);
 
+		m_CommandList->SetGraphicsRootDescriptorTable(1, tex);
 		m_CommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());
-		for (int t = 0;t < m_MeshToDrawList[i]->GetGeometry()->DrawArgs.size();t++)
-		{
 			m_CommandList->DrawIndexedInstanced(
 				m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount,
 				1, 0, 0, 0);
-		}
 	}
 	if (m_MapMesh == nullptr)
 		return;
@@ -207,32 +211,47 @@ ColorBuffer* RenderManager::AddColorBuffer()
 
 void RenderManager::BuildDescriptorHeaps(ID3D12Device* device)
 {
-
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-	cbvHeapDesc.NumDescriptors = 1;
+	cbvHeapDesc.NumDescriptors = 3;
 	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
 	ThrowIfFailed(device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&m_CbvHeap)));
-
 }
 
 void RenderManager::BuildRootSignature(ID3D12Device* device)
 {
-	// Root parameter can be a table, root descriptor or root constants.
-	const int count = 3;
-	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
 
-	// Create a single descriptor table of CBVs.
-	for (int i = 0; i < count; i++)
-	{
-		slotRootParameter[i].InitAsConstantBufferView(0); // 0 <- bo 
-	}
-	// 1 <- b1
-	// 2 <- b2
-	// A root signature is an array of root parameters.
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(count, slotRootParameter, 0, nullptr,
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	const int count = 2;
+
+	CD3DX12_ROOT_PARAMETER rootParameters[count];
+
+
+	CD3DX12_DESCRIPTOR_RANGE cbvRange;
+	cbvRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 2, 0);
+	// 2 CBV à partir de register b0
+
+	rootParameters[0].InitAsDescriptorTable(1, &cbvRange, D3D12_SHADER_VISIBILITY_ALL);
+
+	// Descriptor range pour la texture (t0)
+	CD3DX12_DESCRIPTOR_RANGE srvRange;
+	srvRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+	// 1 SRV à partir de t0
+
+	rootParameters[1].InitAsDescriptorTable(1, &srvRange, D3D12_SHADER_VISIBILITY_PIXEL);
+
+	// Sampler statique (s0)
+	CD3DX12_STATIC_SAMPLER_DESC staticSampler(
+		0, // register s0
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR
+	);
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
+		count,
+		rootParameters,
+		1,
+		&staticSampler,
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+	);
 
 	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
 	ComPtr<ID3DBlob> serializedRootSig = nullptr;
@@ -247,6 +266,7 @@ void RenderManager::BuildRootSignature(ID3D12Device* device)
 	ThrowIfFailed(hr);
 
 	ThrowIfFailed(device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
+
 }
 
  void RenderManager::BuildShadersAndInputLayout()
@@ -256,10 +276,12 @@ void RenderManager::BuildRootSignature(ID3D12Device* device)
 	m_VsByteCode = d3dUtil::CompileShader(L"..\\..\\src\\hlt_render\\Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
 	m_PsByteCode = d3dUtil::CompileShader(L"..\\..\\src\\hlt_render\\Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
 
-	m_InputLayout =
+	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	};
 }

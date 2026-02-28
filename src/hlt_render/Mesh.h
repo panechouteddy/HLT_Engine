@@ -10,6 +10,7 @@ struct Texture;
 struct Vertex
 {
     XMFLOAT3 Pos;
+    XMFLOAT2 TexC;
 };
 
 class Mesh
@@ -18,15 +19,20 @@ protected:
 
     XMFLOAT4 m_Color = XMFLOAT4(Colors::White);
     MeshGeometry* m_pMesh = nullptr;
+
     bool m_IsVisible = true;
     std::string m_MeshName;
-    Texture m_Texture;
+
+    Texture* m_pTexture = nullptr;
 public:
     Mesh() {};
     void SetMesh(std::string meshName, XMFLOAT3 color);
     void SetColor(XMFLOAT4 color) { m_Color = color; }
     void SetColor(XMFLOAT3 color) { m_Color = { color.x,color.y,color.z ,1 }; }
+    void SetTexture(std::string meshName);
+
     MeshGeometry* GetGeometry();
+    Texture* GetTexture() { return m_pTexture; }
     bool MeshIsVisible() { return m_IsVisible; }
     void SetMeshVisibility(bool state) { m_IsVisible = state; }
     std::string GetMeshName() { return m_MeshName; }

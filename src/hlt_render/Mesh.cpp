@@ -24,6 +24,13 @@ void Mesh::SetMesh(std::string meshName, XMFLOAT3 color)
 	SetColor(color);
 }
 
+void Mesh::SetTexture(std::string TextName)
+{
+	std::transform(TextName.begin(), TextName.end(), TextName.begin(), std::tolower);
+
+	m_pTexture = D3DApp::GetApp().
+}
+
 MeshGeometry* Mesh::GetGeometry()
 {
 	return m_pMesh;

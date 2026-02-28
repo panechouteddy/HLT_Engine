@@ -27,7 +27,7 @@ void hlt_PSO::CreateOpaquePsoDesc(DXGI_FORMAT m_BackBufferFormat, bool m_4xMsaaS
 	m_OpaquePsoDesc.SampleDesc.Count = m_4xMsaaState ? 4 : 1;
 	m_OpaquePsoDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
 	m_OpaquePsoDesc.DSVFormat = m_DepthStencilFormat;
-	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&m_OpaquePsoDesc, IID_PPV_ARGS(&m_PSOs["opaque"])));
+	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&m_OpaquePsoDesc, IID_PPV_ARGS(&m_PSOList["opaque"])));
 }
 
 void hlt_PSO::CreateTransparentPsoDesc(ComPtr<ID3D12Device> m_Device)
@@ -47,7 +47,7 @@ void hlt_PSO::CreateTransparentPsoDesc(ComPtr<ID3D12Device> m_Device)
 	m_TransparencyBlendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	m_TransparentPsoDesc.BlendState.RenderTarget[0] = m_TransparencyBlendDesc;
-	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&m_TransparentPsoDesc, IID_PPV_ARGS(&m_PSOs["transparent"])));
+	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&m_TransparentPsoDesc, IID_PPV_ARGS(&m_PSOList["transparent"])));
 }
 
 void hlt_PSO::CreateAlphaTestedPsoDesc(ComPtr<ID3D12Device> m_Device)
@@ -60,5 +60,5 @@ void hlt_PSO::CreateAlphaTestedPsoDesc(ComPtr<ID3D12Device> m_Device)
 		m_Shaders["alphaTestedPS"]->GetBufferSize()
 	};
 	m_AlphaTestedPsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&m_AlphaTestedPsoDesc, IID_PPV_ARGS(&m_PSOs["alphaTested"])));
+	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&m_AlphaTestedPsoDesc, IID_PPV_ARGS(&m_PSOList["alphaTested"])));
 }

@@ -67,6 +67,7 @@ public:
 	//float GetWindowHeight()const;
 	void CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
 	MeshBox* GetMeshBox() const;
+	TextureBox* GetTextureBox() const;
 	hlt_Camera* GetCamera() { return m_Camera; }
 
 	/*void AddMeshPosition(hlt_Transform3D* pos) const;

@@ -10,6 +10,7 @@ struct ObjectConstant
 	ObjectConstant() {};
 	ObjectConstant(XMFLOAT4X4 pos) { WorldViewProj = pos;}
 	XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
+	XMFLOAT4X4 World; 
 };
 
 template <typename T>
