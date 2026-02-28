@@ -59,10 +59,10 @@ public:
 	 T* GetComponent(int ID);
 
 	 template <typename T>
-	 void SetActiveComponent(int ID) { ; }
+	 void SetComponentActive(int ID, bool active);
 
 	 template <typename T>
-	 bool IsComponentActive(int ID) { ; }
+	 bool IsComponentActive(int ID);
 	
 	template <typename T>
 	void RemoveComponent(int ID);
@@ -73,6 +73,9 @@ public:
 
 	template <typename T>
 	ComponentPool<T>* GetComponent();
+
+	template <typename T>
+	void SetComponentActive(bool active);
 
 	template <typename T>
 	void RemoveComponent();
