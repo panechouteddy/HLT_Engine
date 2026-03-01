@@ -74,7 +74,8 @@ void App::OnStart()
 
 void App::OnUpdate()
 {
-	//if (*pIsColliding == true)
+	if (*pIsColliding == true)
+		HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::Mesh>(m_TestID, false);
 	//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
 }
 

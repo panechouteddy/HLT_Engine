@@ -27,8 +27,8 @@ inline T* hlt_ECS::ComponentPool<T>::Add(int ID)
 		entityID.resize(ID + 1, MISS_COMPONENT);
 
 	component.push_back(new T());
-	size_t componentIndex = component.size() - 1;
 	componentOwnerID.push_back(ID);
+	size_t componentIndex = component.size() - 1;
 
 	entityID[ID] = (int)componentIndex;
 
@@ -85,18 +85,15 @@ inline T* hlt_ECS::ComponentPool<T>::Remove(int ID, bool toDelete)
 	std::swap(component[componentIndex], component.back());
 	T* removed = component.back();
 	component.pop_back();
+
 	std::swap(componentOwnerID[componentIndex], componentOwnerID.back());
 	componentOwnerID.pop_back();
 
+	entityID[componentOwnerID[componentIndex]] = componentIndex;
+
 	entityID[ID] = MISS_COMPONENT;
 
-	if (toDelete == false)
-		return removed;
-	else
-	{
-		delete removed;
-		return nullptr;
-	}
+	return removed;
 }
 
 template<typename T>
@@ -233,11 +230,12 @@ inline T* hlt_ECS::MoveComponent(int ID, std::unordered_map<int, CPool*>* from, 
 
 	// 3. S'assurer que le pool de destination existe
 	if (to->contains(T::ID) == false)
-		AddComponent<T>();
+		(*to)[T::ID] = new ComponentPool<T>();
 
 	ComponentPool<T>* toPool = dynamic_cast<ComponentPool<T>*>((*to)[T::ID]);
 
 	fromPool->Remove(ID);
+
 	return toPool->Add(ID, component);
 }
 
