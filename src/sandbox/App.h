@@ -1,5 +1,6 @@
 #pragma once
 
+class Projectile;
 
 class App
 {
@@ -21,8 +22,11 @@ private:
 	std::vector<int> m_EntityID;
 	int m_PlayerID = -1;
 
+	hlt_ECS* ecs;
 	hlt_Camera* m_pCamera;
 	
+	Projectile* m_proj;
+
 	int m_TestID = -1;
 	int m_OtherID = -1;
 

@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include <WindowsX.h>
+#include <hlt_engine/framework.h>
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
@@ -86,13 +87,13 @@ bool D3DApp::Initialize()
     m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
     m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
-    Draw();
+    //Draw();
 
     InitDirect3DDraw();
 
     m_IsLoading = false;
 
-    Update();
+    //Update();
 
     return true;
 }
