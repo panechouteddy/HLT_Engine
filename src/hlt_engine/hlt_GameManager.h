@@ -23,13 +23,17 @@ public:
 	void DeleteEntity(int ID) { return m_EntityManager.DeleteEntity(ID); }
 
 	void Start();
-	void AddMesh(Mesh* mesh) { m_pD3D12App->AddMesh(mesh); }
+
+	void CreateMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
+	void CreateMap(Map_Mesh* map);
+	
 private:
 	void Update();
 	void Render();
 	void Destroy();
 
 	void RefreshCore();
+	void RefreshTransformsMatrix();
 
 private:
 	// RUN
@@ -41,12 +45,13 @@ private:
 	// WINDOW
 	hlt_Window* m_pWindow = nullptr;
 	D3DApp* m_pD3D12App = nullptr;
+	hlt_Camera* m_pCamera = nullptr;
+
+	// DEFAULT WINDOW ICON
+	HICON m_DefaultIcon;
 
 	// ENTITY MANAGER
 	hlt_EntityManager m_EntityManager;
-	/*int m_countEntityID = 0;
-	std::vector<int> m_EntityID;
-	std::vector<int> m_PoolEntityID;*/
 
 	// ECS
 	hlt_ECS m_ECS;

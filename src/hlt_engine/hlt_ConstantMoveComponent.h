@@ -10,6 +10,7 @@ namespace hlt_Component
 		static const int ID = 1;
 
 		float move;
+		float saveMove;
 		XMFLOAT3 dir;
 	};
 }

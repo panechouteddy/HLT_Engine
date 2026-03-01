@@ -4,11 +4,6 @@
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-struct Vertex
-{
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
-};
 //
 //struct ObjectConstants
 //{

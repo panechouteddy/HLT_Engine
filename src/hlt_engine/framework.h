@@ -4,6 +4,9 @@
 #include <hlt_core/framework.h>
 #include <hlt_render/framework.h>
 
+ // FOR SetCurrentProcessExplicitAppUserModelID
+#include <shobjidl.h>
+
 // CONTAINERS
 #include <vector>
 #include <unordered_map>
@@ -15,6 +18,9 @@
 #include <hlt_core/hlt_Time.h>
 #include <hlt_core/hlt_Window.h>
 
+// STATE MACHINE
+#include <hlt_core/hlt_StateMachine.h>
+
 // ECS
 #include "hlt_ECS.inl"
 
@@ -24,13 +30,17 @@
 #include "hlt_InputComponent.h"
 #include "hlt_ColliderComponent.h"
 #include "hlt_MeshComponent.h"
+#include "hlt_StateMachineComponent.h"
+#include "hlt_HierarchyComponent.h"
 
 // ECS SYSTEMS
 #include "hlt_System.h"
 #include "hlt_ConstantMoveSystem.h"
 #include "hlt_InputSystem.h"
 #include "hlt_ColliderSystem.h"
-#include "hlt_Transform3DSystem.h"
+#include "hlt_RepulseSystem.h"
+#include "hlt_StateMachineSystem.h"
+#include "hlt_HierarchySystem.h"
 
 // ENTITY MANAGER
 #include "hlt_EntityManager.h"
@@ -43,12 +53,14 @@
 
 // HLT GLOBAL
 #include "HLT.inl"
+#include "hlt_GameObject.h"
 
 
 // HLT ENGINE CLASS DEFINE
 #define HLT_TIME hlt_Time::GetInstance()
 #define HLT_WINDOW hlt_Window::GetInstance()
 #define HLT_GAMEMANAGER hlt_GameManager::GetInstance()
+#define HLT_CAMERA HLT_GAMEMANAGER.GetCamera()
 
 // SETUP
 #define SETUP_APP_ONSTART(method) HLT_GAMEMANAGER.GetAppMainMethods().m_Start.Set(this, &App::method)

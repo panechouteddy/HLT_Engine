@@ -47,26 +47,25 @@ public:
 	bool Get4xMsaaState()const;
 	void Set4xMsaaState(bool value);
 
-	int Run();
-
 	virtual void OnResize();
-	virtual void Update();
-	virtual void Draw();
+	virtual void Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
+	virtual void Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
 
-	void StartRender();
-	void Render(hlt_Transform3D* transform, Mesh* mesh);
-	void EndRender();
-
+	ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList.Get();}
+	ID3D12Device* GetDevice() { return m_Device.Get(); }
 	virtual bool Initialize();
 	//virtual LRESULT MsgProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 	ConstantBuffer* CreateConstantBufferObject()const;
 	ColorBuffer* CreateColorBufferObject()const;
 	float GetWindowRatio()const;
 
+	void CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
 	MeshBox* GetMeshBox() const;
+	hlt_Camera* GetCamera() { return m_Camera; }
 
-	void AddMeshPosition(hlt_Transform3D* pos) const;
-	void AddMesh(Mesh* pos) const;
+	/*void AddMeshPosition(hlt_Transform3D* pos) const;
+	void AddMesh(Mesh* pos) const;*/
+	void AddMap(Map_Mesh* map);
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
@@ -97,7 +96,6 @@ protected:
 	void LogAdapterOutputs(IDXGIAdapter* adapter);
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 	void CreateMeshBox();
-	
 	
 	
 protected:

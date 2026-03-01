@@ -12,7 +12,7 @@ void hlt_System::ConstantMove::Update()
 
         std::vector<int>& cMovesOwners = cMoves->GetComponentOwnersID();
         
-		float dt = hlt_Time::GetInstance().GetDeltaTime();
+		float dt = HLT_TIME.GetDeltaTime();
 
         for (int i = 0; i < cMovesOwners.size(); i++)
         {
@@ -21,13 +21,13 @@ void hlt_System::ConstantMove::Update()
             if (transforms->entityID[entityID] == MISS_COMPONENT)
                 continue;
 
-            XMFLOAT3 entityPos = transforms->component[transforms->entityID[entityID]].transform.pos;
-            hlt_Component::ConstantMove entityMove = cMoves->component[cMoves->entityID[entityID]];
+            XMFLOAT3 entityPos = transforms->component[transforms->entityID[entityID]]->transform.pos;
+            hlt_Component::ConstantMove& entityMove = *cMoves->component[cMoves->entityID[entityID]];
 
             XMFLOAT3 toMove = { entityMove.move * entityMove.dir.x, entityMove.move * entityMove.dir.y, entityMove.move * entityMove.dir.z };
             XMFLOAT3 newPos = { entityPos.x + toMove.x * dt, entityPos.y + toMove.y * dt, entityPos.z + toMove.z * dt };
 
-            transforms->component[transforms->entityID[entityID]].transform.pos = newPos;
+            transforms->component[transforms->entityID[entityID]]->transform.pos = newPos;
         }
     }
 }

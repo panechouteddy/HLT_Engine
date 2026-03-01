@@ -3,9 +3,12 @@
 #include <iostream>
 #include <WindowsX.h>
 
+#include <hlt_core/framework.h>
 #include <hlt_core/hlt_Time.h>
 #include <hlt_core/hlt_Window.h>
 #include <hlt_core/hlt_Transform3D.h>
+#include <hlt_core/hlt_Input.h>
+#include <hlt_core/hlt_Color.h>
 
 #include "hlt_Camera.h"
 

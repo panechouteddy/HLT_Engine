@@ -21,7 +21,10 @@
 #include <functional>
 #include <cmath>
 #include <emmintrin.h>
-#include "hlt_Color.h"
+
+#ifdef _DEBUG
+#include <crtdbg.h>
+#endif
 
 // DIRECTX API
 #include <DirectXMath.h>
@@ -41,9 +44,8 @@ constexpr bool DEBUG = true;
 #include "hlt_DebugTools.h"
 using namespace hlt_DebugTools;
 
-#ifdef _DEBUG
-#include <crtdbg.h>
-#endif
+// FUNCTIONS
+#include "hlt_Function.h"
 
 /// HLT CORE CLASS DEFINE
 #define HLT_MOUSE hlt_Input::MouseInput::GetInstance()
@@ -54,6 +56,8 @@ using namespace hlt_DebugTools;
 #define VK_Q 0x51
 #define VK_S 0x53
 #define VK_D 0x44
+#define VK_A 0x41
+#define VK_W 0x57
 
 // CONST VALUE
 const float PI = 3.1415926535f;

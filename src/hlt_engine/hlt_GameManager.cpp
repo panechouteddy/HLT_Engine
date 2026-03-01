@@ -24,7 +24,7 @@ hlt_GameManager& hlt_GameManager::GetInstance()
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 
-hlt_GameManager::hlt_GameManager()
+hlt_GameManager::hlt_GameManager() : m_DefaultIcon(NULL)
 {
 }
 hlt_GameManager::~hlt_GameManager()
@@ -69,39 +69,77 @@ void hlt_GameManager::Run()
 
 void hlt_GameManager::Start()
 {
+	// DEBUG CONSOLE
 	if(DEBUG)
+	{
 		hlt_DebugTools::hlt_DebugConsole::CreateDebugConsole();
+		SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.Console.1.0");
+	}
 
+	// ENTITY MANAGER
+	m_EntityManager.SetECS(&m_ECS);
+
+	// WINDOW
+	SetCurrentProcessExplicitAppUserModelID(L"HLT.Engine.MainWnd.1.0");
 	m_pWindow = &HLT_WINDOW;
 	m_pWindow->GetWndName() = L"hlt_Engine Window";
-	m_pWindow->GetWndSize() = XMINT2(1080, 720);
-	if (m_pWindow->CreateWnd(MainWndProc) == false)
+	m_pWindow->SetWndSize(XMINT2(1080, 720));
+	m_DefaultIcon = (HICON)LoadImage(NULL, L"../../res/hlt_engine_logo.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
+	if (m_pWindow->CreateWnd(MainWndProc, m_DefaultIcon) == false)
 		m_IsRunning = false;
+	
+	m_pWindow->SetCursorLock(true);
+	m_pWindow->SetCursorVisibility(true);
+	m_pWindow->OnUpdate();
 
+	// DX12 INIT
 	if(m_pD3D12App == nullptr)
 		m_pD3D12App = new D3DApp(m_pWindow);
 	if (m_pD3D12App->Initialize() == false)
 		m_IsRunning = false;
+	m_pCamera = m_pD3D12App->GetCamera();
+	m_pCamera->m_Transform.ResetRotation();
 
-	if (m_AppToCall.m_Start.m_pWrapper != nullptr)
-		m_AppToCall.m_Start.Execute();
+	// START USER APP
+	m_AppToCall.m_Start.Execute();
+}
+
+void hlt_GameManager::CreateMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
+{
+	m_pD3D12App->CreateOriginalMesh(name,vertexList,indexList);
+}
+void hlt_GameManager::CreateMap(Map_Mesh* map)
+{
+	m_pD3D12App->AddMap(map);
 }
 
 void hlt_GameManager::Update()
 {
-	m_ECS.Update();
-
+	// ENGINE CORE UPDATE
 	RefreshCore();
 
-	if (m_AppToCall.m_Update.m_pWrapper != nullptr)
-		m_AppToCall.m_Update.Execute();
+	// ECS SYSTEMS UPDATE
+	m_ECS.Update();
 
-	m_pD3D12App->Update();
+	// APP UPDATE
+	m_AppToCall.m_Update.Execute();
+
+	// WINDOW UPDATE
+	m_pWindow->OnUpdate();
+
+	// DX12 UPDATES
+	RefreshTransformsMatrix();
+	m_EntityManager.UpdateMeshTransform();
+
+	m_pD3D12App->Update(m_EntityManager.GetMeshs(), m_EntityManager.GetTransforms());
+
+	// MOUSE DELTA UPDATE
+	*HLT_MOUSE.GetLastPos() = *HLT_MOUSE.GetPos();
 }
 
 void hlt_GameManager::Render()
 {
-	m_pD3D12App->Draw();
+	m_pD3D12App->Draw(m_EntityManager.GetMeshs(), m_EntityManager.GetTransforms());
 }
 
 void hlt_GameManager::Destroy()
@@ -112,8 +150,7 @@ void hlt_GameManager::Destroy()
 	if (m_pD3D12App != nullptr)
 		delete m_pD3D12App;
 
-	if (m_AppToCall.m_Exit.m_pWrapper != nullptr)
-		m_AppToCall.m_Exit.Execute();
+	m_AppToCall.m_Exit.Execute();
 
 	if (DEBUG)
 		hlt_DebugTools::hlt_DebugConsole::DestroyDebugConsole();
@@ -125,11 +162,11 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 	{
 	case WM_MOUSEMOVE:
 		HLT_MOUSE.SetMouseMove(lParam);
-		break;
+		return 0;
 
 	case WM_MOUSEWHEEL:
 		HLT_MOUSE.SetMouseWheel(wParam);
-		break;
+		return 0;
 
 	case WM_ACTIVATE: // PAUSE THE WINDOW
 		if (LOWORD(wParam) == WA_INACTIVE)
@@ -142,7 +179,7 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 			m_pWindow->IsPaused() = false;
 			//m_Timer.Start();
 		}
-		break;
+		return 0;
 
 	case WM_SIZING: // TO KEEP A WINDOW RATIO OR A MIN/MAX
 		m_pWindow->IsPaused() = true;
@@ -201,13 +238,14 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 					m_pD3D12App->OnResize();
 			}
 		}
+		return 0;
 
 	case WM_CLOSE:
 		if (MessageBox(hwnd, L"Really quit?", L"My application", MB_OKCANCEL) == IDOK)
 		{
 			m_IsRunning = false;
 		}
-		break;
+		return 0;
 
 	case WM_ENTERSIZEMOVE:
 		m_pWindow->IsPaused() = true;
@@ -242,7 +280,7 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 	default:
 		break;
 	}
-	//D3DApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
+
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
@@ -255,4 +293,39 @@ void hlt_GameManager::RefreshCore()
 	HLT_KEYBOARD.Update();
 	HLT_MOUSE.Update();
 	HLT_TIME.Update();
+}
+
+void hlt_GameManager::RefreshTransformsMatrix()
+{
+	hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_ECS.GetComponent<hlt_Component::Transform3D>();
+	hlt_ECS::ComponentPool<hlt_Component::Hierarchy>* hierarchys = m_ECS.GetComponent<hlt_Component::Hierarchy>();
+
+	if (transforms == nullptr)
+		return;
+
+	if(hierarchys == nullptr)
+	{
+		for (hlt_Component::Transform3D* transformComponent : transforms->component)
+		{
+			transformComponent->transform.UpdateWorld();
+		}
+		return;
+	}
+
+	for (int i = 0; i < transforms->componentOwnerID.size(); i++)
+	{
+		int currentEntityID = transforms->componentOwnerID[i];
+
+		hlt_Component::Transform3D* currentTransform = transforms->component[i];
+		hlt_Component::Hierarchy* currentHierarchy = hierarchys->Get(currentEntityID);
+
+		if (currentHierarchy == nullptr)
+			currentTransform->transform.UpdateWorld();
+		else
+		{
+			hlt_Component::Transform3D* parentTransform = transforms->Get(currentHierarchy->parentID);
+			if (parentTransform != nullptr)
+				currentTransform->transform.UpdateWorld(XMLoadFloat3(&parentTransform->transform.pos));
+		}
+	}
 }

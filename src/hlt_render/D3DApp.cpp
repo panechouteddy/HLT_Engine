@@ -65,37 +65,6 @@ void D3DApp::Set4xMsaaState(bool value)
         CreateSwapChain();
     }
 }
-
-int D3DApp::Run()
-{
-    MSG msg = { 0 };
-
-    while (msg.message != WM_QUIT)
-    {
-        // If there are Window messages then process them.
-        if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-        // Otherwise, do animation/game stuff.
-        else
-        {
-            if (!m_pWindow->IsPaused())
-            {
-                CalculateFrameStats();
-                Update();
-                Draw();
-            }
-            else
-            {
-                Sleep(100);
-            }
-        }
-    }
-
-    return (int)msg.wParam;
-}
 bool D3DApp::Initialize()
 {
     //if (!InitMainWindow())
@@ -127,13 +96,13 @@ bool D3DApp::Initialize()
 
     return true;
 }
-void D3DApp::Update()
+void D3DApp::Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
 {
     m_Camera->Update();
-    m_RenderManager->UpdateRender(m_Camera);
+    m_RenderManager->UpdateRender(m_Camera, meshs, transforms);
 }
 
-void D3DApp::Draw()
+void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
 {
     ThrowIfFailed(m_DirectCmdListAlloc->Reset());
 
@@ -157,7 +126,7 @@ void D3DApp::Draw()
 
     if (!m_IsLoading)
     {
-        m_RenderManager->Draw();
+        m_RenderManager->Draw(meshs);
     }
 
     auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -205,73 +174,6 @@ void D3DApp::Draw()
     FlushCommandQueue();
 }
 
-void D3DApp::StartRender()
-{
-    //ThrowIfFailed(m_DirectCmdListAlloc->Reset());
-
-    //ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
-
-    //auto barrierToRT = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    //m_CommandList->ResourceBarrier(1, &barrierToRT);
-
-    //m_CommandList->RSSetViewports(1, &m_ScreenViewport);
-    //m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
-
-
-    //D3D12_CPU_DESCRIPTOR_HANDLE currentBackBufferView = CurrentBackBufferView();
-    //m_CommandList->ClearRenderTargetView(currentBackBufferView, Colors::LightSteelBlue, 0, nullptr);
-
-    //D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = DepthStencilView();
-    //m_CommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-    //// Specify the buffers we are going to render to.
-    //m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
-}
-
-void D3DApp::Render(hlt_Transform3D* transform, Mesh* mesh)
-{
-   /* ID3D12DescriptorHeap* descriptorHeaps[] = { m_CbvHeap.Get() };
-    m_CommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
-    m_CommandList->SetGraphicsRootSignature(m_RootSignature.Get());
-    m_CommandList->SetPipelineState(m_Pso.Get());
-
-    for (int i = 0; i < m_MeshToDrawList.size(); i++)
-    {
-        if (!m_MeshToDrawList[i]->MeshIsVisible())
-            continue;
-
-        D3D12_VERTEX_BUFFER_VIEW vertexBuffer = m_MeshToDrawList[i]->GetGeometry()->VertexBufferView();
-        m_CommandList->IASetVertexBuffers(0, 1, &vertexBuffer);
-
-        D3D12_INDEX_BUFFER_VIEW indexBuffer = m_MeshToDrawList[i]->GetGeometry()->IndexBufferView();
-        m_CommandList->IASetIndexBuffer(&indexBuffer);
-
-        m_CommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
-
-        m_CommandList->DrawIndexedInstanced(
-            m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount,
-            1, 0, 0, 0);
-    }*/
-}
-
-void D3DApp::EndRender()
-{
-    //auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-    //m_CommandList->ResourceBarrier(1, &barrierToPresent);
-
-    //// Done recording commands.
-    //ThrowIfFailed(m_CommandList->Close());
-
-    //// Add the command list to the queue for execution.
-    //ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
-    //m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-
-    //ThrowIfFailed(m_SwapChain->Present(0, 0));
-    //m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
-
-    //FlushCommandQueue();
-}
 
 //LRESULT D3DApp::MsgProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam)
 //{
@@ -840,6 +742,7 @@ void D3DApp::LogAdapterOutputs(IDXGIAdapter* adapter)
 
 void D3DApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 {
+
     UINT count = 0;
     UINT flags = 0;
 
@@ -868,13 +771,12 @@ void D3DApp::CreateMeshBox()
     m_Box = new MeshBox;
     m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
 }
-
-void D3DApp::AddMeshPosition(hlt_Transform3D* pos) const
+void D3DApp::CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
 {
-    m_RenderManager->AddMeshTransform(pos);
+    m_Box->CreateMesh(name, vertexList, indexList);
 }
 
-void D3DApp::AddMesh(Mesh* mesh) const
+void D3DApp::AddMap(Map_Mesh* map)
 {
-    m_RenderManager->AddMeshToDraw(mesh);
+    m_RenderManager->AddMapToRender(map);
 }
