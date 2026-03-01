@@ -19,8 +19,6 @@
 #include "RenderManager.h"
 
 #include "d3dUtil.h"
-//#include "D3DApp.h"
-//#include "InitDirecX3DApp.h"
 #include "D3DApp.h"
 
 using Microsoft::WRL::ComPtr;

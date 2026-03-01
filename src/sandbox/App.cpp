@@ -92,7 +92,10 @@ void App::OnUpdate()
 	hlt_Input::KeyboardInput& keyboardInput = HLT_KEYBOARD;
 	//if (keyboardInput.IsKey(VK_TAB))
 	//	ecs->SetComponentActive<hlt_Component::ConstantMove>(m_OtherID, false);
-	//if (*pIsColliding == true)
+
+	if (*pIsColliding == true)
+		HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::Mesh>(m_TestID, false);
+	
 	//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
 
 	if (keyboardInput.IsKey(VK_TAB))

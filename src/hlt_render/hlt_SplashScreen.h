@@ -1,3 +1,4 @@
+
 #pragma once
 class hlt_SplashScreen : public hlt_D2DResource
 {
@@ -19,4 +20,3 @@ public:
 	ComPtr<IDWriteTextFormat> m_textFormatBody;
 	ComPtr<ID2D1SolidColorBrush> m_textBrush;
 };
-
