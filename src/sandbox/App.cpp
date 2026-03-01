@@ -81,8 +81,9 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 	ecs->AddSystem<hlt_System::Hierarchy>();
+
 	m_proj = new Projectile();
-	
+	m_EntityID.push_back(m_proj->m_ProjectileID);
 
 	// CreateMap();
 }
@@ -93,17 +94,18 @@ void App::OnUpdate()
 	//if (keyboardInput.IsKey(VK_TAB))
 	//	ecs->SetComponentActive<hlt_Component::ConstantMove>(m_OtherID, false);
 
-	if (*pIsColliding == true)
+	/*if (*pIsColliding == true)
 		HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::Mesh>(m_TestID, false);
-	
+	*/
 	//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
 
 	if (keyboardInput.IsKey(VK_TAB))
 	{
 		m_proj->m_pos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
-		m_proj->m_dir.x = m_pCamera->m_Proj._31;
-		m_proj->m_dir.y = m_pCamera->m_Proj._32;
-		m_proj->m_dir.z = m_pCamera->m_Proj._33;
+		
+		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
+		XMMATRIX invView = XMMatrixInverse(nullptr, view);
+		XMStoreFloat3(&m_proj->m_dir, invView.r[2]);
 	}
 	if(m_proj != nullptr)
 		m_proj->Update();
