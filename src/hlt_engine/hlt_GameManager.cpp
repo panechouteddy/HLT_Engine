@@ -145,7 +145,6 @@ void hlt_GameManager::Render()
 void hlt_GameManager::Destroy()
 {
 	m_ECS.Destroy();
-	//m_pWindow->DestroyWnd();
 
 	if (m_pD3D12App != nullptr)
 		delete m_pD3D12App;
@@ -172,12 +171,10 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 		if (LOWORD(wParam) == WA_INACTIVE)
 		{
 			m_pWindow->IsPaused() = true;
-			//m_Timer.Stop();
 		}
 		else
 		{
 			m_pWindow->IsPaused() = false;
-			//m_Timer.Start();
 		}
 		return 0;
 

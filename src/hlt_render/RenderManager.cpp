@@ -164,8 +164,6 @@ void RenderManager::Draw(std::vector<Mesh*>& meshs)
 		return;
 	for (int i = 0; i < m_MapMesh->MeshContainer.size(); i++)
 	{
-		//if (!m_MeshToDrawList[i]->MeshIsVisible())
-		//	continue;
 
 		D3D12_VERTEX_BUFFER_VIEW vertexBuffer = m_MapMesh->MeshContainer[i].first->GetGeometry()->VertexBufferView();
 		m_CommandList->IASetVertexBuffers(0, 1, &vertexBuffer);

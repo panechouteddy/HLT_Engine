@@ -54,11 +54,6 @@ void MeshBox::CreateMesh(std::string name ,std::vector<Vertex>& vertexList, std:
 	ID3D12Device * device = D3DApp::GetApp()->GetDevice();
 	MeshGeometry* boxGeomety = new MeshGeometry;
 	boxGeomety->Name = name;
-	//ThrowIfFailed(D3DCreateBlob(vbByteSize,&boxGeomety->VertexBufferCPU));
-	//CopyMemory(boxGeomety->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-	//
-	//ThrowIfFailed(D3DCreateBlob(ibByteSize,&boxGeomety->IndexBufferCPU));
-	//CopyMemory(boxGeomety->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
 	boxGeomety->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(device, commandList, vertexList.data(), vbByteSize, boxGeomety->VertexBufferUploader);
 
@@ -113,11 +108,6 @@ void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* com
 
 	MeshGeometry* boxGeomety = new MeshGeometry;
 	boxGeomety->Name = "pyramid";
-	//ThrowIfFailed(D3DCreateBlob(vbByteSize,&boxGeomety->VertexBufferCPU));
-	//CopyMemory(boxGeomety->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-	//
-	//ThrowIfFailed(D3DCreateBlob(ibByteSize,&boxGeomety->IndexBufferCPU));
-	//CopyMemory(boxGeomety->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
 	boxGeomety->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(device,commandList, vertices.data(), vbByteSize,boxGeomety->VertexBufferUploader);
 
@@ -184,11 +174,6 @@ void MeshBox::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 
 	MeshGeometry* boxGeomety = new MeshGeometry;
 	boxGeomety->Name = "cube";
-	//ThrowIfFailed(D3DCreateBlob(vbByteSize,&boxGeomety->VertexBufferCPU));
-	//CopyMemory(boxGeomety->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-	//
-	//ThrowIfFailed(D3DCreateBlob(ibByteSize,&boxGeomety->IndexBufferCPU));
-	//CopyMemory(boxGeomety->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
 	boxGeomety->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(device, commandList, vertices.data(), vbByteSize, boxGeomety->VertexBufferUploader);
 
@@ -257,11 +242,6 @@ void MeshBox::CreateRock(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 
 	MeshGeometry* boxGeomety = new MeshGeometry;
 	boxGeomety->Name = "rock";
-	//ThrowIfFailed(D3DCreateBlob(vbByteSize,&boxGeomety->VertexBufferCPU));
-	//CopyMemory(boxGeomety->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-	//
-	//ThrowIfFailed(D3DCreateBlob(ibByteSize,&boxGeomety->IndexBufferCPU));
-	//CopyMemory(boxGeomety->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
 	boxGeomety->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(device, commandList, vertices.data(), vbByteSize, boxGeomety->VertexBufferUploader);
 
@@ -327,11 +307,6 @@ void MeshBox::CreateGround(ID3D12Device* device, ID3D12GraphicsCommandList* comm
 
 	MeshGeometry* boxGeomety = new MeshGeometry;
 	boxGeomety->Name = "ground";
-	//ThrowIfFailed(D3DCreateBlob(vbByteSize,&boxGeomety->VertexBufferCPU));
-	//CopyMemory(boxGeomety->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-	//
-	//ThrowIfFailed(D3DCreateBlob(ibByteSize,&boxGeomety->IndexBufferCPU));
-	//CopyMemory(boxGeomety->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
 	boxGeomety->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(device, commandList, vertices.data(), vbByteSize, boxGeomety->VertexBufferUploader);
 

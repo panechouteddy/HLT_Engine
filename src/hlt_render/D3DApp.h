@@ -7,14 +7,6 @@
 #include <d2d1_3.h>
 #endif
 
-//#include "d3dUtil.h"
-//#include "GameTimer.h"
-
-//#include "ConstantBuffer.h"
-//#include "Mesh.h"
-//#include "hlt_Camera.h"
-//#include "RenderManager.h"
-
 // Link necessary d3d12 libraries.
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
@@ -59,8 +51,6 @@ public:
 	MeshBox* GetMeshBox() const;
 	hlt_Camera* GetCamera() { return m_Camera; }
 
-	/*void AddMeshPosition(hlt_Transform3D* pos) const;
-	void AddMesh(Mesh* pos) const;*/
 	void AddMap(Map_Mesh* map);
 
 protected:
@@ -97,13 +87,6 @@ protected:
 protected:
 	static D3DApp* m_App;
 
-	//HINSTANCE m_hAppInst = nullptr; // application instance handle
-	//HWND      m_hMainWnd = nullptr; // main window handle
-	//bool      m_AppPaused = false;  // is the application paused?
-	//bool      m_Minimized = false;  // is the application minimized?
-	//bool      m_Maximized = false;  // is the application maximized?
-	//bool      m_Resizing = false;   // are the resize bars being dragged?
-	//bool      m_FullscreenState = false;// fullscreen enabled
 	hlt_Window* m_pWindow = nullptr;
 
 	bool m_4xMsaaState = false;
@@ -150,9 +133,6 @@ protected:
 	//Draw
 	RenderManager* m_RenderManager;
 	MeshBox* m_Box;
-
-	//int m_ClientWidth = 1280;
-	//int m_ClientHeight = 720;
 
 	//4XMAA
 	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;

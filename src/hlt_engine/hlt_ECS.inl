@@ -1,5 +1,12 @@
 #include "hlt_ECS.h"
 
+// MANAGE RECYCLE POOL
+
+template<typename T>
+inline void hlt_ECS::Pool<T>::Recycle(int entityID, hlt_ECS* ecs)
+{
+}
+
 // MANAGE INTERN COMPONENT POOL
 template<typename T>
 inline hlt_ECS::ComponentPool<T>::~ComponentPool()
