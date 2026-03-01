@@ -30,6 +30,12 @@ class hlt_Window;
 class hlt_UI;
 class hlt_SplashScreen;
 
+class ID3D11On12Device;
+class ID2D1DeviceContext2;
+class ID3D11Device;
+class ID3D11DeviceContext;
+class ID3D11Resource;
+
 class D3DApp
 {
 public:
@@ -62,6 +68,7 @@ public:
 	void CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
 	MeshBox* GetMeshBox() const;
 	hlt_Camera* GetCamera() { return m_Camera; }
+	RenderManager* GetRenderManager() { return m_RenderManager; }
 
 	/*void AddMeshPosition(hlt_Transform3D* pos) const;
 	void AddMesh(Mesh* pos) const;*/
