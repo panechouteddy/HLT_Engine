@@ -1,5 +1,6 @@
 #pragma once
 
+class Projectile;
 class Enemy;
 
 class App

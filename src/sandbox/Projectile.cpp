@@ -36,7 +36,7 @@ void Projectile::Move()
 	ecs->GetComponent<hlt_Component::Transform3D>(m_ProjectileID)->transform.pos = m_pos;
 
 	oCMove->dir = m_dir;
-	oCMove->move = 4.f;
+	oCMove->move = 8.f;
 
 	oBox->boxType = oBox->OBB;
 }

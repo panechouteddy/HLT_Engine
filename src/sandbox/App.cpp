@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "App.h"
 #include "Projectile.h"
+#include "Enemy.h"
 
 App* App::s_pInstance = nullptr;
 
@@ -75,12 +76,24 @@ void App::OnStart()
 		oBox->boxType = oBox->OBB;
 		oIsColliding = &oBox->isColliding;
 	}
-	
+
 	ecs->AddSystem<hlt_System::BoxCollider>();
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 	ecs->AddSystem<hlt_System::Hierarchy>();
 
+	m_pEnemy = new Enemy();
+
+	m_pEnemy->m_pos = { 10,0,0 };
+
+	XMMATRIX view = XMLoadFloat4x4(&ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.world);
+	XMMATRIX invView = XMMatrixInverse(nullptr, view);
+
+	XMFLOAT3 forward;
+	XMStoreFloat3(&forward, invView.r[3]);
+
+	m_pEnemy->m_dir = forward;
+	m_pEnemy->Move();
 	// CreateMap();
 }
 
@@ -92,8 +105,8 @@ void App::OnUpdate()
 
 	/*if (*pIsColliding == true)
 		HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::ConstantMove>(m_proj->m_ProjectileID, false);*/
-	
-	//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
+
+		//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
 
 	if (keyboardInput.IsKeyDown(VK_TAB))
 	{
@@ -101,7 +114,7 @@ void App::OnUpdate()
 		m_EntityID.push_back(newBullet->m_ProjectileID);
 
 		newBullet->m_pos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
-		
+
 		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
 		XMMATRIX invView = XMMatrixInverse(nullptr, view);
 
@@ -135,7 +148,7 @@ void App::OnExit()
 void App::CreateMap()
 {
 	Map_Mesh* map = new Map_Mesh;
-	std::pair<Mesh*,hlt_Transform3D*> object1;
+	std::pair<Mesh*, hlt_Transform3D*> object1;
 	object1.first = hlt_Prefab::MeshObject::CreateGround();
 	hlt_Transform3D* transform1 = new hlt_Transform3D;
 	transform1->UpdateWorld();
