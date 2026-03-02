@@ -22,6 +22,12 @@ class hlt_Window;
 class hlt_UI;
 class hlt_SplashScreen;
 
+class ID3D11On12Device;
+class ID2D1DeviceContext2;
+class ID3D11Device;
+class ID3D11DeviceContext;
+class ID3D11Resource;
+
 class D3DApp
 {
 public:
