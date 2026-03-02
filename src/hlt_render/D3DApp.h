@@ -1,13 +1,13 @@
 #pragma once
 
-#if defined(DEBUG) || defined(_DEBUG)
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#include <d3d11on12.h>
-#include <d2d1_3.h>
-#include <windows.foundation.h>
-#include <dwrite.h>
-#endif
+//#if defined(DEBUG) || defined(_DEBUG)
+//#define _CRTDBG_MAP_ALLOC
+//#include <crtdbg.h>
+//#include <d3d11on12.h>
+//#include <d2d1_3.h>
+//#include <windows.foundation.h>
+//#include <dwrite.h>
+//#endif
 
 // Link necessary d3d12 libraries.
 #pragma comment(lib,"d3dcompiler.lib")
