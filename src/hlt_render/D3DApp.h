@@ -5,6 +5,8 @@
 #include <crtdbg.h>
 #include <d3d11on12.h>
 #include <d2d1_3.h>
+#include <windows.foundation.h>
+#include <dwrite.h>
 #endif
 
 // Link necessary d3d12 libraries.
@@ -16,7 +18,9 @@ class ConstantBuffer;
 class Mesh;
 class hlt_Camera;
 class RenderManager;
-
+class hlt_Window;
+class hlt_UI;
+class hlt_SplashScreen;
 
 class D3DApp
 {
@@ -88,7 +92,8 @@ protected:
 	static D3DApp* m_App;
 
 	hlt_Window* m_pWindow = nullptr;
-
+	bool m_IsLoading = true;
+	bool m_IsOpacity = true;
 	bool m_4xMsaaState = false;
 	UINT m_4xMsaaQuality = 0;
 
@@ -133,6 +138,13 @@ protected:
 	//Draw
 	RenderManager* m_RenderManager;
 	MeshBox* m_Box;
+
+	//Ui
+	hlt_UI* m_UI;
+	hlt_SplashScreen* m_SplashScreen;
+
+	//int m_ClientWidth = 1280;
+	//int m_ClientHeight = 720;
 
 	//4XMAA
 	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
