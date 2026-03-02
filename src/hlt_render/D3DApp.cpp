@@ -86,13 +86,9 @@ bool D3DApp::Initialize()
     m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
     m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
-    Draw();
-
     InitDirect3DDraw();
 
     m_IsLoading = false;
-
-    Update();
 
     return true;
 }
