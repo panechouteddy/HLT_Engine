@@ -21,7 +21,7 @@ inline hlt_ECS::ComponentPool<T>::~ComponentPool()
 template<typename T>
 inline T* hlt_ECS::ComponentPool<T>::Add(int ID)
 {
-	if (Have(ID)) return nullptr;
+	if (Have(ID)) return Get(ID);
 
 	if (ID >= entityID.capacity())
 		entityID.resize(ID + 1, MISS_COMPONENT);
@@ -38,7 +38,7 @@ inline T* hlt_ECS::ComponentPool<T>::Add(int ID)
 template<typename T>
 inline T* hlt_ECS::ComponentPool<T>::Add(int ID, T* pComponent)
 {
-	if (Have(ID)) return nullptr;
+	if (Have(ID)) return Get(ID);
 
 	if (ID >= entityID.capacity())
 		entityID.resize(ID + 1, MISS_COMPONENT);
