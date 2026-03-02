@@ -76,11 +76,23 @@ bool D3DApp::Initialize()
     if (!InitD3D11On12())
         return false;
 
+    m_UI = new hlt_UI;
+    m_SplashScreen = new hlt_SplashScreen;
+
     // Do the initial resize code.
     OnResize();
 
     m_Camera = new hlt_Camera;
+    m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+
+    Draw();
+
     InitDirect3DDraw();
+
+    m_IsLoading = false;
+
+    Update();
 
     return true;
 }
@@ -96,12 +108,13 @@ void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tran
 
     ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
+    FlushCommandQueue();
+
     auto barrierToRT = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
     m_CommandList->ResourceBarrier(1, &barrierToRT);
 
     m_CommandList->RSSetViewports(1, &m_ScreenViewport);
     m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
-
 
     D3D12_CPU_DESCRIPTOR_HANDLE currentBackBufferView = CurrentBackBufferView();
     m_CommandList->ClearRenderTargetView(currentBackBufferView, Colors::LightSteelBlue, 0, nullptr);
@@ -111,7 +124,10 @@ void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tran
     // Specify the buffers we are going to render to.
     m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
 
-    m_RenderManager->Draw(meshs);
+    if (!m_IsLoading)
+    {
+        m_RenderManager->Draw(meshs);
+    }
 
     auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
     m_CommandList->ResourceBarrier(1, &barrierToPresent);
@@ -122,6 +138,35 @@ void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tran
     // Add the command list to the queue for execution.
     ID3D12CommandList* cmdsLists[] = { m_CommandList.Get()};
     m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+    FlushCommandQueue();
+    
+    ///.....2D.....///
+    if (!m_IsLoading && m_SplashScreen->m_Opacity > 0)
+        m_SplashScreen->m_Opacity -= 0.01f;
+    else if (m_IsOpacity && m_SplashScreen->m_Opacity <= 0)
+        m_IsOpacity = false;
+
+    if (!m_IsLoading)
+    {
+        m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+
+        std::wstring stats = L"FPS: " + std::to_wstring(1.0f);
+        m_UI->Draw(m_pWindow->GetWndSize().x * 0.5f, stats);
+
+        m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    }
+
+    if (m_IsOpacity)
+    {
+        m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+
+        m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
+
+        m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    }
+
+    ///.....2D.....///
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));
     m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
@@ -268,6 +313,9 @@ void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tran
 //}
 void D3DApp::OnResize()
 {
+    m_UI->ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
+    m_SplashScreen->ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
+
     assert(m_Device);
     assert(m_SwapChain);
     assert(m_DirectCmdListAlloc);
@@ -352,6 +400,11 @@ void D3DApp::OnResize()
     m_ScreenViewport.MaxDepth = 1.0f;
 
     m_ScissorRect = { 0, 0, clientSize.x, clientSize.y };
+
+    m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 }
 //bool D3DApp::InitMainWindow()
 //{

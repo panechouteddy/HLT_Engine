@@ -7,6 +7,6 @@
 //
 //#include "d3dApp.h"
 //#include <WindowsX.h>
-//#include "hlt_render.h"
+#include "hlt_render.h"
 #endif
 //#include "d3dUtil.h"
