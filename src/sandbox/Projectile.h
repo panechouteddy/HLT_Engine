@@ -18,5 +18,10 @@ public:
 
 private:
 	hlt_ECS* ecs;
+
+	hlt_Component::ConstantMove* oCMove;
+	hlt_Component::BoxCollider3D* oBox;
+
 	bool* oIsColliding = nullptr;
+	bool m_IsActive = false;
 };

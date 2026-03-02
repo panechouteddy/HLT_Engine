@@ -10,6 +10,11 @@ Projectile::Projectile()
 	ecs = HLT_GAMEMANAGER.GetECS();
 
 	m_ProjectileID = hlt_Prefab::GameObject::CreatePyramid();
+	oCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_ProjectileID);
+	ecs->SetComponentActive<hlt_Component::ConstantMove>(m_ProjectileID, m_IsActive);
+
+	oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_ProjectileID);
+	ecs->SetComponentActive<hlt_Component::BoxCollider3D>(m_ProjectileID, m_IsActive);
 }
 
 Projectile::~Projectile()
@@ -24,13 +29,13 @@ void Projectile::Update()
 
 void Projectile::Move()
 {
+	if()
 	ecs->GetComponent<hlt_Component::Transform3D>(m_ProjectileID)->transform.pos = m_pos;
 
-	hlt_Component::ConstantMove* oCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_ProjectileID);
 	oCMove->dir = m_dir;
 	oCMove->move = 4.f;
 
-	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_ProjectileID);
+	
 	oBox->boxType = oBox->OBB;
 	oIsColliding = &oBox->isColliding;
 }
