@@ -1,4 +1,6 @@
 #pragma once
+class hlt_Material;
+
 class hlt_RenderItem
 {
 public:

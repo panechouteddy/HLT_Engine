@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../hlt_core/hlt_core.h"
+#include <hlt_core/framework.h>
 
 #include "D3DApp.h"
 #include "d3dUtil.h"
 #include "hlt_D2DResource.h"
-#include "DDSTextureLoader.h" 
+#include "hlt_TextureLoader.h" 
 #include "GameTimer.h"
 #include "MathHelper.h"
 
