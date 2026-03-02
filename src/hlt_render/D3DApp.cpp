@@ -109,7 +109,7 @@ bool D3DApp::Initialize()
 
     m_UI = new hlt_UI;
     m_SplashScreen = new hlt_SplashScreen;
-
+    m_TextureBox = new TextureBox;
     // Do the initial resize code.
     OnResize();
 
@@ -571,6 +571,7 @@ void D3DApp::InitDirect3DDraw()
     m_DirectCmdListAlloc->Reset();
 
     CreateMeshBox();
+    m_TextureBox->CreateDefaultTexture();
 
     ThrowIfFailed(m_CommandList->Close());
     ID3D12CommandList* cmdsLists2[] = { m_CommandList.Get()};
@@ -614,6 +615,11 @@ void D3DApp::CreateSwapChain()
     sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     ThrowIfFailed(m_DxgiFactory->CreateSwapChain(m_CommandQueue.Get(), &sd, m_SwapChain.GetAddressOf()));
+}
+void D3DApp::LoadTexture(std::vector<std::pair<std::string, std::wstring>>& fileList)
+{
+    m_TextureBox->CreateAllTexture(fileList);
+    FlushCommandQueue();
 }
 void D3DApp::CreateRtvAndDsvDescriptorHeaps()
 {
@@ -678,6 +684,10 @@ D3D12_CPU_DESCRIPTOR_HANDLE D3DApp::DepthStencilView()const
 MeshBox* D3DApp::GetMeshBox() const
 {
     return m_Box;
+}
+TextureBox* D3DApp::GetTextureBox() const
+{
+    return m_TextureBox;
 }
 void D3DApp::CalculateFrameStats()
 {

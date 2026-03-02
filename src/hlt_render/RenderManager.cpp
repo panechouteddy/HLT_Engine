@@ -156,10 +156,17 @@ void RenderManager::Draw()
 		D3D12_INDEX_BUFFER_VIEW indexBuffer = m_MeshToDrawList[i]->GetGeometry()->IndexBufferView();
 		m_CommandList->IASetIndexBuffer(&indexBuffer);
 		
-		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-		tex.Offset(m_MeshToDrawList[i]->DiffuseSrvHeapIndex, mCbvSrvDescriptorSize);
+		Texture* texture = m_MeshToDrawList[i]->GetTexture();
 
-		m_CommandList->SetGraphicsRootDescriptorTable(1, tex);
+		if (texture != nullptr)
+		{
+			CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(
+				m_CbvHeap->GetGPUDescriptorHandleForHeapStart(),
+				texture->SrvHeapIndex,
+				descriptorSize);
+
+			m_CommandList->SetGraphicsRootDescriptorTable(1, srvHandle);
+		}
 		m_CommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());

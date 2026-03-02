@@ -12,6 +12,11 @@ using namespace DirectX;
 
 
 
+Mesh::Mesh()
+{
+	m_pTexture = D3DApp::GetApp()->GetTextureBox()->GetTexture("Default");
+}
+
 void Mesh::SetMesh(std::string meshName, XMFLOAT3 color)
 {
 	std::transform(meshName.begin(), meshName.end(), meshName.begin(), std::tolower);
@@ -28,7 +33,7 @@ void Mesh::SetTexture(std::string TextName)
 {
 	std::transform(TextName.begin(), TextName.end(), TextName.begin(), std::tolower);
 
-	m_pTexture = D3DApp::GetApp().
+	m_pTexture = D3DApp::GetApp()->GetTextureBox()->GetTexture(TextName);
 }
 
 MeshGeometry* Mesh::GetGeometry()

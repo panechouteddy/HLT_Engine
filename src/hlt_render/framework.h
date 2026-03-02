@@ -15,6 +15,7 @@
 #include "ConstantBuffer.h"
 #include "ColorBuffer.h"
 #include "Mesh.h"
+#include "Texture.h"
 #include "RenderManager.h"
 
 #include "d3dUtil.h"

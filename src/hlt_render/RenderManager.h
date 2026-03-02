@@ -12,6 +12,7 @@ private:
 
     std::vector<ConstantBuffer*> m_ConstantBufferList;
     std::vector<ColorBuffer*> m_ColorBufferList;
+    Texture* m_pBasicTexture;
 protected:
 
     ID3D12GraphicsCommandList* m_CommandList;
