@@ -24,7 +24,7 @@
 
 class ConstantBuffer;
 class Mesh;
-class TextureBox;
+struct TextureBox;
 class hlt_Camera;
 class RenderManager;
 class hlt_Window;
@@ -58,7 +58,6 @@ public:
 
 	ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList.Get();}
 	ID3D12Device* GetDevice() { return m_Device.Get(); }
-	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return m_SrvDescriptorHeap.Get();}
 	virtual bool Initialize();
 	//virtual LRESULT MsgProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam);
 	ConstantBuffer* CreateConstantBufferObject()const;
@@ -79,7 +78,9 @@ public:
 	void AddTextToDraw(std::wstring text, XMFLOAT2 position) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, position}); }
 	void AddTextToDraw(std::wstring text, float x, float y) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, XMFLOAT2{x,y}});}
 
+	void CreateTextureBox(ID3D12DescriptorHeap* srvDescriptorHeap);
 	void LoadTexture(std::vector<std::pair<std::string, std::wstring>>&fileList);
+
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
 	
@@ -144,7 +145,7 @@ protected:
 	// DescriptorHead
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_RtvHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DsvHeap;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_SrvDescriptorHeap ;
+
 
 	UINT m_RtvDescriptorSize = 0;
 	UINT m_DsvDescriptorSize = 0;

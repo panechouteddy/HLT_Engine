@@ -18,8 +18,9 @@ struct TextureBox
 protected:
     std::unordered_map<std::string, Texture*> m_TextureBox;
     int m_CurrentSrvIndex = 2;
+    ID3D12DescriptorHeap* m_pSrvDescriptorHeap = nullptr;
 public:
-    TextureBox() {};
+    TextureBox(ID3D12DescriptorHeap* srvDescriptorHeap) { m_pSrvDescriptorHeap = srvDescriptorHeap;}
     bool IsAllreadyCreated(std::string texture) { return m_TextureBox.contains(texture); }
     Texture* GetTexture(std::string texture) { return m_TextureBox.contains(texture) ? m_TextureBox[texture] : nullptr; }
     void CreateAllTexture(std::vector<std::pair<std::string, std::wstring>>& fileList);

@@ -109,7 +109,6 @@ bool D3DApp::Initialize()
 
     m_UI = new hlt_UI;
     m_SplashScreen = new hlt_SplashScreen;
-    m_TextureBox = new TextureBox;
     // Do the initial resize code.
     OnResize();
 
@@ -117,7 +116,7 @@ bool D3DApp::Initialize()
     m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
     m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
-    DrawRender();
+   
 
     InitDirect3DDraw();
 
@@ -125,6 +124,7 @@ bool D3DApp::Initialize()
 
     Update();
 
+    DrawRender();
     return true;
 }
 void D3DApp::Update()
@@ -135,10 +135,11 @@ void D3DApp::Update()
 
 void D3DApp::DrawRender()
 {
+    Draw2D();
    // if renderIs3D
     Draw3D();
     // else if renderIs2D*
-    Draw2D();
+  
 
 }
 
@@ -615,6 +616,10 @@ void D3DApp::CreateSwapChain()
     sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     ThrowIfFailed(m_DxgiFactory->CreateSwapChain(m_CommandQueue.Get(), &sd, m_SwapChain.GetAddressOf()));
+}
+void D3DApp::CreateTextureBox(ID3D12DescriptorHeap* srvDescriptorHeap)
+{
+    m_TextureBox = new TextureBox(srvDescriptorHeap);
 }
 void D3DApp::LoadTexture(std::vector<std::pair<std::string, std::wstring>>& fileList)
 {

@@ -22,8 +22,7 @@ void TextureBox::CreateTexture(std::string name, std::wstring fileName)
 
 	texture->SrvHeapIndex = m_CurrentSrvIndex++;
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(
-		D3DApp::GetApp()->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(),
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(m_pSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
 		2, // <- IMPORTANT : slot 2
 		descriptorSize);
 
@@ -42,7 +41,7 @@ void TextureBox::CreateTexture(std::string name, std::wstring fileName)
 
 void TextureBox::CreateDefaultTexture()
 {
-	Texture* texture = new Texture;
+	/*Texture* texture = new Texture;
 	texture->Name = "Default";
 	UINT whitePixel[1] = { 0xffffffff };
 
@@ -57,7 +56,7 @@ void TextureBox::CreateDefaultTexture()
 
 	texture->SrvHeapIndex = m_CurrentSrvIndex++;
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(D3DApp::GetApp()->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(),texture->SrvHeapIndex,   
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(m_pSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),texture->SrvHeapIndex,
 	descriptorSize);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -73,6 +72,6 @@ void TextureBox::CreateDefaultTexture()
 		&srvDesc,
 		hDescriptor);
 
-	m_TextureBox.insert(std::make_pair(texture->Name, texture));
+	m_TextureBox.insert(std::make_pair(texture->Name, texture));*/
 
 }

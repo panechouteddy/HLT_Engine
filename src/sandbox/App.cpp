@@ -14,7 +14,7 @@ void App::OnStart()
 	m_EntityID.push_back(m_PlayerID);
 	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos.z = 5.f;
 
-	CreateMap();
+	//CreateMap();
 }
 
 void App::OnUpdate()

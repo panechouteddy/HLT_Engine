@@ -6,6 +6,7 @@ RenderManager::RenderManager(ID3D12GraphicsCommandList* commandList, ID3D12Comma
 {
     m_CommandList = commandList;
     m_DirectCmdListAlloc = directCmdListAlloc;
+	m_PsoManager = new hlt_PSO;
 }
 
 RenderManager::~RenderManager()
@@ -66,31 +67,26 @@ void RenderManager::UpdateColorBuffer()
 
 void RenderManager::UpdateConstantBuffer()
 {
-
-
     for (int i = 0; i < m_MeshToDrawList.size();i++)
     {
         if (i >= m_ConstantBufferList.size())
 			m_ConstantBufferList.push_back(AddConstantBuffer());
 
 		if (i >= m_MeshTransform.size())
-			m_ConstantBufferList[i]->SetWorldMatrix(MathHelper::Identity4x4());
+			m_ConstantBufferList[i]->World = MathHelper::Identity4x4();
 		else
-			m_ConstantBufferList[i]->SetWorldMatrix(m_MeshTransform[i]->world);
+			m_ConstantBufferList[i]->World = m_MeshTransform[i]->world;
     }
 
 	if (m_MapMesh != nullptr)
 	{
-		if (m_MapMesh->MapMesh_ConstantBuffer.empty())
-		{
 			for (int i = 0; i < m_MapMesh->MeshContainer.size(); i++)
 			{
 				if (i >= m_MapMesh->MapMesh_ConstantBuffer.size())
 					m_MapMesh->MapMesh_ConstantBuffer.push_back(AddConstantBuffer());
 
-				m_MapMesh->MapMesh_ConstantBuffer[i]->SetWorldMatrix(m_MapMesh->MeshContainer[i].second->world);
+				m_MapMesh->MapMesh_ConstantBuffer[i]->World = m_MapMesh->MeshContainer[i].second->world;
 			}
-		}
 	}
 }
 
@@ -98,7 +94,7 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 {
 	for (int i = 0; i < m_MeshToDrawList.size(); i++)
 	{
-		XMFLOAT4X4 CBworld = m_ConstantBufferList[i]->GetWorldMatrix();
+		XMFLOAT4X4 CBworld = m_ConstantBufferList[i]->World;
 		XMMATRIX world = XMLoadFloat4x4(&CBworld);// objet
 		XMMATRIX view  = XMLoadFloat4x4(&camera->m_View);
 		XMMATRIX proj = XMLoadFloat4x4(&camera->m_Proj);
@@ -107,14 +103,13 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 		// Update the constant buffer with the latest worldViewProj matrix.
 		ObjectConstant objConstants;
 		XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
-		XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
 		m_ConstantBufferList[i]->GetBuffer()->CopyData(0, objConstants);
 	}
 	if (m_MapMesh != nullptr)
 	{
 		for (int i = 0; i < m_MapMesh->MeshContainer.size(); i++)
 		{
-			XMFLOAT4X4 CBworld = m_MapMesh->MapMesh_ConstantBuffer[i]->GetWorldMatrix();
+			XMFLOAT4X4 CBworld = m_MapMesh->MapMesh_ConstantBuffer[i]->World;
 			XMMATRIX world = XMLoadFloat4x4(&CBworld);// objet
 			XMMATRIX view = XMLoadFloat4x4(&camera->m_View);
 			XMMATRIX proj = XMLoadFloat4x4(&camera->m_Proj);
@@ -123,7 +118,8 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 			// Update the constant buffer with the latest worldViewProj matrix.
 			ObjectConstant objConstants;
 			XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
-			XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
+			XMStoreFloat4x4(&objConstants.World, world);
+			XMStoreFloat4x4(&objConstants.TexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
 			m_MapMesh->MapMesh_ConstantBuffer[i]->GetBuffer()->CopyData(0, objConstants);
 		}
 	}
@@ -132,11 +128,11 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 void RenderManager::Draw()
 {
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = { m_CbvHeap.Get() };
+	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get() };
 	m_CommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-	m_CommandList->SetGraphicsRootSignature(m_RootSignature.Get());
-	m_CommandList->SetPipelineState(m_Pso.Get());
+	m_CommandList->SetGraphicsRootSignature(m_pRootSignature.Get());
+	m_CommandList->SetPipelineState(m_PsoManager->m_PSOList["opaque"].Get());
 
 	UINT descriptorSize =D3DApp::GetApp()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	for (int i = 0;i < m_MeshToDrawList.size();i++)
@@ -161,7 +157,7 @@ void RenderManager::Draw()
 		if (texture != nullptr)
 		{
 			CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(
-				m_CbvHeap->GetGPUDescriptorHandleForHeapStart(),
+				m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart(),
 				texture->SrvHeapIndex,
 				descriptorSize);
 
@@ -178,6 +174,8 @@ void RenderManager::Draw()
 		return;
 	for (int i = 0; i < m_MapMesh->MeshContainer.size(); i++)
 	{
+		if (m_MapMesh->MeshContainer.size() > m_MapMesh->MapMesh_ConstantBuffer.size() && m_MapMesh->MeshContainer.size() > m_MapMesh->MapMesh_ColorBuffer.size())
+			continue;
 		//if (!m_MeshToDrawList[i]->MeshIsVisible())
 		//	continue;
 
@@ -218,12 +216,13 @@ ColorBuffer* RenderManager::AddColorBuffer()
 
 void RenderManager::BuildDescriptorHeaps(ID3D12Device* device)
 {
-	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-	cbvHeapDesc.NumDescriptors = 3;
-	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	cbvHeapDesc.NodeMask = 0;
-	ThrowIfFailed(device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&m_CbvHeap)));
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.NumDescriptors = 3;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	ThrowIfFailed(device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_SrvDescriptorHeap)));
+
+	D3DApp::GetApp()->CreateTextureBox(m_SrvDescriptorHeap.Get());
 }
 
 void RenderManager::BuildRootSignature(ID3D12Device* device)
@@ -272,7 +271,7 @@ void RenderManager::BuildRootSignature(ID3D12Device* device)
 	}
 	ThrowIfFailed(hr);
 
-	ThrowIfFailed(device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
+	ThrowIfFailed(device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(&m_pRootSignature)));
 
 }
 
@@ -280,29 +279,27 @@ void RenderManager::BuildRootSignature(ID3D12Device* device)
 {
 	HRESULT hr = S_OK;
 
-	m_VsByteCode = d3dUtil::CompileShader(L"..\\..\\src\\hlt_render\\Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
-	m_PsByteCode = d3dUtil::CompileShader(L"..\\..\\src\\hlt_render\\Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
+	m_PsoManager->m_Shaders["standardVS"] = d3dUtil::CompileShader(L"..\\..\\src\\hlt_render\\Shaders\\color.hlsl", nullptr, "VS", "vs_5_0");
+	m_PsoManager->m_Shaders["opaquePS"] = d3dUtil::CompileShader(L"..\\..\\src\\hlt_render\\Shaders\\color.hlsl", nullptr, "PS", "ps_5_0");
 
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
+	m_PsoManager->m_InputLayout =
 	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+	  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,
+	  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24,
+	  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 	};
 }
 
  void RenderManager::BuildPSO(DXGI_FORMAT BackBufferFormat, ID3D12Device* device, bool _4xMsaaState, UINT _4xMsaaQuality, DXGI_FORMAT DepthStencilFormat)
 {
 
-
-	 m_PsoManager = new hlt_PSO;
-	m_PsoManager->m_InputLayout = m_InputLayout;
-	m_PsoManager->m_RootSignature = m_RootSignature;
-
-	m_PsoManager->CreateOpaquePsoDesc(BackBufferFormat, _4xMsaaState, _4xMsaaQuality, DepthStencilFormat,device);
-	m_PsoManager->CreateTransparentPsoDesc(device);
-	m_PsoManager->CreateAlphaTestedPsoDesc(device);
+	m_PsoManager->CreateOpaquePsoDesc(m_pRootSignature.Get(), BackBufferFormat, _4xMsaaState, _4xMsaaQuality, DepthStencilFormat, device);
+	//m_PsoManager->CreateTransparentPsoDesc(device);
+	//m_PsoManager->CreateAlphaTestedPsoDesc(device);
 
 }

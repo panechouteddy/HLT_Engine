@@ -4,8 +4,9 @@
 
 cbuffer cbPerObject : register(b0)
 {
-    float4x4 gWorldViewProj;
+    float4x4 gViewProj;
     float4x4 gWorld;
+    float4x4 gTexTransform;
 };
 
 cbuffer cbColor : register(b1)
@@ -26,28 +27,31 @@ SamplerState gSampler : register(s0);
 struct VertexIn
 {
     float3 PosL : POSITION;
-    float3 Normal : NORMAL;
+    float3 NormalL : NORMAL;
     float2 TexC : TEXCOORD;
 };
 
 struct VertexOut
 {
     float4 PosH : SV_POSITION;
+    float3 PosW : POSITION;
     float3 NormalW : NORMAL;
     float2 TexC : TEXCOORD;
 };
 
 VertexOut VS(VertexIn vin)
 {
-    VertexOut vout;
+    VertexOut vout = (VertexOut) 0.0f;
 
-    // Position clip space
-    vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
+    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+    vout.PosW = posW.xyz;
 
-    // Normale en world space
-    vout.NormalW = mul(vin.Normal, (float3x3) gWorld);
+    vout.NormalW = mul(vin.NormalL, (float3x3) gWorld);
 
-    vout.TexC = vin.TexC;
+    vout.PosH = mul(posW, gViewProj);
+
+    float4 texC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform);
+    vout.TexC = texC.xy;
 
     return vout;
 }

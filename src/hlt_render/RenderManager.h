@@ -18,17 +18,12 @@ protected:
     ID3D12GraphicsCommandList* m_CommandList;
     ID3D12CommandAllocator * m_DirectCmdListAlloc;
 
-    ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
-    ComPtr<ID3D12DescriptorHeap> m_CbvHeap = nullptr;
-
-    ComPtr<ID3DBlob> m_VsByteCode = nullptr;
-    ComPtr<ID3DBlob> m_PsByteCode = nullptr;
-
-    std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
-
+    ComPtr<ID3D12DescriptorHeap> m_SrvDescriptorHeap = nullptr;
+    ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr;
     ComPtr<ID3D12PipelineState> m_Pso = nullptr;
+
     hlt_PSO* m_PsoManager = nullptr;
-    std::unordered_map<std::string, ComPtr<ID3DBlob>> mShaders;
+
 
 
 public:
@@ -42,7 +37,7 @@ public:
     void AddMeshTransform(hlt_Transform3D* transform, Mesh* mesh);
     ConstantBuffer* AddConstantBuffer();
     ColorBuffer* AddColorBuffer();
-    void BuildDescriptorHeaps(ID3D12Device* device);
+    void BuildDescriptorHeaps(ID3D12Device* device );
     void BuildRootSignature(ID3D12Device* device);
     void BuildShadersAndInputLayout();
     void BuildPSO(DXGI_FORMAT BackBufferFormat ,ID3D12Device* device, bool _4xMsaaState, UINT _4xMsaaQuality , DXGI_FORMAT DepthStencilFormat);
