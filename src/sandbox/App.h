@@ -1,6 +1,6 @@
 #pragma once
 
-class Projectile;
+class Enemy;
 
 class App
 {
@@ -26,8 +26,7 @@ private:
 
 	hlt_ECS* ecs;
 	hlt_Camera* m_pCamera;
-	
-	Projectile* m_proj;
+	Enemy* m_pEnemy;
 
 	int m_TestID = -1;
 	int m_Test2ID = -1;

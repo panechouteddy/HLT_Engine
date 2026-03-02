@@ -81,12 +81,6 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 	ecs->AddSystem<hlt_System::Hierarchy>();
 
-	/*ecs->SetComponentActive<hlt_Component::ConstantMove>(m_proj->m_ProjectileID, false);
-	ecs->SetComponentActive<hlt_Component::BoxCollider3D>(m_proj->m_ProjectileID, false);*/
-
-	//m_proj = new Projectile();
-	//m_EntityID.push_back(m_proj->m_ProjectileID);
-
 	// CreateMap();
 }
 
