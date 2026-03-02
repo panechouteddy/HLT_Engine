@@ -91,7 +91,7 @@ void App::OnStart()
 
 	XMFLOAT3 forward;
 	XMStoreFloat3(&forward, invView.r[3]);
-
+	///////////////////////////////////////////////////// FAIRE DES TAGS //////////////////////////////////////////////////////////
 	m_pEnemy->m_dir = forward;
 	m_pEnemy->Move();
 	// CreateMap();
