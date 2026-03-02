@@ -16,12 +16,13 @@ public:
 	int m_ProjectileID = -1;
 	bool m_IsDead;
 
+	
 private:
 	hlt_ECS* ecs;
 
 	hlt_Component::ConstantMove* oCMove;
 	hlt_Component::BoxCollider3D* oBox;
 
-	bool* oIsColliding = nullptr;
+	bool oIsColliding = false;
 	bool m_IsActive = false;
 };

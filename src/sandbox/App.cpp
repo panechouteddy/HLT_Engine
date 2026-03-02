@@ -32,22 +32,22 @@ void App::OnStart()
 	ecs = HLT_GAMEMANAGER.GetECS();
 
 	{
-		m_PlayerID = hlt_Prefab::GameObject::CreateCube();
-		m_EntityID.push_back(m_PlayerID);
+		m_Test2ID = hlt_Prefab::GameObject::CreateCube();
+		m_EntityID.push_back(m_Test2ID);
 
-		ecs->GetComponent<hlt_Component::Mesh>(m_PlayerID)->mesh.SetColor(hlt_Color::LightGreen);
+		ecs->GetComponent<hlt_Component::Mesh>(m_Test2ID)->mesh.SetColor(hlt_Color::LightGreen);
 
-		hlt_Component::Transform3D* pTransform = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID);
+		hlt_Component::Transform3D* pTransform = ecs->GetComponent<hlt_Component::Transform3D>(m_Test2ID);
 		pTransform->transform.pos = { -5, 0, 15 };
 		XMVECTOR angle = XMVectorSet(45.f, 0.f, 0.f, 0.f);
 		XMVECTOR rot = XMQuaternionRotationRollPitchYawFromVector(angle);
 		pTransform->transform.AddYPR(rot);
 
-		hlt_Component::ConstantMove* pCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_PlayerID);
+		hlt_Component::ConstantMove* pCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_Test2ID);
 		pCMove->dir = { 1.f, 0.f, 0.f };
 		pCMove->move = 2.f;
 
-		hlt_Component::BoxCollider3D* pBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
+		hlt_Component::BoxCollider3D* pBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_Test2ID);
 		pBox->boxType = pBox->OBB;
 		pIsColliding = &pBox->isColliding;
 		XMStoreFloat4(&pBox->boxOBB.m_Box.Orientation, XMQuaternionRotationRollPitchYawFromVector(angle));
@@ -60,9 +60,8 @@ void App::OnStart()
 
 		hlt_Component::Transform3D* pTransform = ecs->GetComponent<hlt_Component::Transform3D>(m_TestID);
 		hlt_Component::Hierarchy* pHierarchy = ecs->AddComponent<hlt_Component::Hierarchy>(m_TestID);
-		pHierarchy->parentID = m_PlayerID;
+		pHierarchy->parentID = m_Test2ID;
 	}
-	
 
 	{
 		m_OtherID = hlt_Prefab::GameObject::CreateCube();
@@ -82,8 +81,11 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 	ecs->AddSystem<hlt_System::Hierarchy>();
 
-	m_proj = new Projectile();
-	m_EntityID.push_back(m_proj->m_ProjectileID);
+	/*ecs->SetComponentActive<hlt_Component::ConstantMove>(m_proj->m_ProjectileID, false);
+	ecs->SetComponentActive<hlt_Component::BoxCollider3D>(m_proj->m_ProjectileID, false);*/
+
+	//m_proj = new Projectile();
+	//m_EntityID.push_back(m_proj->m_ProjectileID);
 
 	// CreateMap();
 }
@@ -95,20 +97,41 @@ void App::OnUpdate()
 	//	ecs->SetComponentActive<hlt_Component::ConstantMove>(m_OtherID, false);
 
 	/*if (*pIsColliding == true)
-		HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::Mesh>(m_TestID, false);
-	*/
+		HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::ConstantMove>(m_proj->m_ProjectileID, false);*/
+	
 	//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
 
-	if (keyboardInput.IsKey(VK_TAB))
+	if (keyboardInput.IsKeyDown(VK_TAB))
 	{
-		m_proj->m_pos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
+		Projectile* newBullet = new Projectile();
+		m_EntityID.push_back(newBullet->m_ProjectileID);
+
+		newBullet->m_pos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
 		
 		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
 		XMMATRIX invView = XMMatrixInverse(nullptr, view);
-		XMStoreFloat3(&m_proj->m_dir, invView.r[2]);
+
+		XMFLOAT3 forward;
+		XMStoreFloat3(&forward, invView.r[2]);
+
+		newBullet->m_dir = forward;
+
+		newBullet->Move();
+
+		m_vProjs.push_back(newBullet);
 	}
-	if(m_proj != nullptr)
-		m_proj->Update();
+	for (int i = 0; i < m_vProjs.size(); i++)
+	{
+		if (m_vProjs[i]->m_IsDead)
+		{
+			delete m_vProjs[i];
+			m_vProjs.erase(m_vProjs.begin() + i);
+			i--;
+			continue;
+		}
+
+		m_vProjs[i]->Update();
+	}
 }
 
 void App::OnExit()

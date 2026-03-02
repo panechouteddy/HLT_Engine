@@ -30,6 +30,11 @@ inline T* hlt_ECS::ComponentPool<T>::Add(int ID)
 	componentOwnerID.push_back(ID);
 	size_t componentIndex = component.size() - 1;
 
+	if (ID >= entityID.size())
+	{
+		for(int i = entityID.size(); i < ID + 1; i++)
+			entityID.push_back(MISS_COMPONENT);
+	}
 	entityID[ID] = (int)componentIndex;
 
 	return component[entityID[ID]];
@@ -46,6 +51,12 @@ inline T* hlt_ECS::ComponentPool<T>::Add(int ID, T* pComponent)
 	component.push_back(pComponent);
 	size_t componentIndex = component.size() - 1;
 	componentOwnerID.push_back(ID);
+
+	if (ID >= entityID.size())
+	{
+		for (int i = entityID.size(); i < ID + 1; i++)
+			entityID.push_back(MISS_COMPONENT);
+	}
 
 	entityID[ID] = (int)componentIndex;
 
@@ -87,9 +98,11 @@ inline T* hlt_ECS::ComponentPool<T>::Remove(int ID, bool toDelete)
 	component.pop_back();
 
 	std::swap(componentOwnerID[componentIndex], componentOwnerID.back());
-	componentOwnerID.pop_back();
 
 	entityID[componentOwnerID[componentIndex]] = componentIndex;
+
+	componentOwnerID.pop_back();
+	
 
 	entityID[ID] = MISS_COMPONENT;
 
@@ -122,7 +135,7 @@ inline T* hlt_ECS::AddComponent(int ID)
 	if (pool->wastedComponents.size() == 0)
 		return componentPool->Add(ID);
 	else
-		return MoveComponent<T>(ID, &m_WastedComponents, &m_ActiveComponents);
+		return ReuseComponent<T>(ID, &m_ActiveComponents);
 }
 
 template<typename T>
@@ -235,6 +248,29 @@ inline T* hlt_ECS::MoveComponent(int ID, std::unordered_map<int, CPool*>* from, 
 	ComponentPool<T>* toPool = dynamic_cast<ComponentPool<T>*>((*to)[T::ID]);
 
 	fromPool->Remove(ID);
+
+	return toPool->Add(ID, component);
+}
+
+template<typename T>
+inline T* hlt_ECS::ReuseComponent(int ID, std::unordered_map<int, CPool*>* to)
+{
+	if (m_WastedComponents.contains(T::ID) == false) exit(404);
+
+	Pool<T>* fromPool = dynamic_cast<Pool<T>*>(m_WastedComponents[T::ID]);
+	if (fromPool == nullptr) return nullptr;
+
+	// 2. Récupérer les données existantes
+	T* component = fromPool->wastedComponents[0];
+	component->Reset();
+
+	// 3. S'assurer que le pool de destination existe
+	if (to->contains(T::ID) == false)
+		(*to)[T::ID] = new ComponentPool<T>();
+
+	ComponentPool<T>* toPool = dynamic_cast<ComponentPool<T>*>((*to)[T::ID]);
+
+	fromPool->wastedComponents.erase(fromPool->wastedComponents.begin());
 
 	return toPool->Add(ID, component);
 }

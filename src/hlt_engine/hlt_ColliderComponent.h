@@ -19,5 +19,13 @@ namespace hlt_Component
 		hlt_Box::Box3D_AABB boxAABB = hlt_Box::Box3D_AABB();
 		hlt_Box::Box3D_OBB boxOBB = hlt_Box::Box3D_OBB();
 		bool isColliding = false;
+
+		void Reset()
+		{
+			boxType = BoxType::COUNT;
+			boxAABB = hlt_Box::Box3D_AABB();
+			boxOBB = hlt_Box::Box3D_OBB();
+			isColliding = false;
+		}
 	};
 }

@@ -102,4 +102,7 @@ public:
 private:
 	template <typename T>
 	T* MoveComponent(int ID, std::unordered_map<int, CPool*>* from, std::unordered_map<int, CPool*>* to);
+
+	template <typename T>
+	T* ReuseComponent(int ID, std::unordered_map<int, CPool*>* to);
 };

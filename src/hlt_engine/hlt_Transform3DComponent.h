@@ -10,5 +10,10 @@ namespace hlt_Component
 		static const int ID = 0;
 
 		hlt_Transform3D transform;
+
+		void Reset()
+		{
+			transform = hlt_Transform3D();
+		}
 	};
 }

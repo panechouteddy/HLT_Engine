@@ -17,6 +17,14 @@ namespace hlt_Component
 			std::vector<bool> isDown;
 			std::vector<bool> isUp;
 			std::vector<bool> isKey;
+
+			void Reset()
+			{
+				keys.clear();
+				isDown.clear();
+				isUp.clear();
+				isKey.clear();
+			}
 		};
 
 		struct hlt_Mouse
@@ -32,6 +40,14 @@ namespace hlt_Component
 			
 			DirectX::XMINT2* m_Pos = ::hlt_Input::MouseInput::GetInstance().GetPos();
 			DirectX::XMINT2* m_LastPos = ::hlt_Input::MouseInput::GetInstance().GetLastPos();
+
+			void Reset()
+			{
+				keys.clear();
+				isDown.clear();
+				isUp.clear();
+				isKey.clear();
+			}
 		};
 	}
 }

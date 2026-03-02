@@ -19,6 +19,8 @@ public:
 	void CreateMap();
 
 private:
+	std::vector<Projectile*> m_vProjs;
+
 	std::vector<int> m_EntityID;
 	int m_PlayerID = -1;
 
@@ -28,6 +30,7 @@ private:
 	Projectile* m_proj;
 
 	int m_TestID = -1;
+	int m_Test2ID = -1;
 	int m_OtherID = -1;
 
 	bool* pIsColliding = nullptr;
