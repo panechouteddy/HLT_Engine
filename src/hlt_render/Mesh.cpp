@@ -45,10 +45,10 @@ MeshGeometry* Mesh::GetGeometry()
 
 void MeshBox::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
-	CreatePyramid(device,commandList);
+	//CreatePyramid(device,commandList);
 	CreateCube(device,commandList);
-	CreateRock(device, commandList);
-	CreateGround(device, commandList);
+	//CreateRock(device, commandList);
+	//CreateGround(device, commandList);
 }
 
 
@@ -153,43 +153,53 @@ void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* com
 
 void MeshBox::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
-	std::array<Vertex, 8> vertices =
+	std::array<Vertex, 24> vertices =
 	{
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f) }),
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f) })
+		// Front face
+		Vertex({ -1.0f, -1.0f, -1.0f }, { 0.0f, 1.0f }),
+		Vertex({ -1.0f,  1.0f, -1.0f }, { 0.0f, 0.0f }),
+		Vertex({  1.0f,  1.0f, -1.0f }, { 1.0f, 0.0f }),
+		Vertex({  1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f }),
+
+		// Back face
+		Vertex({ -1.0f, -1.0f,  1.0f }, { 1.0f, 1.0f }),
+		Vertex({  1.0f, -1.0f,  1.0f }, { 0.0f, 1.0f }),
+		Vertex({  1.0f,  1.0f,  1.0f }, { 0.0f, 0.0f }),
+		Vertex({ -1.0f,  1.0f,  1.0f }, { 1.0f, 0.0f }),
+
+		// Top face
+		Vertex({ -1.0f,  1.0f, -1.0f }, { 0.0f, 1.0f }),
+		Vertex({ -1.0f,  1.0f,  1.0f }, { 0.0f, 0.0f }),
+		Vertex({  1.0f,  1.0f,  1.0f }, { 1.0f, 0.0f }),
+		Vertex({  1.0f,  1.0f, -1.0f }, { 1.0f, 1.0f }),
+
+		// Bottom face
+		Vertex({ -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f }),
+		Vertex({  1.0f, -1.0f, -1.0f }, { 0.0f, 1.0f }),
+		Vertex({  1.0f, -1.0f,  1.0f }, { 0.0f, 0.0f }),
+		Vertex({ -1.0f, -1.0f,  1.0f }, { 1.0f, 0.0f }),
+
+		// Left face
+		Vertex({ -1.0f, -1.0f,  1.0f }, { 0.0f, 1.0f }),
+		Vertex({ -1.0f,  1.0f,  1.0f }, { 0.0f, 0.0f }),
+		Vertex({ -1.0f,  1.0f, -1.0f }, { 1.0f, 0.0f }),
+		Vertex({ -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f }),
+
+		// Right face
+		Vertex({  1.0f, -1.0f, -1.0f }, { 0.0f, 1.0f }),
+		Vertex({  1.0f,  1.0f, -1.0f }, { 0.0f, 0.0f }),
+		Vertex({  1.0f,  1.0f,  1.0f }, { 1.0f, 0.0f }),
+		Vertex({  1.0f, -1.0f,  1.0f }, { 1.0f, 1.0f }),
 	};
 
 	std::array<std::uint16_t, 36> indices =
 	{
-		// front face
-		0, 1, 2,
-		0, 2, 3,
-
-		// back face
-		4, 6, 5,
-		4, 7, 6,
-
-		// left face
-		4, 5, 1,
-		4, 1, 0,
-
-		// right face
-		3, 2, 6,
-		3, 6, 7,
-
-		// top face
-		1, 5, 6,
-		1, 6, 2,
-
-		// bottom face
-		4, 0, 3,
-		4, 3, 7
+		0,1,2,  0,2,3,
+		4,5,6,  4,6,7,
+		8,9,10, 8,10,11,
+		12,13,14, 12,14,15,
+		16,17,18, 16,18,19,
+		20,21,22, 20,22,23
 	};
 	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
 	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);

@@ -10,7 +10,7 @@ struct Texture;
 struct Vertex
 {
     XMFLOAT3 Pos;
-
+    XMFLOAT2 TexC;
 };
 
 class Mesh

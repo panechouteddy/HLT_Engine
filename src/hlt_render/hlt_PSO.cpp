@@ -1,12 +1,12 @@
 #include "pch.h"
 
-void hlt_PSO::CreateOpaquePsoDesc(ID3D12RootSignature* rootSignature, DXGI_FORMAT m_BackBufferFormat, bool m_4xMsaaState, UINT m_4xMsaaQuality, DXGI_FORMAT m_DepthStencilFormat, ComPtr<ID3D12Device> m_Device)
+void hlt_PSO::CreateOpaquePsoDesc( DXGI_FORMAT m_BackBufferFormat, bool m_4xMsaaState, UINT m_4xMsaaQuality, DXGI_FORMAT m_DepthStencilFormat, ComPtr<ID3D12Device> m_Device)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
 	//PSO Opaque
 	ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	opaquePsoDesc.InputLayout = { m_InputLayout.data(), (UINT)m_InputLayout.size() };
-	opaquePsoDesc.pRootSignature = rootSignature;
+	opaquePsoDesc.pRootSignature = m_pRootSignature.Get();
 	opaquePsoDesc.VS =
 	{
 		reinterpret_cast<BYTE*>(m_Shaders["standardVS"]->GetBufferPointer()),
@@ -27,6 +27,10 @@ void hlt_PSO::CreateOpaquePsoDesc(ID3D12RootSignature* rootSignature, DXGI_FORMA
 	opaquePsoDesc.SampleDesc.Count = m_4xMsaaState ? 4 : 1;
 	opaquePsoDesc.SampleDesc.Quality = m_4xMsaaState ? (m_4xMsaaQuality - 1) : 0;
 	opaquePsoDesc.DSVFormat = m_DepthStencilFormat;
+
+	D3D12_DEPTH_STENCIL_DESC dsDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	dsDesc.DepthEnable = FALSE;
+	opaquePsoDesc.DepthStencilState = dsDesc;
 
 	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&m_PSOList["opaque"])));
 

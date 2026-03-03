@@ -19,8 +19,6 @@ protected:
     ID3D12CommandAllocator * m_DirectCmdListAlloc;
 
     ComPtr<ID3D12DescriptorHeap> m_SrvDescriptorHeap = nullptr;
-    ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr;
-    ComPtr<ID3D12PipelineState> m_Pso = nullptr;
 
     hlt_PSO* m_PsoManager = nullptr;
 
