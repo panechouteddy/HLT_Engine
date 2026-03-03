@@ -8,9 +8,9 @@ using namespace DirectX;
 struct ObjectConstant
 {
 	ObjectConstant() {};
-	ObjectConstant(XMFLOAT4X4 pos) { WorldViewProj = pos;}
 	XMFLOAT4X4 WorldViewProj = MathHelper::Identity4x4();
 	XMFLOAT4X4 World = MathHelper::Identity4x4();
+
 	XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
 };
 
@@ -26,7 +26,7 @@ protected:
 	
 
 public:
-	XMFLOAT4X4 World = MathHelper::Identity4x4();
+	XMFLOAT4X4 m_World = MathHelper::Identity4x4();
 	ConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device> Device);
 	~ConstantBuffer();
 

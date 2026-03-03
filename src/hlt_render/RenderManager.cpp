@@ -73,9 +73,9 @@ void RenderManager::UpdateConstantBuffer()
 			m_ConstantBufferList.push_back(AddConstantBuffer());
 
 		if (i >= m_MeshTransform.size())
-			m_ConstantBufferList[i]->World = MathHelper::Identity4x4();
+			m_ConstantBufferList[i]->m_World = MathHelper::Identity4x4();
 		else
-			m_ConstantBufferList[i]->World = m_MeshTransform[i]->world;
+			m_ConstantBufferList[i]->m_World = m_MeshTransform[i]->world;
     }
 
 	if (m_MapMesh != nullptr)
@@ -85,7 +85,7 @@ void RenderManager::UpdateConstantBuffer()
 				if (i >= m_MapMesh->MapMesh_ConstantBuffer.size())
 					m_MapMesh->MapMesh_ConstantBuffer.push_back(AddConstantBuffer());
 
-				m_MapMesh->MapMesh_ConstantBuffer[i]->World = m_MapMesh->MeshContainer[i].second->world;
+				m_MapMesh->MapMesh_ConstantBuffer[i]->m_World = m_MapMesh->MeshContainer[i].second->world;
 			}
 	}
 }
@@ -94,7 +94,7 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 {
 	for (int i = 0; i < m_MeshToDrawList.size(); i++)
 	{
-		XMFLOAT4X4 CBworld = m_ConstantBufferList[i]->World;
+		XMFLOAT4X4 CBworld = m_ConstantBufferList[i]->m_World;
 		XMMATRIX world = XMLoadFloat4x4(&CBworld);// objet
 		XMMATRIX view  = XMLoadFloat4x4(&camera->m_View);
 		XMMATRIX proj = XMLoadFloat4x4(&camera->m_Proj);
@@ -104,7 +104,7 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 		ObjectConstant objConstants;
 
 		XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
-		XMStoreFloat4x4(&objConstants.World, world);
+		XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
 		XMStoreFloat4x4(&objConstants.TexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
 		m_ConstantBufferList[i]->GetBuffer()->CopyData(0, objConstants);
 	}
@@ -112,7 +112,7 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 	{
 		for (int i = 0; i < m_MapMesh->MeshContainer.size(); i++)
 		{
-			XMFLOAT4X4 CBworld = m_MapMesh->MapMesh_ConstantBuffer[i]->World;
+			XMFLOAT4X4 CBworld = m_MapMesh->MapMesh_ConstantBuffer[i]->m_World;
 			XMMATRIX world = XMLoadFloat4x4(&CBworld);// objet
 			XMMATRIX view = XMLoadFloat4x4(&camera->m_View);
 			XMMATRIX proj = XMLoadFloat4x4(&camera->m_Proj);
