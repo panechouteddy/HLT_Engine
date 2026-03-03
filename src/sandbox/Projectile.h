@@ -16,6 +16,7 @@ public:
 	int m_ProjectileID = -1;
 	bool m_IsDead;
 
+	std::string m_Tag;
 	
 private:
 	hlt_ECS* ecs;

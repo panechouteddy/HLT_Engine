@@ -94,6 +94,7 @@ protected:
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 	void CreateMeshBox();
 	
+	void ScreenSplash();
 	
 protected:
 	static D3DApp* m_App;

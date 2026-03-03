@@ -86,13 +86,14 @@ void App::OnStart()
 
 	m_pEnemy->m_pos = { 10,0,0 };
 
-	XMMATRIX view = XMLoadFloat4x4(&ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.world);
-	XMMATRIX invView = XMMatrixInverse(nullptr, view);
+	XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos);
+	XMVECTOR enemyPosVec = XMLoadFloat3(&m_pEnemy->m_pos);
 
-	XMFLOAT3 forward;
-	XMStoreFloat3(&forward, invView.r[3]);
-	///////////////////////////////////////////////////// FAIRE DES TAGS //////////////////////////////////////////////////////////
-	m_pEnemy->m_dir = forward;
+	XMVECTOR dirVec = XMVectorSubtract(playerPosVec, enemyPosVec);
+	dirVec = XMVector3Normalize(dirVec);
+
+	XMStoreFloat3(&m_pEnemy->m_dir, dirVec);
+
 	m_pEnemy->Move();
 	// CreateMap();
 }
@@ -139,6 +140,7 @@ void App::OnUpdate()
 
 		m_vProjs[i]->Update();
 	}
+	m_pEnemy->Update();
 }
 
 void App::OnExit()

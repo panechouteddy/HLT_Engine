@@ -5,7 +5,10 @@ Enemy::Enemy()
 {
 	m_pos = { 0,0,0 };
 	m_dir = { 0,0,0 };
+
 	m_IsDead = false;
+
+	m_Tag = "Enemy";
 
 	ecs = HLT_GAMEMANAGER.GetECS();
 

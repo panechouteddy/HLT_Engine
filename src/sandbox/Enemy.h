@@ -15,6 +15,7 @@ public:
 	int m_EnemyID = -1;
 	bool m_IsDead;
 
+	std::string m_Tag;
 
 private:
 	hlt_ECS* ecs;

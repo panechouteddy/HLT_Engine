@@ -77,7 +77,7 @@ bool D3DApp::Initialize()
     m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
     m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
-    //Draw();
+    ScreenSplash();
 
     InitDirect3DDraw();
 
@@ -150,11 +150,7 @@ void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tran
 
     if (m_IsOpacity)
     {
-        m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-
-        m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
-
-        m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+        ScreenSplash();
     }
 
     ///.....2D.....///
@@ -577,6 +573,14 @@ void D3DApp::CreateMeshBox()
 {
     m_Box = new MeshBox;
     m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
+}
+void D3DApp::ScreenSplash()
+{
+    m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+
+    m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
+
+    m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 }
 void D3DApp::CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
 {
