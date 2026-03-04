@@ -563,6 +563,9 @@ bool D3DApp::InitD3D11On12()
 
 void D3DApp::InitDirect3DDraw()
 {
+    ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
+    m_DirectCmdListAlloc->Reset();
+
     m_RenderManager = new RenderManager(m_CommandList.Get(),m_DirectCmdListAlloc.Get());
     m_TextureBox->LoadAllTexture();
 
@@ -570,9 +573,6 @@ void D3DApp::InitDirect3DDraw()
     m_RenderManager->BuildRootSignature(m_Device.Get());
     m_RenderManager->BuildShadersAndInputLayout();
     m_RenderManager->BuildPSO(m_BackBufferFormat,m_Device.Get(),m_4xMsaaState,m_4xMsaaQuality, m_DepthStencilFormat);
-    
-    ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
-    m_DirectCmdListAlloc->Reset();
 
     CreateMeshBox();
     m_TextureBox->CreateDefaultTexture();

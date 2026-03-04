@@ -266,7 +266,7 @@ void RenderManager::BuildRootSignature(ID3D12Device* device)
 	rootParameters[1].InitAsConstantBufferView(1);
 	rootParameters[2].InitAsDescriptorTable(1, &srvRange);
 	CD3DX12_STATIC_SAMPLER_DESC sampler(
-		0, // s0
+		0, 
 		D3D12_FILTER_MIN_MAG_MIP_LINEAR,
 		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
 		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
