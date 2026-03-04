@@ -29,7 +29,6 @@ void hlt_PSO::CreateOpaquePsoDesc( DXGI_FORMAT m_BackBufferFormat, bool m_4xMsaa
 	opaquePsoDesc.DSVFormat = m_DepthStencilFormat;
 
 	D3D12_DEPTH_STENCIL_DESC dsDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	dsDesc.DepthEnable = FALSE;
 	opaquePsoDesc.DepthStencilState = dsDesc;
 
 	ThrowIfFailed(m_Device->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&m_PSOList["opaque"])));

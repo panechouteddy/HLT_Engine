@@ -23,6 +23,8 @@ void App::OnStart()
 
 			m_PlayerID = hlt_Prefab::GameObject::CreateCube();
 		m_EntityID.push_back(m_PlayerID);
+		m_PlayerID = hlt_Prefab::GameObject::CreatePyramid();
+		m_EntityID.push_back(m_PlayerID);
 	CreateMap();
 }
 
@@ -47,7 +49,7 @@ void App::CreateMap()
 
 	hlt_Transform3D* transform1 = new hlt_Transform3D;
 	transform1->pos.y = -4;
-	transform1->sca = { 5.f, 0.1f,5.f };
+	transform1->sca = { 5.f, 1.5f,5.f };
 	transform1->UpdateWorld();
 
 	object1.second = transform1;
