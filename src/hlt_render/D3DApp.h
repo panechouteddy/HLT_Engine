@@ -78,8 +78,6 @@ public:
 	void AddTextToDraw(std::wstring text, XMFLOAT2 position) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, position}); }
 	void AddTextToDraw(std::wstring text, float x, float y) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, XMFLOAT2{x,y}});}
 
-	void CreateTextureBox(ID3D12DescriptorHeap* srvDescriptorHeap);
-	void LoadTexture(std::vector<std::pair<std::string, std::wstring>>&fileList);
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();

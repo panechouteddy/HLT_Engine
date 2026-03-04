@@ -22,7 +22,7 @@ protected:
 
     hlt_PSO* m_PsoManager = nullptr;
 
-
+    UINT m_CbvSrvDescriptorSize = 0;
 
 public:
     RenderManager(ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* directCmdListAlloc);

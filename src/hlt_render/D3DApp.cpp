@@ -109,6 +109,7 @@ bool D3DApp::Initialize()
 
     m_UI = new hlt_UI;
     m_SplashScreen = new hlt_SplashScreen;
+    m_TextureBox = new TextureBox;
     // Do the initial resize code.
     OnResize();
 
@@ -563,6 +564,8 @@ bool D3DApp::InitD3D11On12()
 void D3DApp::InitDirect3DDraw()
 {
     m_RenderManager = new RenderManager(m_CommandList.Get(),m_DirectCmdListAlloc.Get());
+    m_TextureBox->CreateAllTexture();
+
     m_RenderManager->BuildDescriptorHeaps(m_Device.Get());
     m_RenderManager->BuildRootSignature(m_Device.Get());
     m_RenderManager->BuildShadersAndInputLayout();
@@ -617,15 +620,7 @@ void D3DApp::CreateSwapChain()
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     ThrowIfFailed(m_DxgiFactory->CreateSwapChain(m_CommandQueue.Get(), &sd, m_SwapChain.GetAddressOf()));
 }
-void D3DApp::CreateTextureBox(ID3D12DescriptorHeap* srvDescriptorHeap)
-{
-    m_TextureBox = new TextureBox(srvDescriptorHeap);
-}
-void D3DApp::LoadTexture(std::vector<std::pair<std::string, std::wstring>>& fileList)
-{
-    m_TextureBox->CreateAllTexture(fileList);
-    FlushCommandQueue();
-}
+
 void D3DApp::CreateRtvAndDsvDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
