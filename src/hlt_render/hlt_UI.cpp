@@ -2,11 +2,11 @@
 
 void hlt_UI::Draw(float WindowWidthMiddle, std::wstring stats)
 {
-	D2D1_RECT_F layoutRect = D2D1::RectF(WindowWidthMiddle - 50, 50.0f, WindowWidthMiddle + 50, 300.0f);
 	
+	D2D1_RECT_F layoutRect = D2D1::RectF(text.second.x -100 , text.second.y , text.second.x , text.second.y +50 );
 	m_d2dContext->DrawText(
-		stats.c_str(),
-		(UINT32)stats.length(),
+		text.first.c_str(),
+		(UINT32)text.first.length(),
 		m_textFormatBody.Get(),
 		layoutRect,
 		m_textBrush.Get()

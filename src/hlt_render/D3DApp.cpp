@@ -68,7 +68,7 @@ bool D3DApp::Initialize()
 
     m_UI = new hlt_UI;
     m_SplashScreen = new hlt_SplashScreen;
-
+    m_TextureBox = new TextureBox;
     // Do the initial resize code.
     OnResize();
 
@@ -88,7 +88,27 @@ void D3DApp::Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tr
     m_RenderManager->UpdateRender(m_Camera, meshs, transforms);
 }
 
-void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
+void D3DApp::DrawRender(std::vector<Mesh*>& meshs)
+{
+    Draw2D();
+
+    Draw3D(meshs);
+  
+
+}
+
+void D3DApp::Draw3D(std::vector<Mesh*>& meshs)
+{
+    StartDraw3D();
+
+    if (!m_IsLoading)
+    {
+        m_RenderManager->Draw(meshs);
+    }
+    EndDraw3D();
+}
+
+void D3DApp::StartDraw3D()
 {
     ThrowIfFailed(m_DirectCmdListAlloc->Reset());
 
@@ -109,11 +129,10 @@ void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tran
     m_CommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
     // Specify the buffers we are going to render to.
     m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
+}
 
-    if (!m_IsLoading)
-    {
-        m_RenderManager->Draw(meshs);
-    }
+void D3DApp::EndDraw3D()
+{
 
     auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
     m_CommandList->ResourceBarrier(1, &barrierToPresent);
@@ -122,26 +141,27 @@ void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tran
     ThrowIfFailed(m_CommandList->Close());
 
     // Add the command list to the queue for execution.
-    ID3D12CommandList* cmdsLists[] = { m_CommandList.Get()};
+    ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
     m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
     FlushCommandQueue();
-    
-    ///.....2D.....///
-    if (!m_IsLoading && m_SplashScreen->m_Opacity > 0)
+}
+
+void D3DApp::Draw2D()
+{
+    if ( m_SplashScreen->m_Opacity > 0)
         m_SplashScreen->m_Opacity -= 0.01f;
     else if (m_IsOpacity && m_SplashScreen->m_Opacity <= 0)
         m_IsOpacity = false;
 
-    if (!m_IsLoading)
-    {
         m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-
-        std::wstring stats = L"FPS: " + std::to_wstring(1.0f);
-        m_UI->Draw(m_pWindow->GetWndSize().x * 0.5f, stats);
-
+        for (int i = 0; i < m_TextToDraw.size(); i++)
+        {
+            m_UI->Draw(m_TextToDraw[i]);
+        }
         m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-    }
+
+        m_TextToDraw.clear();
 
     if (m_IsOpacity)
     {
@@ -152,7 +172,6 @@ void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tran
         m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
     }
 
-    ///.....2D.....///
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));
     m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
@@ -218,8 +237,7 @@ void D3DApp::OnResize()
 
     CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_DEFAULT);
     ThrowIfFailed(m_Device->CreateCommittedResource(&heapProperties,D3D12_HEAP_FLAG_NONE,&depthStencilDesc,D3D12_RESOURCE_STATE_COMMON,&optClear,IID_PPV_ARGS(m_DepthStencilBuffer.GetAddressOf())));
-
-    // Create descriptor to mip level 0 of entire resource using the format of the resource.
+   
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
     dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
@@ -227,20 +245,16 @@ void D3DApp::OnResize()
     dsvDesc.Texture2D.MipSlice = 0;
     m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &dsvDesc, DepthStencilView());
 
-    // Transition the resource from its initial state to be used as a depth buffer.
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_DepthStencilBuffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE);
    
     m_CommandList->ResourceBarrier(1,&barrier);
 
-    // Execute the resize commands.
     ThrowIfFailed(m_CommandList->Close());
     ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
     m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-    // Wait until resize is complete.
     FlushCommandQueue();
 
-    // Update the viewport transform to cover the client area.
     m_ScreenViewport.TopLeftX = 0;
     m_ScreenViewport.TopLeftY = 0;
     m_ScreenViewport.Width = static_cast<float>(clientSize.x);
@@ -323,16 +337,19 @@ bool D3DApp::InitD3D11On12()
 
 void D3DApp::InitDirect3DDraw()
 {
-    m_RenderManager = new RenderManager(m_CommandList.Get(),m_DirectCmdListAlloc.Get());
-    m_RenderManager->BuildDescriptorHeaps(m_Device.Get());
-    m_RenderManager->BuildRootSignature(m_Device.Get());
-    m_RenderManager->BuildShadersAndInputLayout();
-    m_RenderManager->BuildPSO(m_Device.Get(),m_4xMsaaState,m_4xMsaaQuality);
-
     ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
     m_DirectCmdListAlloc->Reset();
 
+    m_RenderManager = new RenderManager(m_CommandList.Get(),m_DirectCmdListAlloc.Get());
+    m_TextureBox->LoadAllTexture();
+
+    m_RenderManager->BuildDescriptorHeaps(m_Device.Get());
+    m_RenderManager->BuildRootSignature(m_Device.Get());
+    m_RenderManager->BuildShadersAndInputLayout();
+    m_RenderManager->BuildPSO(m_BackBufferFormat,m_Device.Get(),m_4xMsaaState,m_4xMsaaQuality, m_DepthStencilFormat);
+
     CreateMeshBox();
+    m_TextureBox->CreateDefaultTexture();
 
     ThrowIfFailed(m_CommandList->Close());
     ID3D12CommandList* cmdsLists2[] = { m_CommandList.Get()};
@@ -377,6 +394,7 @@ void D3DApp::CreateSwapChain()
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     ThrowIfFailed(m_DxgiFactory->CreateSwapChain(m_CommandQueue.Get(), &sd, m_SwapChain.GetAddressOf()));
 }
+
 void D3DApp::CreateRtvAndDsvDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
@@ -397,23 +415,16 @@ void D3DApp::CreateRtvAndDsvDescriptorHeaps()
 
 void D3DApp::FlushCommandQueue()
 {
-    // Advance the fence value to mark commands up to this fence point.
     m_currentFence++;
 
-    // Add an instruction to the command queue to set a new fence point.  Because we 
-    // are on the GPU timeline, the new fence point won't be set until the GPU finishes
-    // processing all the commands prior to this Signal().
     ThrowIfFailed(m_CommandQueue->Signal(m_Fence.Get(), m_currentFence));
 
-    // Wait until the GPU has completed commands up to this fence point.
     if (m_Fence->GetCompletedValue() < m_currentFence)
     {
         HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
 
-        // Fire event when GPU hits current fence.  
         ThrowIfFailed(m_Fence->SetEventOnCompletion(m_currentFence, eventHandle));
 
-        // Wait until the GPU hits current fence event is fired.
         if (eventHandle != 0)
         {
             WaitForSingleObject(eventHandle, INFINITE);
@@ -441,6 +452,10 @@ MeshBox* D3DApp::GetMeshBox() const
 {
     return m_Box;
 }
+TextureBox* D3DApp::GetTextureBox() const
+{
+    return m_TextureBox;
+}
 void D3DApp::CalculateFrameStats()
 {
 
@@ -451,9 +466,12 @@ void D3DApp::CalculateFrameStats()
 
     if ((hlt_Time::GetInstance().GetTotalTime() - timeElapsed) >= 1.0f)
     {
+
         float fps = (float)frameCnt; // fps 
         float mspf = 1000.0f / fps;
 
+
+        
         wstring fpsStr = to_wstring(fps);
         wstring mspfStr = to_wstring(mspf);
 
@@ -490,6 +508,17 @@ float D3DApp::GetWindowRatio() const
     return ((float)clientSize.x / (float)clientSize.y);
 }
 
+//float D3DApp::GetWindowWidth() const
+//{
+//    XMINT2 clientSize = m_pWindow->GetWndSize();
+//
+//    return (float)clientSize.x;
+//}
+//float D3DApp::GetWindowHeight() const
+//{
+//    XMINT2 clientSize = m_pWindow->GetWndSize();
+//    return (float)clientSize.y;
+//}
 
 
 void D3DApp::LogAdapters()
@@ -573,6 +602,7 @@ void D3DApp::CreateMeshBox()
     m_Box = new MeshBox;
     m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
 }
+
 void D3DApp::CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
 {
     m_Box->CreateMesh(name, vertexList, indexList);

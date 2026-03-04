@@ -16,6 +16,7 @@
 
 class ConstantBuffer;
 class Mesh;
+struct TextureBox;
 class hlt_Camera;
 class RenderManager;
 class hlt_Window;
@@ -49,9 +50,13 @@ public:
 	void SetLoading(bool newStatus) { m_IsLoading = newStatus; }
 
 	virtual void OnResize();
-	virtual void Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
-	virtual void Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
 
+	virtual void DrawRender(std::vector<Mesh*>& meshs);
+	virtual void Draw3D(std::vector<Mesh*>& meshs);
+	virtual void StartDraw3D();
+	virtual void EndDraw3D();
+	virtual void Draw2D();
+	virtual void Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
 	ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList.Get();}
 	ID3D12Device* GetDevice() { return m_Device.Get(); }
 	virtual bool Initialize();
@@ -59,12 +64,18 @@ public:
 	ConstantBuffer* CreateConstantBufferObject()const;
 	ColorBuffer* CreateColorBufferObject()const;
 	float GetWindowRatio()const;
-
+	//float GetWindowWidth()const;
+	//float GetWindowHeight()const;
 	void CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
 	MeshBox* GetMeshBox() const;
+	TextureBox* GetTextureBox() const;
 	hlt_Camera* GetCamera() { return m_Camera; }
 
 	void AddMap(Map_Mesh* map);
+
+	void AddTextToDraw(std::wstring text, XMFLOAT2 position) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, position}); }
+	void AddTextToDraw(std::wstring text, float x, float y) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, XMFLOAT2{x,y}});}
+
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
@@ -76,7 +87,6 @@ protected:
 
 protected:
 
-	//bool InitMainWindow();
 	bool InitDirect3D();
 	void InitDirect3DDraw();
 	bool InitD3D11On12();
@@ -132,6 +142,7 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_RtvHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DsvHeap;
 
+
 	UINT m_RtvDescriptorSize = 0;
 	UINT m_DsvDescriptorSize = 0;
 	UINT m_CbvSrvDescriptorSize = 0;
@@ -151,6 +162,7 @@ protected:
 	//Draw
 	RenderManager* m_RenderManager;
 	MeshBox* m_Box;
+	TextureBox* m_TextureBox;
 	 
 	//Ui
 	std::vector<hlt_D2DResource*> m_pUI;

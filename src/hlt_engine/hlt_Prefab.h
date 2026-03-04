@@ -8,7 +8,6 @@ namespace hlt_Prefab
 		static int CreateCube();
 		static int CreateCube(XMFLOAT3 pos, XMFLOAT3 sca);
 		static int CreateRock();
-		static int CreateGround();
 		static int CreatePyramid();
 	};
 	class MeshObject
@@ -17,7 +16,6 @@ namespace hlt_Prefab
 		static Mesh* CreateCube();
 		static Mesh* CreateCube(XMFLOAT3 pos, XMFLOAT3 sca);
 		static Mesh* CreateRock();
-		static Mesh* CreateGround();
 		static Mesh* CreatePyramid();
 
 	};

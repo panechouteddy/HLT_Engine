@@ -113,6 +113,26 @@ void hlt_GameManager::CreateMap(Map_Mesh* map)
 	m_pD3D12App->AddMap(map);
 }
 
+void hlt_GameManager::UpdateFps()
+{
+	static int fps = 0;
+	static int frameCnt = 0;
+	static int lastTime = HLT_TIME.GetTotalTime();
+
+	frameCnt++;
+
+	if (frameCnt >= 100)
+	{
+		int currentTime = HLT_TIME.GetTotalTime();
+		fps = frameCnt / (currentTime - lastTime) ;
+		lastTime = currentTime;
+		frameCnt = 0;
+	}
+	std::wstring text = L"FPS: " + std::to_wstring(fps);
+
+	m_pD3D12App->AddTextToDraw(text, m_pWindow->GetWndSize().x, 0);
+}
+
 void hlt_GameManager::Update()
 {
 	// ENGINE CORE UPDATE
@@ -128,6 +148,7 @@ void hlt_GameManager::Update()
 	m_pWindow->OnUpdate();
 
 	// DX12 UPDATES
+	UpdateFps();
 	RefreshTransformsMatrix();
 	m_EntityManager.UpdateMeshTransform();
 
@@ -139,7 +160,7 @@ void hlt_GameManager::Update()
 
 void hlt_GameManager::Render()
 {
-	m_pD3D12App->Draw(m_EntityManager.GetMeshs(), m_EntityManager.GetTransforms());
+	m_pD3D12App->DrawRender(m_EntityManager.GetMeshs());
 }
 
 void hlt_GameManager::Destroy()
@@ -302,6 +323,7 @@ void hlt_GameManager::RefreshCore()
 	HLT_KEYBOARD.Update();
 	HLT_MOUSE.Update();
 	HLT_TIME.Update();
+	
 }
 
 void hlt_GameManager::RefreshTransformsMatrix()

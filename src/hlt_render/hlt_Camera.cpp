@@ -2,6 +2,7 @@
 
 hlt_Camera::hlt_Camera()
 {
+    m_Transform.pos.z = -5;
 	m_height = 5.0f;
 	m_width = 2.0f;
 	m_z = 0.0f;
@@ -13,7 +14,6 @@ void hlt_Camera::Update()
     m_Transform.UpdateWorld();
     XMMATRIX view = XMLoadFloat4x4(&m_Transform.world);
 
-    // View is inverse of world
     XMVECTOR determinant;
     view = XMMatrixInverse(&determinant, view);
 
@@ -42,21 +42,15 @@ void hlt_Camera::DebugInput()
     if (keyboardInput.IsKey(VK_LCONTROL))
         m_Transform.pos.y -= 10.f * hlt_Time::GetInstance().GetDeltaTime();
 
-    // ROTATION TO DO
     hlt_Input::MouseInput& mouse = hlt_Input::MouseInput::GetInstance();
 
-    // On récupère le delta de mouvement de la souris
     XMINT2 delta = mouse.GetDeltaPos();
 
     if (delta.x != 0 || delta.y != 0)
     {
-        // x de la souris = Yaw (rotation autour de l'axe Up)
-        // y de la souris = Pitch (rotation autour de l'axe Right)
         float yaw = static_cast<float>(delta.x) * CAMERA_SENSIBILITY;
         float pitch = static_cast<float>(delta.y) * CAMERA_SENSIBILITY;
 
-        // On utilise ta fonction existante dans hlt_Transform3D
-        // AddYPR(yaw, pitch, roll)
         m_Transform.AddYPR(yaw, pitch, 0.f);
     }
 

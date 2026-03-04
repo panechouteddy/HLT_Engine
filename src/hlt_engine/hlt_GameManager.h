@@ -26,6 +26,7 @@ public:
 
 	void CreateMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
 	void CreateMap(Map_Mesh* map);
+	void UpdateFps();
 	
 private:
 	void Update();
