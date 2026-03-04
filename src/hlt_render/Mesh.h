@@ -53,13 +53,12 @@ public:
     void CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
     void CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
     void  CreateRock(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
-    void CreateGround(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 };
 
 
 struct Map_Mesh
 {
-    std::vector<std::pair<Mesh*, hlt_Transform3D*>> MeshContainer;
-    std::vector<ColorBuffer*> MapMesh_ColorBuffer;
-    std::vector<ConstantBuffer*> MapMesh_ConstantBuffer;
+    std::vector<std::pair<Mesh*, hlt_Transform3D*>> Meshs;
+    std::vector<ColorBuffer*> ColorBuffers;
+    std::vector<ConstantBuffer*> ConstantBuffers;
 };

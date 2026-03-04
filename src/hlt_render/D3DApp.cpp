@@ -90,9 +90,6 @@ bool D3DApp::Initialize()
 
     m_IsLoading = false;
 
-    Update();
-
-    DrawRender();
     return true;
 }
 void D3DApp::Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
@@ -101,18 +98,27 @@ void D3DApp::Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tr
     m_RenderManager->UpdateRender(m_Camera, meshs, transforms);
 }
 
-void D3DApp::DrawRender(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
+void D3DApp::DrawRender(std::vector<Mesh*>& meshs)
 {
     Draw2D();
-   // if renderIs3D
-    Draw3D(meshs,transforms);
-    // else if renderIs2D*
+
+    Draw3D(meshs);
   
 
 }
 
-void D3DApp::Draw3D()
-void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
+void D3DApp::Draw3D(std::vector<Mesh*>& meshs)
+{
+    StartDraw3D();
+
+    if (!m_IsLoading)
+    {
+        m_RenderManager->Draw(meshs);
+    }
+    EndDraw3D();
+}
+
+void D3DApp::StartDraw3D()
 {
     ThrowIfFailed(m_DirectCmdListAlloc->Reset());
 
@@ -133,11 +139,10 @@ void D3DApp::Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& tran
     m_CommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
     // Specify the buffers we are going to render to.
     m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
+}
 
-    if (!m_IsLoading)
-    {
-        m_RenderManager->Draw(meshs);
-    }
+void D3DApp::EndDraw3D()
+{
 
     auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
     m_CommandList->ResourceBarrier(1, &barrierToPresent);
@@ -184,143 +189,6 @@ void D3DApp::Draw2D()
     FlushCommandQueue();
 }
 
-
-//LRESULT D3DApp::MsgProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& lParam)
-//{
-//    //switch (msg)
-//    //{
-//    //    // WM_ACTIVATE is sent when the window is activated or deactivated.  
-//    //    // We pause the game when the window is deactivated and unpause it 
-//    //    // when it becomes active.  
-//    ////case WM_ACTIVATE:
-//    ////    if (LOWORD(wParam) == WA_INACTIVE)
-//    ////    {
-//    ////        m_AppPaused = true;
-//    ////        m_Timer.Stop();
-//    ////    }
-//    ////    else
-//    ////    {
-//    ////        m_AppPaused = false;
-//    ////        m_Timer.Start();
-//    ////    }
-//    ////    return 0;
-//
-//    //    // WM_SIZE is sent when the user resizes the window.  
-//    ////case WM_SIZE:
-//    ////    // Save the new client area dimensions.
-//    ////    //m_ClientWidth = LOWORD(lParam);
-//    ////    //m_ClientHeight = HIWORD(lParam);
-//    ////    if (m_Device)
-//    ////    {
-//    ////        if (wParam == SIZE_MINIMIZED)
-//    ////        {
-//    ////            m_AppPaused = true;
-//    ////            m_Minimized = true;
-//    ////            m_Maximized = false;
-//    ////        }
-//    ////        else if (wParam == SIZE_MAXIMIZED)
-//    ////        {
-//    ////            m_AppPaused = false;
-//    ////            m_Minimized = false;
-//    ////            m_Maximized = true;
-//    ////            OnResize();
-//    ////        }
-//    ////        else if (wParam == SIZE_RESTORED)
-//    ////        {
-//
-//    ////            // Restoring from minimized state?
-//    ////            if (m_Minimized)
-//    ////            {
-//    ////                m_AppPaused = false;
-//    ////                m_Minimized = false;
-//    ////                OnResize();
-//    ////            }
-//
-//    ////            // Restoring from maximized state?
-//    ////            else if (m_Maximized)
-//    ////            {
-//    ////                m_AppPaused = false;
-//    ////                m_Maximized = false;
-//    ////                OnResize();
-//    ////            }
-//    ////            else if (m_Resizing)
-//    ////            {
-//    ////                // If user is dragging the resize bars, we do not resize 
-//    ////                // the buffers here because as the user continuously 
-//    ////                // drags the resize bars, a stream of WM_SIZE messages are
-//    ////                // sent to the window, and it would be pointless (and slow)
-//    ////                // to resize for each WM_SIZE message received from dragging
-//    ////                // the resize bars.  So instead, we reset after the user is 
-//    ////                // done resizing the window and releases the resize bars, which 
-//    ////                // sends a WM_EXITSIZEMOVE message.
-//    ////            }
-//    ////            else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
-//    ////            {
-//    ////                OnResize();
-//    ////            }
-//    ////        }
-//    ////    }
-//    ////    return 0;
-//
-//    //    // WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
-//    //case WM_ENTERSIZEMOVE:
-//    //    m_AppPaused = true;
-//    //    m_Resizing = true;
-//    //    m_Timer.Stop();
-//    //    return 0;
-//
-//    //    // WM_EXITSIZEMOVE is sent when the user releases the resize bars.
-//    //    // Here we reset everything based on the new window dimensions.
-//    //case WM_EXITSIZEMOVE:
-//    //    m_AppPaused = false;
-//    //    m_Resizing = false;
-//    //    m_Timer.Start();
-//    //    OnResize();
-//    //    return 0;
-//
-//    //    // WM_DESTROY is sent when the window is being destroyed.
-//    //case WM_DESTROY:
-//    //    PostQuitMessage(0);
-//    //    return 0;
-//
-//    //    // The WM_MENUCHAR message is sent when a menu is active and the user presses 
-//    //    // a key that does not correspond to any mnemonic or accelerator key. 
-//    //case WM_MENUCHAR:
-//    //    // Don't beep when we alt-enter.
-//    //    return MAKELRESULT(0, MNC_CLOSE);
-//
-//    //    // Catch this message so to prevent the window from becoming too small.
-//    //case WM_GETMINMAXINFO:
-//    //    ((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
-//    //    ((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
-//    //    return 0;
-//
-//    //case WM_LBUTTONDOWN:
-//    //case WM_MBUTTONDOWN:
-//    //case WM_RBUTTONDOWN:
-//    //    OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-//    //    return 0;
-//    //case WM_LBUTTONUP:
-//    //case WM_MBUTTONUP:
-//    //case WM_RBUTTONUP:
-//    //    OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-//    //    return 0;
-//    //case WM_MOUSEMOVE:
-//    //    OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-//    //    return 0;
-//    //case WM_KEYUP:
-//    //    if (wParam == VK_ESCAPE)
-//    //    {
-//    //        PostQuitMessage(0);
-//    //    }
-//    //    else if ((int)wParam == VK_F2)
-//    //        Set4xMsaaState(!m_4xMsaaState);
-//
-//    //    return 0;
-//    //}
-//
-//    //return DefWindowProc(hwnd, msg, wParam, lParam);
-//}
 void D3DApp::OnResize()
 {
     m_UI->ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
@@ -379,8 +247,7 @@ void D3DApp::OnResize()
 
     CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_DEFAULT);
     ThrowIfFailed(m_Device->CreateCommittedResource(&heapProperties,D3D12_HEAP_FLAG_NONE,&depthStencilDesc,D3D12_RESOURCE_STATE_COMMON,&optClear,IID_PPV_ARGS(m_DepthStencilBuffer.GetAddressOf())));
-
-    // Create descriptor to mip level 0 of entire resource using the format of the resource.
+   
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
     dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
@@ -388,20 +255,16 @@ void D3DApp::OnResize()
     dsvDesc.Texture2D.MipSlice = 0;
     m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &dsvDesc, DepthStencilView());
 
-    // Transition the resource from its initial state to be used as a depth buffer.
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_DepthStencilBuffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE);
    
     m_CommandList->ResourceBarrier(1,&barrier);
 
-    // Execute the resize commands.
     ThrowIfFailed(m_CommandList->Close());
     ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
     m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-    // Wait until resize is complete.
     FlushCommandQueue();
 
-    // Update the viewport transform to cover the client area.
     m_ScreenViewport.TopLeftX = 0;
     m_ScreenViewport.TopLeftY = 0;
     m_ScreenViewport.Width = static_cast<float>(clientSize.x);
@@ -416,56 +279,9 @@ void D3DApp::OnResize()
     m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
         SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 }
-//bool D3DApp::InitMainWindow()
-//{
-//
-//    WNDCLASS wc;
-//    wc.style = CS_HREDRAW | CS_VREDRAW;
-//    wc.lpfnWndProc = MainWndProc;
-//    wc.cbClsExtra = 0;
-//    wc.cbWndExtra = 0;
-//    wc.hInstance = m_hAppInst;
-//    wc.hIcon = LoadIcon(0, IDI_APPLICATION);
-//    wc.hCursor = LoadCursor(0, IDC_ARROW);
-//    wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
-//    wc.lpszMenuName = 0;
-//    wc.lpszClassName = L"MainWnd";
-//
-//    if (!RegisterClass(&wc))
-//    {
-//        MessageBox(0, L"RegisterClass Failed.", 0, 0);
-//        return false;
-//    }
-//
-//    // Compute window rectangle dimensions based on requested client area dimensions.
-//    RECT R = { 0, 0, m_ClientWidth, m_ClientHeight };
-//    AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
-//    int width = R.right - R.left;
-//    int height = R.bottom - R.top;
-//
-//    m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
-//        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);
-//    if (!m_hMainWnd)
-//    {
-//        MessageBox(0, L"CreateWindow Failed.", 0, 0);
-//        return false;
-//    }
-//
-//    ShowWindow(m_hMainWnd, SW_SHOW);
-//    UpdateWindow(m_hMainWnd);
-//
-//    return true;
-//}
+
 bool D3DApp::InitDirect3D()
 {
-   // #if defined(DEBUG) || defined(_DEBUG)
-    // Enable the D3D12 debug layer.
-   // {
-       // ComPtr<ID3D12Debug> debugController;
-       // ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
-       // debugController->EnableDebugLayer();
-   // }
-   // #endif
     ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&m_DxgiFactory)));
 
     HRESULT hardwareResult = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_Device));
@@ -609,23 +425,16 @@ void D3DApp::CreateRtvAndDsvDescriptorHeaps()
 
 void D3DApp::FlushCommandQueue()
 {
-    // Advance the fence value to mark commands up to this fence point.
     m_currentFence++;
 
-    // Add an instruction to the command queue to set a new fence point.  Because we 
-    // are on the GPU timeline, the new fence point won't be set until the GPU finishes
-    // processing all the commands prior to this Signal().
     ThrowIfFailed(m_CommandQueue->Signal(m_Fence.Get(), m_currentFence));
 
-    // Wait until the GPU has completed commands up to this fence point.
     if (m_Fence->GetCompletedValue() < m_currentFence)
     {
         HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
 
-        // Fire event when GPU hits current fence.  
         ThrowIfFailed(m_Fence->SetEventOnCompletion(m_currentFence, eventHandle));
 
-        // Wait until the GPU hits current fence event is fired.
         if (eventHandle != 0)
         {
             WaitForSingleObject(eventHandle, INFINITE);
@@ -667,9 +476,12 @@ void D3DApp::CalculateFrameStats()
 
     if ((hlt_Time::GetInstance().GetTotalTime() - timeElapsed) >= 1.0f)
     {
+
         float fps = (float)frameCnt; // fps 
         float mspf = 1000.0f / fps;
 
+
+        
         wstring fpsStr = to_wstring(fps);
         wstring mspfStr = to_wstring(mspf);
 

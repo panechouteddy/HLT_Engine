@@ -45,5 +45,5 @@ VertexOut VS(VertexIn vin)
 float4 PS(VertexOut pin) : SV_Target
 {
     float4 texColor = gTexture.Sample(gSampler, pin.TexC);
-    return texColor ;
+    return texColor * gObjectColor;
 }

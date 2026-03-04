@@ -49,12 +49,13 @@ public:
 	void Set4xMsaaState(bool value);
 
 	virtual void OnResize();
-	virtual void DrawRender(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
-	virtual void Draw3D(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
+
+	virtual void DrawRender(std::vector<Mesh*>& meshs);
+	virtual void Draw3D(std::vector<Mesh*>& meshs);
+	virtual void StartDraw3D();
+	virtual void EndDraw3D();
 	virtual void Draw2D();
 	virtual void Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
-	virtual void Draw(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
-
 	ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList.Get();}
 	ID3D12Device* GetDevice() { return m_Device.Get(); }
 	virtual bool Initialize();
