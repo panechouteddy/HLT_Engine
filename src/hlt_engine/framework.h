@@ -42,8 +42,9 @@
 #include "hlt_StateMachineSystem.h"
 #include "hlt_HierarchySystem.h"
 
-// ENTITY MANAGER
+// MANAGER
 #include "hlt_EntityManager.h"
+#include "hlt_SceneManager.h"
 
 // APP USING FUNCTION
 #include "hlt_ToCall.h"

@@ -1,13 +1,13 @@
 #pragma once
 
-#if defined(DEBUG) || defined(_DEBUG)
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#include <d3d11on12.h>
-#include <d2d1_3.h>
-#include <windows.foundation.h>
-#include <dwrite.h>
-#endif
+//#if defined(DEBUG) || defined(_DEBUG)
+//#define _CRTDBG_MAP_ALLOC
+//#include <crtdbg.h>
+//#include <d3d11on12.h>
+//#include <d2d1_3.h>
+//#include <windows.foundation.h>
+//#include <dwrite.h>
+//#endif
 
 // Link necessary d3d12 libraries.
 #pragma comment(lib,"d3dcompiler.lib")
@@ -150,9 +150,6 @@ protected:
 	//Ui
 	hlt_UI* m_UI;
 	hlt_SplashScreen* m_SplashScreen;
-
-	//int m_ClientWidth = 1280;
-	//int m_ClientHeight = 720;
 
 	//4XMAA
 	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;

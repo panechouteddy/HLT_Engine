@@ -20,6 +20,8 @@ namespace hlt_Component
 		hlt_Box::Box3D_OBB boxOBB = hlt_Box::Box3D_OBB();
 		bool isColliding = false;
 
+		std::vector<int> collideWith;
+
 		void Reset()
 		{
 			boxType = BoxType::COUNT;

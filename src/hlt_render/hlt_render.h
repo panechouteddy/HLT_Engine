@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../hlt_core/hlt_core.h"
+#include <hlt_core/framework.h>
 
 #include "D3DApp.h"
 #include "d3dUtil.h"

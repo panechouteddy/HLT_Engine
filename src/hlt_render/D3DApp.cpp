@@ -83,8 +83,6 @@ bool D3DApp::Initialize()
 
     m_IsLoading = false;
 
-    //Update();
-
     return true;
 }
 void D3DApp::Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)

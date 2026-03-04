@@ -1,5 +1,9 @@
-
 #pragma once
+#include <d3d11on12.h>
+#include <d2d1_3.h>
+#include <windows.foundation.h>
+#include <dwrite.h>
+
 class hlt_SplashScreen : public hlt_D2DResource
 {
 public:
