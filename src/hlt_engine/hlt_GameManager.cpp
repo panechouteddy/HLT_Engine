@@ -197,7 +197,10 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 			m_pWindow->IsMini() = false;
 			m_pWindow->IsMaxi() = true;
 			if(m_pD3D12App != nullptr)
+			{
 				m_pD3D12App->OnResize();
+				m_pD3D12App->SetSize(m_pWindow->GetWndSize());
+			}
 		}
 		else if (wParam == SIZE_RESTORED)
 		{
@@ -207,7 +210,10 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 				m_pWindow->IsPaused() = false;
 				m_pWindow->IsMini() = false;
 				if (m_pD3D12App != nullptr)
+				{
 					m_pD3D12App->OnResize();
+					m_pD3D12App->SetSize(m_pWindow->GetWndSize());
+				}
 			}
 
 			// Restoring from maximized state?
@@ -216,7 +222,10 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 				m_pWindow->IsPaused() = false;
 				m_pWindow->IsMaxi() = false;
 				if (m_pD3D12App != nullptr)
+				{
 					m_pD3D12App->OnResize();
+					m_pD3D12App->SetSize(m_pWindow->GetWndSize());
+				}
 			}
 			else if (m_pWindow->IsResizing())
 			{
@@ -232,7 +241,10 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 			else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
 			{
 				if (m_pD3D12App != nullptr)
+				{
 					m_pD3D12App->OnResize();
+					m_pD3D12App->SetSize(m_pWindow->GetWndSize());
+				}
 			}
 		}
 		return 0;

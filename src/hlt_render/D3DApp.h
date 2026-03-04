@@ -44,6 +44,9 @@ public:
 
 	bool Get4xMsaaState()const;
 	void Set4xMsaaState(bool value);
+	void SetSize(XMINT2 newSize) { m_WindowSize = newSize; }
+
+	void SetLoading(bool newStatus) { m_IsLoading = newStatus; }
 
 	virtual void OnResize();
 	virtual void Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
@@ -141,11 +144,18 @@ protected:
 
 	//Camera
 	hlt_Camera* m_Camera;
+
+	// WINDOW DIMENSIONS
+	XMINT2 m_WindowSize;
+
 	//Draw
 	RenderManager* m_RenderManager;
 	MeshBox* m_Box;
-
+	 
 	//Ui
+	std::vector<hlt_D2DResource*> m_pUI;
+	hlt_SplashScreen* m_pSplashScreen = nullptr;
+
 	hlt_UI* m_UI;
 	hlt_SplashScreen* m_SplashScreen;
 
