@@ -24,12 +24,34 @@ Enemy::~Enemy()
 {
 }
 
-void Enemy::Update()
+void Enemy::Update(int m_PlayerID, std::vector<Enemy*>* enemys)
 {
+	m_vCollideWith = oBox->collideWith;
+
 	oIsColliding = oBox->isColliding;
 
+	m_CollideOther = false;
+
 	if (oIsColliding == true)
-		m_IsDead = true;
+	{
+		for (int j = 0; j < m_vCollideWith.size(); j++) //Collide with
+		{
+			if (m_vCollideWith[j] == m_PlayerID) //Player
+			{
+				m_CollideOther = true;
+				break;
+			}
+			for (int i = 0; i < enemys->size(); i++)
+			{
+				if (m_vCollideWith[j] == (*enemys)[i]->m_EnemyID) //Other Enemy
+				{
+					m_CollideOther = true;
+				}
+			}
+		}
+		if(m_CollideOther == false)
+			m_IsDead = true;
+	}
 
 	if (m_IsDead)
 		ecs->RemoveEntity(m_EnemyID);

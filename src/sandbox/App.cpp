@@ -26,13 +26,17 @@ void App::OnStart()
 	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
 	m_EntityID.push_back(m_PlayerID);
 
-	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { 0.0f, 0.5f, 5.f };
+	ecs = HLT_GAMEMANAGER.GetECS();
+	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { 0.0f, 0.5f, 0.f };
+	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
+	oBox->boxType = oBox->OBB;
+	oIsColliding = &oBox->isColliding;
+
 	m_pCamera = HLT_CAMERA;
 
-	XMFLOAT3 pos = { 0,0.5f,5.f };
+	XMFLOAT3 pos = { 0,0.5f,0.f };
 	m_pCamera->m_Transform.pos = pos;
 	m_pCamera->m_IsMouseCamera = true;
-	ecs = HLT_GAMEMANAGER.GetECS();
 
 	/*{
 		m_Test2ID = hlt_Prefab::GameObject::CreateCube();
@@ -100,7 +104,7 @@ void App::OnUpdate()
 			continue;
 		}
 
-		m_vEnemys[i]->Update();
+		m_vEnemys[i]->Update(m_PlayerID, &m_vEnemys);
 	}
 
 	if (keyboardInput.IsKeyDown(VK_LBUTTON))
@@ -108,13 +112,18 @@ void App::OnUpdate()
 		Projectile* newBullet = new Projectile();
 		m_EntityID.push_back(newBullet->m_ProjectileID);
 
-		newBullet->m_pos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
+		XMFLOAT3 playerPos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
 
 		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
 		XMMATRIX invView = XMMatrixInverse(nullptr, view);
 
 		XMFLOAT3 forward;
 		XMStoreFloat3(&forward, invView.r[2]);
+
+		float spawnOffset = 3.0f;
+		newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
+		newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
+		newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
 
 		newBullet->m_dir = forward;
 

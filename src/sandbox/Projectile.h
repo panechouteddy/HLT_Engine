@@ -24,6 +24,8 @@ private:
 	hlt_Component::ConstantMove* oCMove;
 	hlt_Component::BoxCollider3D* oBox;
 
+	std::vector<int> m_vCollideWith;
+
 	bool oIsColliding = false;
 	bool m_IsActive = false;
 };

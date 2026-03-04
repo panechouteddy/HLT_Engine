@@ -27,13 +27,10 @@ private:
 
 	std::vector<int> m_EntityID;
 	int m_PlayerID = -1;
+	int m_PlayerLife = 10;
 
 	hlt_ECS* ecs;
 	hlt_Camera* m_pCamera;
-
-	int m_TestID = -1;
-	int m_Test2ID = -1;
-	int m_OtherID = -1;
 
 	bool* pIsColliding = nullptr;
 	bool* oIsColliding = nullptr;

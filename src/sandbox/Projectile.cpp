@@ -27,6 +27,8 @@ Projectile::~Projectile()
 
 void Projectile::Update()
 {
+	m_vCollideWith = oBox->collideWith;
+
 	oIsColliding = oBox->isColliding;
 
 	if (oIsColliding == true)

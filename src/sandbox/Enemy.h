@@ -5,7 +5,7 @@ public:
 	Enemy();
 	~Enemy();
 
-	void Update();
+	void Update(int m_PlayerID, std::vector<Enemy*>* enemys);
 	void Move();
 
 public:
@@ -14,8 +14,11 @@ public:
 
 	int m_EnemyID = -1;
 	bool m_IsDead;
+	bool m_CollideOther = false;
 
 	std::string m_Tag;
+
+	std::vector<int> m_vCollideWith;
 
 private:
 	hlt_ECS* ecs;
