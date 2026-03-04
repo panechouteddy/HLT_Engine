@@ -1,10 +1,31 @@
 #include "pch.h"
 
-void hlt_D2DResource::Initialize(ID3D11On12Device* d11On12, ID2D1DeviceContext2* d2dCtx, ID3D11DeviceContext* d11Ctx, int swapChainBC, ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers, WCHAR* fontFamilyName, float fontSize, WCHAR* localName, D2D1_COLOR_F& fontColor)
+ID2D1DeviceContext2* hlt_D2DResource::m_d2dContext = nullptr;
+ID3D11On12Device* hlt_D2DResource::m_d3d11On12Device = nullptr;
+ID3D11DeviceContext* hlt_D2DResource::m_d3d11DeviceContext = nullptr;
+
+hlt_D2DResource::hlt_D2DResource(int swapChainBC, ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
-	m_d3d11On12Device = d11On12;
-	m_d2dContext = d2dCtx;
-	m_d3d11DeviceContext = d11Ctx;
+	if (m_d3d11On12Device == nullptr) return;
+
+	D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
+	for (UINT i = 0; i < (UINT)swapChainBC; i++)
+	{
+		if (wrappedBackBuffers[i] == nullptr) {
+			ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(
+				swapChainBuffer[i].Get(),
+				&d3d11Flags,
+				D3D12_RESOURCE_STATE_PRESENT,
+				D3D12_RESOURCE_STATE_RENDER_TARGET,
+				IID_PPV_ARGS(&wrappedBackBuffers[i])
+			));
+		}
+	}
+}
+
+void hlt_D2DResource::Regenerate(int swapChainBC, ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
+{
+	if (m_d3d11On12Device == nullptr) return;
 
 	D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
 	for (UINT i = 0; i < (UINT)swapChainBC; i++)
@@ -20,6 +41,16 @@ void hlt_D2DResource::Initialize(ID3D11On12Device* d11On12, ID2D1DeviceContext2*
 		}
 	}
 
+	m_IsInitialized = false;
+}
+
+void hlt_D2DResource::Initialize(WCHAR* fontFamilyName, float fontSize, WCHAR* localName, D2D1_COLOR_F fontColor)
+{
+	if (m_d2dContext == nullptr) return;
+
+	if (m_IsInitialized == true)
+		return;
+
 	ComPtr<IDWriteFactory> writeFactory;
 	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &writeFactory));
 
@@ -30,6 +61,34 @@ void hlt_D2DResource::Initialize(ID3D11On12Device* d11On12, ID2D1DeviceContext2*
 	));
 
 	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(fontColor, &m_textBrush));
+
+	m_pFontFamilyName = fontFamilyName;
+	m_FontSize = fontSize;
+	m_pLocalName = localName;
+	m_FontColor = fontColor;
+
+	m_IsInitialized = true;
+}
+
+void hlt_D2DResource::Reinitialize()
+{
+	if (m_d2dContext == nullptr) return;
+
+	if (m_IsInitialized == true)
+		return;
+
+	ComPtr<IDWriteFactory> writeFactory;
+	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &writeFactory));
+
+	ThrowIfFailed(writeFactory->CreateTextFormat(
+		m_pFontFamilyName, nullptr, DWRITE_FONT_WEIGHT_NORMAL,
+		DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+		m_FontSize, m_pLocalName, &m_textFormatBody
+	));
+
+	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(m_FontColor, &m_textBrush));
+
+	m_IsInitialized = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,6 +105,7 @@ void hlt_D2DResource::ReleaseResources(int swapChainBC, ComPtr<ID3D11Resource>* 
 	{
 		m_d2dContext->SetTarget(nullptr);
 	}
+	m_IsInitialized = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +114,8 @@ void hlt_D2DResource::ReleaseResources(int swapChainBC, ComPtr<ID3D11Resource>* 
 
 void hlt_D2DResource::StartDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
+	if (m_d2dContext == nullptr || m_d3d11On12Device == nullptr || m_d3d11DeviceContext == nullptr) return;
+
 	m_d2dContext->SetTarget(nullptr);
 
 	ComPtr<IDXGISurface> surface;
@@ -75,6 +137,8 @@ void hlt_D2DResource::StartDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wr
 
 void hlt_D2DResource::EndDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
+	if (m_d2dContext == nullptr || m_d3d11On12Device == nullptr || m_d3d11DeviceContext == nullptr) return;
+
 	m_d2dContext->EndDraw();
 
 	m_d2dContext->SetTarget(nullptr);
@@ -85,6 +149,11 @@ void hlt_D2DResource::EndDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrap
 
 void hlt_D2DResource::Draw()
 {
+	if (m_d2dContext == nullptr || m_d3d11On12Device == nullptr || m_d3d11DeviceContext == nullptr) return;
+
+	if (m_IsInitialized == false)
+		return;
+
 	//D2D1_RECT_F layoutRect = D2D1::RectF(WindowWidthMiddle - 50, 50.0f, WindowWidthMiddle + 50, 300.0f);
 
 	/*m_d2dContext->DrawText(

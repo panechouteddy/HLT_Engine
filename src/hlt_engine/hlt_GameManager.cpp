@@ -100,6 +100,13 @@ void hlt_GameManager::Start()
 	m_pCamera = m_pD3D12App->GetCamera();
 	m_pCamera->m_Transform.ResetRotation();
 
+	// DEBUG
+	if (DEBUG)
+	{
+		m_pTextFPS = m_pD3D12App->CreateResource2D();
+		m_pTextFPS->Initialize((WCHAR*)L"Consolas", 20.f, (WCHAR*)L"en-us", D2D1::ColorF(D2D1::ColorF::White));
+	}
+
 	// START USER APP
 	m_AppToCall.m_Start.Execute();
 }
@@ -129,8 +136,8 @@ void hlt_GameManager::UpdateFps()
 		frameCnt = 0;
 	}
 	std::wstring text = L"FPS: " + std::to_wstring(fps);
-
-	m_pD3D12App->AddTextToDraw(text, m_pWindow->GetWndSize().x, 0);
+	m_pTextFPS->SetText(text);
+	//m_pD3D12App->AddTextToDraw(text, m_pWindow->GetWndSize().x, 0);
 }
 
 void hlt_GameManager::Update()
@@ -160,7 +167,15 @@ void hlt_GameManager::Update()
 
 void hlt_GameManager::Render()
 {
-	m_pD3D12App->DrawRender(m_EntityManager.GetMeshs());
+	//m_pD3D12App->DrawRender(m_EntityManager.GetMeshs());
+
+	m_pD3D12App->StartDraw3D();
+	m_pD3D12App->Draw3D(m_EntityManager.GetMeshs());
+	m_pD3D12App->EndDraw3D();
+
+	m_pD3D12App->StartDraw2D();
+	m_pD3D12App->Draw2D();
+	m_pD3D12App->EndDraw2D();
 }
 
 void hlt_GameManager::Destroy()

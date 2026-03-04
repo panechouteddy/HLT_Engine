@@ -7,9 +7,23 @@
 class hlt_SplashScreen : public hlt_D2DResource
 {
 public:
-	hlt_SplashScreen() = default;
-	
-	void Draw(float WindowWidthMiddle, float WindowHightMiddle);
-	D2D1_RECT_F DrawRect(float left, float top, float right, float bottom, D2D1::ColorF colorBrush, D2D1::ColorF colorRectEdge);
+	hlt_SplashScreen(
+		int swapChainBC,
+		ComPtr<ID3D12Resource>* swapChainBuffer,
+		ComPtr<ID3D11Resource>* wrappedBackBuffers) : hlt_D2DResource(swapChainBC, swapChainBuffer, wrappedBackBuffers) { ; }
+
+	void Initialize(WCHAR* fontFamilyName,
+		float fontSize,
+		WCHAR* localName,
+		D2D1_COLOR_F fontColor) override;
+
+	void SetSmoothTransition(bool isSmooth) { m_SmoothTransition = isSmooth; }
+
+	void Update();
+
+private:
+	bool m_SmoothTransition = false;
+
+	XMINT2 m_WindowSize = { 0, 0 };
 };
 

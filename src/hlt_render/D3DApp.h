@@ -22,6 +22,7 @@ class RenderManager;
 class hlt_Window;
 class hlt_UI;
 class hlt_SplashScreen;
+class hlt_D2DResource;
 
 class ID3D11On12Device;
 class ID2D1DeviceContext2;
@@ -46,17 +47,24 @@ public:
 	bool Get4xMsaaState()const;
 	void Set4xMsaaState(bool value);
 	void SetSize(XMINT2 newSize) { m_WindowSize = newSize; }
+	XMINT2 GetSize() { return m_WindowSize; }
 
 	void SetLoading(bool newStatus) { m_IsLoading = newStatus; }
+	hlt_SplashScreen* GetSplashScreen() { return m_pSplashScreen; }
+	hlt_D2DResource* CreateResource2D();
 
 	virtual void OnResize();
 
-	virtual void DrawRender(std::vector<Mesh*>& meshs);
-	virtual void Draw3D(std::vector<Mesh*>& meshs);
 	virtual void StartDraw3D();
+	virtual void Draw3D(std::vector<Mesh*>& meshs);
 	virtual void EndDraw3D();
+
+	virtual void StartDraw2D();
 	virtual void Draw2D();
+	virtual void EndDraw2D();
+
 	virtual void Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
+
 	ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList.Get();}
 	ID3D12Device* GetDevice() { return m_Device.Get(); }
 	virtual bool Initialize();
@@ -72,9 +80,6 @@ public:
 	hlt_Camera* GetCamera() { return m_Camera; }
 
 	void AddMap(Map_Mesh* map);
-
-	void AddTextToDraw(std::wstring text, XMFLOAT2 position) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, position}); }
-	void AddTextToDraw(std::wstring text, float x, float y) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, XMFLOAT2{x,y}});}
 
 
 protected:
@@ -150,9 +155,6 @@ protected:
 	D3D12_VIEWPORT m_ScreenViewport ;
 	D3D12_RECT m_ScissorRect;
 
-	//Mesh
-	
-
 	//Camera
 	hlt_Camera* m_Camera;
 
@@ -168,8 +170,8 @@ protected:
 	std::vector<hlt_D2DResource*> m_pUI;
 	hlt_SplashScreen* m_pSplashScreen = nullptr;
 
-	hlt_UI* m_UI;
-	hlt_SplashScreen* m_SplashScreen;
+	/*hlt_UI* m_UI;
+	hlt_SplashScreen* m_SplashScreen;*/
 
 	//4XMAA
 	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
