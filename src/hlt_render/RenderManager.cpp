@@ -95,12 +95,11 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 	for (int i = 0; i < m_MeshToDrawList.size(); i++)
 	{
 		XMFLOAT4X4 CBworld = m_ConstantBufferList[i]->m_World;
-		XMMATRIX world = XMLoadFloat4x4(&CBworld);// objet
+		XMMATRIX world = XMLoadFloat4x4(&CBworld);
 		XMMATRIX view  = XMLoadFloat4x4(&camera->m_View);
 		XMMATRIX proj = XMLoadFloat4x4(&camera->m_Proj);
 		XMMATRIX worldViewProj = world * view * proj ;
 
-		// Update the constant buffer with the latest worldViewProj matrix.
 		ObjectConstant objConstants;
 
 		XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
@@ -113,12 +112,11 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 		for (int i = 0; i < m_MapMesh->MeshContainer.size(); i++)
 		{
 			XMFLOAT4X4 CBworld = m_MapMesh->MapMesh_ConstantBuffer[i]->m_World;
-			XMMATRIX world = XMLoadFloat4x4(&CBworld);// objet
+			XMMATRIX world = XMLoadFloat4x4(&CBworld);
 			XMMATRIX view = XMLoadFloat4x4(&camera->m_View);
 			XMMATRIX proj = XMLoadFloat4x4(&camera->m_Proj);
 			XMMATRIX worldViewProj = world * view * proj;
 
-			// Update the constant buffer with the latest worldViewProj matrix.
 			ObjectConstant objConstants;
 			XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
 			XMStoreFloat4x4(&objConstants.World, world);
@@ -159,14 +157,15 @@ void RenderManager::Draw()
 
 		if (texture == nullptr)
 		{
-			texture = D3DApp::GetApp()->GetTextureBox()->GetTexture("grass");
+			texture = D3DApp::GetApp()->GetTextureBox()->GetTexture("bricks");
 		}
-		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(
+			m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart(),texture->SrvHeapIndex,descriptorSize);
 			
 		m_CommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_CommandList->SetGraphicsRootDescriptorTable(0, tex);
-		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
-		m_CommandList->SetGraphicsRootConstantBufferView(2, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());
+		m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
+		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());
+		m_CommandList->SetGraphicsRootDescriptorTable(2, tex);
 
 			m_CommandList->DrawIndexedInstanced(
 				m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount, 
@@ -238,12 +237,16 @@ void RenderManager::BuildDescriptorHeaps(ID3D12Device* device)
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-	for (auto& pair : textureBox->GetAllTexture())
+	int index = 0;
+	for (auto&pair : textureBox->GetAllTexture())
 	{
 		srvDesc.Format = pair.second->Resource->GetDesc().Format;
 		srvDesc.Texture2D.MipLevels = pair.second->Resource->GetDesc().MipLevels;
 
 		device->CreateShaderResourceView(pair.second->Resource.Get(), &srvDesc, hDescriptor);
+
+		pair.second->SrvHeapIndex = index;
+		index++;
 		hDescriptor.Offset(1, m_CbvSrvDescriptorSize);
 	}
 
@@ -251,28 +254,29 @@ void RenderManager::BuildDescriptorHeaps(ID3D12Device* device)
 
 void RenderManager::BuildRootSignature(ID3D12Device* device)
 {
-
 	const int count = 3;
 
 	CD3DX12_ROOT_PARAMETER rootParameters[count];
 
 	CD3DX12_DESCRIPTOR_RANGE srvRange;
-	srvRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+	srvRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, m_CbvSrvDescriptorSize, 0);
 
 
-	rootParameters[0].InitAsDescriptorTable(1, &srvRange, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters[1].InitAsConstantBufferView(0);
-	rootParameters[2].InitAsConstantBufferView(1);
+	rootParameters[0].InitAsConstantBufferView(0);
+	rootParameters[1].InitAsConstantBufferView(1);
+	rootParameters[2].InitAsDescriptorTable(1, &srvRange);
+	CD3DX12_STATIC_SAMPLER_DESC sampler(
+		0, // s0
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
 
-	CD3DX12_STATIC_SAMPLER_DESC staticSampler(
-		0, 
-		D3D12_FILTER_MIN_MAG_MIP_LINEAR
-	);
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
 		count,
 		rootParameters,
 		1,
-		&staticSampler,
+		&sampler,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
 	);
 

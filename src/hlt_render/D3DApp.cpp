@@ -564,7 +564,7 @@ bool D3DApp::InitD3D11On12()
 void D3DApp::InitDirect3DDraw()
 {
     m_RenderManager = new RenderManager(m_CommandList.Get(),m_DirectCmdListAlloc.Get());
-    m_TextureBox->CreateAllTexture();
+    m_TextureBox->LoadAllTexture();
 
     m_RenderManager->BuildDescriptorHeaps(m_Device.Get());
     m_RenderManager->BuildRootSignature(m_Device.Get());

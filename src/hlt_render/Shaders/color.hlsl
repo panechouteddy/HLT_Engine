@@ -37,7 +37,7 @@ VertexOut VS(VertexIn vin)
     vout.PosH = mul(posW, gViewProj);
 
     float4 texC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform);
-    vout.TexC = texC.xy;
+    vout.TexC = vin.TexC;
 
     return vout;
 }
@@ -45,5 +45,5 @@ VertexOut VS(VertexIn vin)
 float4 PS(VertexOut pin) : SV_Target
 {
     float4 texColor = gTexture.Sample(gSampler, pin.TexC);
-    return texColor * gObjectColor;
+    return texColor ;
 }

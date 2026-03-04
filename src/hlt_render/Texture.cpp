@@ -2,9 +2,10 @@
 #include "Texture.h"
 #include <filesystem>
 
-void TextureBox::CreateAllTexture()
+void TextureBox::LoadAllTexture()
 {
-    for (const auto& entry : std::filesystem::directory_iterator(L"../../res/Textures"))
+
+    for (const auto& entry : std::filesystem::directory_iterator(L"..\\..\\res\\Textures"))
     {
         if (!entry.is_regular_file())
             continue;
