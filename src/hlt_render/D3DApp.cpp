@@ -73,8 +73,8 @@ bool D3DApp::Initialize()
     OnResize();
 
     m_Camera = new hlt_Camera;
-    m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
-    m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    //m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers, );
+    //m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
     InitDirect3DDraw();
 
@@ -149,28 +149,28 @@ void D3DApp::EndDraw3D()
 
 void D3DApp::Draw2D()
 {
-    if ( m_SplashScreen->m_Opacity > 0)
-        m_SplashScreen->m_Opacity -= 0.01f;
-    else if (m_IsOpacity && m_SplashScreen->m_Opacity <= 0)
-        m_IsOpacity = false;
+    //if ( m_SplashScreen->m_Opacity > 0)
+    //    m_SplashScreen->m_Opacity -= 0.01f;
+    //else if (m_IsOpacity && m_SplashScreen->m_Opacity <= 0)
+    //    m_IsOpacity = false;
 
-        m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-        for (int i = 0; i < m_TextToDraw.size(); i++)
-        {
-            m_UI->Draw(m_TextToDraw[i]);
-        }
-        m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    //    m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    //    for (int i = 0; i < m_TextToDraw.size(); i++)
+    //    {
+    //        m_UI->Draw(m_TextToDraw[i]);
+    //    }
+    //    m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 
-        m_TextToDraw.clear();
+    //    m_TextToDraw.clear();
 
-    if (m_IsOpacity)
-    {
-        m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    //if (m_IsOpacity)
+    //{
+    //    m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 
-        m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
+    //    m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
 
-        m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-    }
+    //    m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    //}
 
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));
@@ -264,10 +264,10 @@ void D3DApp::OnResize()
 
     m_ScissorRect = { 0, 0, clientSize.x, clientSize.y };
 
-    m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
-        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
-    m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
-        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    //m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+    //    SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    //m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+    //    SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 }
 
 bool D3DApp::InitDirect3D()

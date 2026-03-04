@@ -19,17 +19,25 @@ App::App()
 
 void App::OnStart()
 {
+	std::string path = "../../res/test.obj";
+	hlt_ModelImporter::ImportOBJ(path);
+
 	hlt_ECS* ecs = HLT_GAMEMANAGER.GetECS();
 
-			m_PlayerID = hlt_Prefab::GameObject::CreateCube();
-		m_EntityID.push_back(m_PlayerID);
+	m_PlayerID = HLT_GAMEMANAGER.CreateEntity();
+	m_EntityID.push_back(m_PlayerID);
+
+	ecs->AddComponent<hlt_Component::Transform3D>(m_PlayerID);
+	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(m_PlayerID);
+	mesh->mesh.SetMesh("path", hlt_Color::White);
+
 	CreateMap();
 }
 
 void App::OnUpdate()
 {
-	if (*pIsColliding == true)
-		HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::Mesh>(m_TestID, false);
+	//if (*pIsColliding == true)
+	//	HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::Mesh>(m_TestID, false);
 	//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
 }
 

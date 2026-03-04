@@ -73,8 +73,8 @@ public:
 
 	void AddMap(Map_Mesh* map);
 
-	void AddTextToDraw(std::wstring text, XMFLOAT2 position) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, position}); }
-	void AddTextToDraw(std::wstring text, float x, float y) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, XMFLOAT2{x,y}});}
+	void AddTextToDraw(std::wstring text, XMFLOAT2 position) { ; } //{ m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, position}); }
+	void AddTextToDraw(std::wstring text, float x, float y) { ; } //{ m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, XMFLOAT2{x,y}});}
 
 
 protected:

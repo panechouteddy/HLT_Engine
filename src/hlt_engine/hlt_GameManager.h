@@ -18,6 +18,7 @@ public:
 
 	hlt_ToCall& GetAppMainMethods() { return m_AppToCall; }
 	hlt_ECS* GetECS() { return &m_ECS; }
+	hlt_Camera* GetCamera() { return m_pCamera; }
 
 	int CreateEntity() { return m_EntityManager.CreateEntity(); }
 	void DeleteEntity(int ID) { return m_EntityManager.DeleteEntity(ID); }
