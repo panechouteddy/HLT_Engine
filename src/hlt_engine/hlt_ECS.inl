@@ -175,6 +175,8 @@ inline void hlt_ECS::RemoveComponent(int ID)
 	ComponentPool<T>* componentPool = GetComponent<T>();
 	T* removed = componentPool->Remove(ID);
 
+	if (removed == nullptr) return;
+
 	if (m_WastedComponents.contains(T::ID) == false)
 		m_WastedComponents[T::ID] = new Pool<T>();
 

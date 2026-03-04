@@ -66,7 +66,7 @@ void hlt_Camera::DebugInput()
         m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
     if (keyboardInput.IsKey(VK_SPACE))
         m_Transform.pos.y += 10.f * hlt_Time::GetInstance().GetDeltaTime();
-    if (keyboardInput.IsKey(VK_LCONTROL))
+    if (keyboardInput.IsKey(VK_LSHIFT))
         m_Transform.pos.y -= 10.f * hlt_Time::GetInstance().GetDeltaTime();
 
     if (keyboardInput.IsKey(VK_A))

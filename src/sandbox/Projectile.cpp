@@ -14,6 +14,8 @@ Projectile::Projectile()
 	ecs = HLT_GAMEMANAGER.GetECS();
 
 	m_ProjectileID = hlt_Prefab::GameObject::CreatePyramid();
+	ecs->GetComponent<hlt_Component::Transform3D>(m_ProjectileID)->transform.sca = XMFLOAT3(0.1f, 0.1f, 0.1f);
+	ecs->GetComponent<hlt_Component::Transform3D>(m_ProjectileID)->transform.AddYPR(1.5f, 0, 1.5f);
 
 	oCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_ProjectileID);
 	oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_ProjectileID);

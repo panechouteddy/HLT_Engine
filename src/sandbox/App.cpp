@@ -3,6 +3,8 @@
 #include "Projectile.h"
 #include "Enemy.h"
 
+#include <random>
+
 App* App::s_pInstance = nullptr;
 
 App* App::GetInstance()
@@ -82,34 +84,44 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 	ecs->AddSystem<hlt_System::Hierarchy>();
 
-	m_pEnemy = new Enemy();
-
-	m_pEnemy->m_pos = { 10,0,0 };
-
-	XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos);
-	XMVECTOR enemyPosVec = XMLoadFloat3(&m_pEnemy->m_pos);
-
-	XMVECTOR dirVec = XMVectorSubtract(playerPosVec, enemyPosVec);
-	dirVec = XMVector3Normalize(dirVec);
-
-	XMStoreFloat3(&m_pEnemy->m_dir, dirVec);
-
-	m_pEnemy->Move();
 	// CreateMap();
 }
 
 void App::OnUpdate()
 {
-	hlt_Input::KeyboardInput& keyboardInput = HLT_KEYBOARD;
-	//if (keyboardInput.IsKey(VK_TAB))
-	//	ecs->SetComponentActive<hlt_Component::ConstantMove>(m_OtherID, false);
 
-	/*if (*pIsColliding == true)
-		HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::ConstantMove>(m_proj->m_ProjectileID, false);*/
+	{
+		Enemy* enemy = new Enemy();
+		m_EntityID.push_back(enemy->m_EnemyID);
 
-		//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
+		enemy->m_pos = { 10,0,0 };
 
-	if (keyboardInput.IsKeyDown(VK_TAB))
+		XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos);
+		XMVECTOR enemyPosVec = XMLoadFloat3(&enemy->m_pos);
+
+		XMVECTOR dirVec = XMVectorSubtract(playerPosVec, enemyPosVec);
+		dirVec = XMVector3Normalize(dirVec);
+
+		XMStoreFloat3(&enemy->m_dir, dirVec);
+
+		enemy->Move();
+
+		m_vEnemys.push_back(enemy);
+	}
+	for (int i = 0; i < m_vEnemys.size(); i++)
+	{
+		if (m_vEnemys[i]->m_IsDead)
+		{
+			delete m_vEnemys[i];
+			m_vEnemys.erase(m_vEnemys.begin() + i);
+			i--;
+			continue;
+		}
+
+		m_vEnemys[i]->Update();
+	}
+
+	if (keyboardInput.IsKeyDown(VK_LBUTTON))
 	{
 		Projectile* newBullet = new Projectile();
 		m_EntityID.push_back(newBullet->m_ProjectileID);
@@ -140,7 +152,6 @@ void App::OnUpdate()
 
 		m_vProjs[i]->Update();
 	}
-	m_pEnemy->Update();
 }
 
 void App::OnExit()

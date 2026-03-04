@@ -21,13 +21,13 @@ public:
 
 private:
 	std::vector<Projectile*> m_vProjs;
+	std::vector<Enemy*> m_vEnemys;
 
 	std::vector<int> m_EntityID;
 	int m_PlayerID = -1;
 
 	hlt_ECS* ecs;
 	hlt_Camera* m_pCamera;
-	Enemy* m_pEnemy;
 
 	int m_TestID = -1;
 	int m_Test2ID = -1;
@@ -35,5 +35,11 @@ private:
 
 	bool* pIsColliding = nullptr;
 	bool* oIsColliding = nullptr;
+
+	int m_Easy = 5;
+	int m_Medium = 10;
+	int m_Hard = 15;
+
+	hlt_Input::KeyboardInput& keyboardInput = HLT_KEYBOARD;
 };
 
