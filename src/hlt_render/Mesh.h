@@ -41,7 +41,6 @@ public:
 
 class MeshBox
 {
-
 protected:
     std::unordered_map<std::string, MeshGeometry*> m_BoxOfMesh;
 public:

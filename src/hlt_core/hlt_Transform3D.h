@@ -26,7 +26,12 @@ public:
 
 	// DX12 TRANSFORM
 	bool isWorldUpdated = false;
-	XMFLOAT4X4 world;
+	XMFLOAT4X4 world = {
+		1.f, 0.f, 0.f, 0.f,
+		0.f, 1.f, 0.f, 0.f,
+		0.f, 0.f, 1.f, 0.f,
+		0.f, 0.f, 0.f, 1.f,
+	};
 
 public:
 	// POSITION
@@ -49,4 +54,5 @@ public:
 
 	// DX12 TRANSFORM
 	void UpdateWorld();
+	void UpdateWorld(FXMVECTOR offset);
 };

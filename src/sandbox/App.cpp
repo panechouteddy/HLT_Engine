@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "App.h"
 
+App* App::s_pInstance = nullptr;
+
+App* App::GetInstance()
+{
+	if (s_pInstance == nullptr)
+		s_pInstance = this;
+	return s_pInstance;
+}
+
 App::App()
 {
 	SETUP_APP_ONSTART(OnStart);
@@ -10,15 +19,17 @@ App::App()
 
 void App::OnStart()
 {
-	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
-	m_EntityID.push_back(m_PlayerID);
-	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos.z = 5.f;
+	hlt_ECS* ecs = HLT_GAMEMANAGER.GetECS();
 
+			m_PlayerID = hlt_Prefab::GameObject::CreateCube();
+		m_EntityID.push_back(m_PlayerID);
 	//CreateMap();
 }
 
 void App::OnUpdate()
 {
+	//if (*pIsColliding == true)
+	//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
 }
 
 void App::OnExit()
@@ -51,9 +62,14 @@ void App::CreateMap()
 	transform3->pos.z = 1;
 	transform3->UpdateWorld();
 	object3.second = transform3;
-	map->MeshContainer.push_back(object3);
-	
-	HLT_GAMEMANAGER.CreateMap(map);
+	//map->MeshContainer.push_back(object3);
+
+	//HLT_GAMEMANAGER.AddMesh(object1.second, object1.first);
+	//HLT_GAMEMANAGER.AddMesh(object2.second, object2.first);
+	//HLT_GAMEMANAGER.AddMesh(object3.second, object3.first);
+
+	/*HLT_GAMEMANAGER.AddTransform(object1.second);
+	HLT_GAMEMANAGER.AddTransform(object2.second);
+	HLT_GAMEMANAGER.AddTransform(object3.second);*/
+		
 }
-
-

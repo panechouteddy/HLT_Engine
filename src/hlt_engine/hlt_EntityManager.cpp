@@ -32,3 +32,22 @@ void hlt_EntityManager::DeleteEntity(int ID)
 	m_PoolEntityID.push_back(*it);
 	m_EntityID.erase(it);
 }
+
+void hlt_EntityManager::UpdateMeshTransform()
+{
+	m_pTransforms.clear();
+	m_pMeshs.clear();
+
+	hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_pECS->GetComponent<hlt_Component::Transform3D>();
+	hlt_ECS::ComponentPool<hlt_Component::Mesh>* meshs = m_pECS->GetComponent<hlt_Component::Mesh>();
+
+	for (int i = 0; i < transforms->componentOwnerID.size(); i++)
+	{
+		Mesh* mesh = &meshs->Get(transforms->componentOwnerID[i])->mesh;
+		if (mesh != nullptr)
+		{
+			m_pTransforms.push_back(&transforms->component[i]->transform);
+			m_pMeshs.push_back(mesh);
+		}
+	}
+}

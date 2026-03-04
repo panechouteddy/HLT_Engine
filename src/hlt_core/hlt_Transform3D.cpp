@@ -117,3 +117,19 @@ void hlt_Transform3D::UpdateWorld()
 
 	XMStoreFloat4x4(&world, newWorld);
 }
+
+void hlt_Transform3D::UpdateWorld(FXMVECTOR offset)
+{
+	XMVECTOR vPos = XMLoadFloat3(&pos);
+	vPos += offset;
+	XMVECTOR vSca = XMLoadFloat3(&sca);
+	XMVECTOR vRot = XMLoadFloat4(&quaternion);
+
+	XMMATRIX pos = XMMatrixTranslationFromVector(vPos);
+	XMMATRIX sca = XMMatrixScalingFromVector(vSca);
+	XMMATRIX rot = XMMatrixRotationQuaternion(vRot);
+
+	XMMATRIX newWorld = sca * rot * pos;
+
+	XMStoreFloat4x4(&world, newWorld);
+}

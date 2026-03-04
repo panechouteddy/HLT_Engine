@@ -18,6 +18,9 @@
 #include <hlt_core/hlt_Time.h>
 #include <hlt_core/hlt_Window.h>
 
+// STATE MACHINE
+#include <hlt_core/hlt_StateMachine.h>
+
 // ECS
 #include "hlt_ECS.inl"
 
@@ -27,6 +30,7 @@
 #include "hlt_InputComponent.h"
 #include "hlt_ColliderComponent.h"
 #include "hlt_MeshComponent.h"
+#include "hlt_StateMachineComponent.h"
 #include "hlt_HierarchyComponent.h"
 
 // ECS SYSTEMS
@@ -34,6 +38,8 @@
 #include "hlt_ConstantMoveSystem.h"
 #include "hlt_InputSystem.h"
 #include "hlt_ColliderSystem.h"
+#include "hlt_RepulseSystem.h"
+#include "hlt_StateMachineSystem.h"
 #include "hlt_HierarchySystem.h"
 
 // ENTITY MANAGER
@@ -47,6 +53,7 @@
 
 // HLT GLOBAL
 #include "HLT.inl"
+#include "hlt_GameObject.h"
 
 
 // HLT ENGINE CLASS DEFINE

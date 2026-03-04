@@ -7,8 +7,8 @@ class RenderManager
 private:
     Map_Mesh* m_MapMesh = nullptr;
 
-    std::vector<Mesh*> m_MeshToDrawList;
-    std::vector<hlt_Transform3D*> m_MeshTransform;
+    /*std::vector<Mesh*> m_MeshToDrawList;
+    std::vector<hlt_Transform3D*> m_MeshTransform;*/
 
     std::vector<ConstantBuffer*> m_ConstantBufferList;
     std::vector<ColorBuffer*> m_ColorBufferList;
@@ -27,12 +27,12 @@ protected:
 public:
     RenderManager(ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* directCmdListAlloc);
     ~RenderManager();
-    void UpdateRender(hlt_Camera* camera);
-    void UpdateColorBuffer();
-    void UpdateConstantBuffer();
-    void UpdateView(hlt_Camera* camera);
-    void Draw();
-    void AddMeshTransform(hlt_Transform3D* transform, Mesh* mesh);
+    void UpdateRender(hlt_Camera* camera, std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
+    void UpdateColorBuffer(std::vector<Mesh*>& meshs);
+    void UpdateConstantBuffer(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
+    void UpdateView(hlt_Camera* camera, std::vector<Mesh*>& meshs);
+    void Draw(std::vector<Mesh*>& meshs);
+
     ConstantBuffer* AddConstantBuffer();
     ColorBuffer* AddColorBuffer();
     void BuildDescriptorHeaps(ID3D12Device* device );

@@ -11,37 +11,37 @@ RenderManager::RenderManager(ID3D12GraphicsCommandList* commandList, ID3D12Comma
 
 RenderManager::~RenderManager()
 {
-	for (Mesh* m : m_MeshToDrawList)
+	/*for (Mesh* m : m_MeshToDrawList)
 	{
 		delete m;
-	}
+	}*/
 	for (ConstantBuffer* cb : m_ConstantBufferList)
 	{
 		delete cb;
 	}
-	for (hlt_Transform3D* mT : m_MeshTransform)
+	/*for (hlt_Transform3D* mT : m_MeshTransform)
 	{
 		delete mT;
-	}
+	}*/
 	m_MapMesh->MeshContainer.clear();
 }
 
-void RenderManager::UpdateRender(hlt_Camera* camera)
+void RenderManager::UpdateRender(hlt_Camera* camera, std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
 {
-	UpdateColorBuffer();
-	UpdateConstantBuffer();
-	UpdateView(camera);
+	UpdateColorBuffer(meshs);
+	UpdateConstantBuffer(meshs, transforms);
+	UpdateView(camera, meshs);
 }
 
-void RenderManager::UpdateColorBuffer()
+void RenderManager::UpdateColorBuffer(std::vector<Mesh*>& meshs)
 {
-	for (int i = 0; i <m_MeshToDrawList.size(); i++)
+	for (int i = 0; i <meshs.size(); i++)
 	{
 		if (i >= m_ColorBufferList.size())
 			m_ColorBufferList.push_back(AddColorBuffer());
 		
 		
-		XMVECTOR color =  XMLoadFloat4(m_MeshToDrawList[i]->GetColor());
+		XMVECTOR color =  XMLoadFloat4(meshs[i]->GetColor());
 		ColorConstants colorConstants;
 		XMStoreFloat4(&colorConstants.ObjectColor, color);
 		m_ColorBufferList[i]->GetBuffer()->CopyData(0, colorConstants);
@@ -65,17 +65,17 @@ void RenderManager::UpdateColorBuffer()
 	}
 }
 
-void RenderManager::UpdateConstantBuffer()
+void RenderManager::UpdateConstantBuffer(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms)
 {
-    for (int i = 0; i < m_MeshToDrawList.size();i++)
+    for (int i = 0; i < meshs.size();i++)
     {
         if (i >= m_ConstantBufferList.size())
 			m_ConstantBufferList.push_back(AddConstantBuffer());
 
-		if (i >= m_MeshTransform.size())
+		if (i >= transforms.size())
 			m_ConstantBufferList[i]->m_World = MathHelper::Identity4x4();
 		else
-			m_ConstantBufferList[i]->m_World = m_MeshTransform[i]->world;
+			m_ConstantBufferList[i]->m_World = transforms[i]->world;
     }
 
 	if (m_MapMesh != nullptr)
@@ -90,9 +90,9 @@ void RenderManager::UpdateConstantBuffer()
 	}
 }
 
-void RenderManager::UpdateView(hlt_Camera* camera)
+void RenderManager::UpdateView(hlt_Camera* camera, std::vector<Mesh*>& meshs)
 {
-	for (int i = 0; i < m_MeshToDrawList.size(); i++)
+	for (int i = 0; i < meshs.size(); i++)
 	{
 		XMFLOAT4X4 CBworld = m_ConstantBufferList[i]->m_World;
 		XMMATRIX world = XMLoadFloat4x4(&CBworld);
@@ -126,7 +126,7 @@ void RenderManager::UpdateView(hlt_Camera* camera)
 	}
 }
 
-void RenderManager::Draw()
+void RenderManager::Draw(std::vector<Mesh*>& meshs)
 {
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get() };
@@ -136,21 +136,21 @@ void RenderManager::Draw()
 	m_CommandList->SetPipelineState(m_PsoManager->m_PSOList["opaque"].Get());
 
 	UINT descriptorSize =D3DApp::GetApp()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	for (int i = 0;i < m_MeshToDrawList.size();i++)
+	for (int i = 0;i < meshs.size();i++)
 	{
-
-		if (m_MeshToDrawList[i] == nullptr)
+		if (meshs[i] == nullptr)
 			continue;
 
-		if (m_MeshToDrawList.size() > m_ColorBufferList.size() && m_MeshToDrawList.size() > m_ConstantBufferList.size())
+		if (!meshs[i]->MeshIsVisible())
 			continue;
-		//if (!m_MeshToDrawList[i]->MeshIsVisible())
-		//	continue;
 
-		D3D12_VERTEX_BUFFER_VIEW vertexBuffer = m_MeshToDrawList[i]->GetGeometry()->VertexBufferView();
+		if (meshs.size() > m_ColorBufferList.size() && meshs.size() > m_ConstantBufferList.size())
+			continue;
+
+		D3D12_VERTEX_BUFFER_VIEW vertexBuffer = meshs[i]->GetGeometry()->VertexBufferView();
 		m_CommandList->IASetVertexBuffers(0, 1, &vertexBuffer);
 
-		D3D12_INDEX_BUFFER_VIEW indexBuffer = m_MeshToDrawList[i]->GetGeometry()->IndexBufferView();
+		D3D12_INDEX_BUFFER_VIEW indexBuffer = meshs[i]->GetGeometry()->IndexBufferView();
 		m_CommandList->IASetIndexBuffer(&indexBuffer);
 		
 		Texture* texture = m_MeshToDrawList[i]->GetTexture();
@@ -166,10 +166,7 @@ void RenderManager::Draw()
 		m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstantBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->SetGraphicsRootConstantBufferView(1, m_ColorBufferList[i]->GetResource()->GetGPUVirtualAddress());
 		m_CommandList->SetGraphicsRootDescriptorTable(2, tex);
-
-			m_CommandList->DrawIndexedInstanced(
-				m_MeshToDrawList[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount, 
-					1,0,0,0);
+		m_CommandList->DrawIndexedInstanced(meshs[i]->GetGeometry()->DrawArgs[m_MeshToDrawList[i]->GetMeshName()].IndexCount, 1, 0, 0, 0);
 	}
 	if (m_MapMesh == nullptr)
 		return;
@@ -194,12 +191,6 @@ void RenderManager::Draw()
 			1, 0, 0, 0);
 
 	}
-}
-
-void RenderManager::AddMeshTransform(hlt_Transform3D* transform, Mesh* mesh)
-{
-	m_MeshToDrawList.push_back(mesh);
-	m_MeshTransform.push_back(transform);
 }
 
 ConstantBuffer* RenderManager::AddConstantBuffer()
