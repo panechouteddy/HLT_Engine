@@ -19,6 +19,8 @@ public:
 	void OnExit();
 	void CreateMap();
 
+	std::vector<Enemy*> GenerateWave(int count);
+
 private:
 	std::vector<Projectile*> m_vProjs;
 	std::vector<Enemy*> m_vEnemys;

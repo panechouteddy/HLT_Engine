@@ -34,7 +34,7 @@ void App::OnStart()
 	m_pCamera->m_IsMouseCamera = true;
 	ecs = HLT_GAMEMANAGER.GetECS();
 
-	{
+	/*{
 		m_Test2ID = hlt_Prefab::GameObject::CreateCube();
 		m_EntityID.push_back(m_Test2ID);
 
@@ -77,37 +77,19 @@ void App::OnStart()
 		hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_OtherID);
 		oBox->boxType = oBox->OBB;
 		oIsColliding = &oBox->isColliding;
-	}
+	}*/
 
 	ecs->AddSystem<hlt_System::BoxCollider>();
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
-	ecs->AddSystem<hlt_System::Hierarchy>();
 
-	// CreateMap();
+	CreateMap();
+
+	m_vEnemys = GenerateWave(m_Easy);
 }
 
 void App::OnUpdate()
 {
-
-	{
-		Enemy* enemy = new Enemy();
-		m_EntityID.push_back(enemy->m_EnemyID);
-
-		enemy->m_pos = { 10,0,0 };
-
-		XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos);
-		XMVECTOR enemyPosVec = XMLoadFloat3(&enemy->m_pos);
-
-		XMVECTOR dirVec = XMVectorSubtract(playerPosVec, enemyPosVec);
-		dirVec = XMVector3Normalize(dirVec);
-
-		XMStoreFloat3(&enemy->m_dir, dirVec);
-
-		enemy->Move();
-
-		m_vEnemys.push_back(enemy);
-	}
 	for (int i = 0; i < m_vEnemys.size(); i++)
 	{
 		if (m_vEnemys[i]->m_IsDead)
@@ -164,27 +146,44 @@ void App::CreateMap()
 	std::pair<Mesh*, hlt_Transform3D*> object1;
 	object1.first = hlt_Prefab::MeshObject::CreateGround();
 	hlt_Transform3D* transform1 = new hlt_Transform3D;
+	transform1->sca = XMFLOAT3(5.f, 1, 5.f);
+	transform1->pos = XMFLOAT3(0, 0, 0);
 	transform1->UpdateWorld();
 	object1.second = transform1;
 	map->MeshContainer.push_back(object1);
 
-	/*std::pair<Mesh*, hlt_Transform3D*> object2;
-	object2.first = hlt_Prefab::MeshObject::CreateRock();
-	hlt_Transform3D* transform2 = new hlt_Transform3D;
-	transform2->pos.x = 2;
-	transform2->pos.z = 1;
-	transform2->UpdateWorld();
-	object2.second = transform2;
-	map->MeshContainer.push_back(object2);
-
-	std::pair<Mesh*, hlt_Transform3D*> object3;
-	object3.first = hlt_Prefab::MeshObject::CreatePyramid();
-	hlt_Transform3D* transform3 = new hlt_Transform3D;
-	transform3->pos.x = -2;
-	transform3->pos.z = 1;
-	transform3->UpdateWorld();
-	object3.second = transform3;
-	map->MeshContainer.push_back(object3);
-	*/
 	HLT_GAMEMANAGER.CreateMap(map);
+}
+
+std::vector<Enemy*> App::GenerateWave(int count) 
+{
+	std::vector<Enemy*> enemies(count);
+	int i = 0;
+
+	while (count != 0)
+	{
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<float> distXZ(-50.0f, 50.0f);
+
+		Enemy* enemy = new Enemy();
+		m_EntityID.push_back(enemy->m_EnemyID);
+
+		enemy->m_pos = { distXZ(gen), 0.5f, distXZ(gen) };
+
+		XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos);
+		XMVECTOR enemyPosVec = XMLoadFloat3(&enemy->m_pos);
+
+		XMVECTOR dirVec = XMVectorSubtract(playerPosVec, enemyPosVec);
+		dirVec = XMVector3Normalize(dirVec);
+
+		XMStoreFloat3(&enemy->m_dir, dirVec);
+
+		enemy->Move();
+
+		enemies[i] = enemy;
+		i++;
+		count--;
+	}
+	return enemies;
 }
