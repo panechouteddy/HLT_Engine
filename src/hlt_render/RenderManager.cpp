@@ -153,7 +153,7 @@ void RenderManager::Draw(std::vector<Mesh*>& meshs)
 		D3D12_INDEX_BUFFER_VIEW indexBuffer = meshs[i]->GetGeometry()->IndexBufferView();
 		m_CommandList->IASetIndexBuffer(&indexBuffer);
 		
-		Texture* texture = m_MeshToDrawList[i]->GetTexture();
+		Texture* texture = meshs[i]->GetTexture();
 
 		if (texture == nullptr)
 		{
