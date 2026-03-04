@@ -40,9 +40,9 @@ private:
 	// RUN
 	bool m_IsRunning = false;
 
-	// APP FUNCTIONS
-	hlt_ToCall m_AppToCall;
-	
+	// DEBUG
+	hlt_D2DResource* m_pTextFPS = nullptr;
+
 	// WINDOW
 	hlt_Window* m_pWindow = nullptr;
 	D3DApp* m_pD3D12App = nullptr;
@@ -56,5 +56,8 @@ private:
 
 	// ECS
 	hlt_ECS m_ECS;
+
+	// APP FUNCTIONS
+	hlt_ToCall m_AppToCall;
 };
 

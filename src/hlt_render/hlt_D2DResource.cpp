@@ -1,7 +1,121 @@
 #include "pch.h"
 
+ID2D1DeviceContext2* hlt_D2DResource::m_d2dContext = nullptr;
+ID3D11On12Device* hlt_D2DResource::m_d3d11On12Device = nullptr;
+ID3D11DeviceContext* hlt_D2DResource::m_d3d11DeviceContext = nullptr;
+
+hlt_D2DResource::hlt_D2DResource(int swapChainBC, ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
+{
+	if (m_d3d11On12Device == nullptr) return;
+
+	D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
+	for (UINT i = 0; i < (UINT)swapChainBC; i++)
+	{
+		if (wrappedBackBuffers[i] == nullptr) {
+			ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(
+				swapChainBuffer[i].Get(),
+				&d3d11Flags,
+				D3D12_RESOURCE_STATE_PRESENT,
+				D3D12_RESOURCE_STATE_RENDER_TARGET,
+				IID_PPV_ARGS(&wrappedBackBuffers[i])
+			));
+		}
+	}
+}
+
+void hlt_D2DResource::Regenerate(int swapChainBC, ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
+{
+	if (m_d3d11On12Device == nullptr) return;
+
+	D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
+	for (UINT i = 0; i < (UINT)swapChainBC; i++)
+	{
+		if (wrappedBackBuffers[i] == nullptr) {
+			ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(
+				swapChainBuffer[i].Get(),
+				&d3d11Flags,
+				D3D12_RESOURCE_STATE_PRESENT,
+				D3D12_RESOURCE_STATE_RENDER_TARGET,
+				IID_PPV_ARGS(&wrappedBackBuffers[i])
+			));
+		}
+	}
+
+	m_IsInitialized = false;
+}
+
+void hlt_D2DResource::Initialize(WCHAR* fontFamilyName, float fontSize, WCHAR* localName, D2D1_COLOR_F fontColor)
+{
+	if (m_d2dContext == nullptr) return;
+
+	if (m_IsInitialized == true)
+		return;
+
+	ComPtr<IDWriteFactory> writeFactory;
+	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &writeFactory));
+
+	ThrowIfFailed(writeFactory->CreateTextFormat(
+		fontFamilyName, nullptr, DWRITE_FONT_WEIGHT_NORMAL,
+		DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+		fontSize, localName, &m_textFormatBody
+	));
+
+	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(fontColor, &m_textBrush));
+
+	m_pFontFamilyName = fontFamilyName;
+	m_FontSize = fontSize;
+	m_pLocalName = localName;
+	m_FontColor = fontColor;
+
+	m_IsInitialized = true;
+}
+
+void hlt_D2DResource::Reinitialize()
+{
+	if (m_d2dContext == nullptr) return;
+
+	if (m_IsInitialized == true)
+		return;
+
+	ComPtr<IDWriteFactory> writeFactory;
+	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &writeFactory));
+
+	ThrowIfFailed(writeFactory->CreateTextFormat(
+		m_pFontFamilyName, nullptr, DWRITE_FONT_WEIGHT_NORMAL,
+		DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+		m_FontSize, m_pLocalName, &m_textFormatBody
+	));
+
+	ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(m_FontColor, &m_textBrush));
+
+	m_IsInitialized = true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void hlt_D2DResource::ReleaseResources(int swapChainBC, ComPtr<ID3D11Resource>* wrappedBackBuffers)
+{
+	for (int i = 0; i < swapChainBC; i++)
+	{
+		wrappedBackBuffers[i].Reset();
+	}
+	if (m_d2dContext)
+	{
+		m_d2dContext->SetTarget(nullptr);
+	}
+	m_IsInitialized = false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void hlt_D2DResource::StartDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
+	if (m_d2dContext == nullptr || m_d3d11On12Device == nullptr || m_d3d11DeviceContext == nullptr) return;
+
 	m_d2dContext->SetTarget(nullptr);
 
 	ComPtr<IDXGISurface> surface;
@@ -23,6 +137,8 @@ void hlt_D2DResource::StartDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wr
 
 void hlt_D2DResource::EndDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers)
 {
+	if (m_d2dContext == nullptr || m_d3d11On12Device == nullptr || m_d3d11DeviceContext == nullptr) return;
+
 	m_d2dContext->EndDraw();
 
 	m_d2dContext->SetTarget(nullptr);
@@ -31,15 +147,67 @@ void hlt_D2DResource::EndDraw(int m_CurrBackBuffer, ComPtr<ID3D11Resource>* wrap
 	m_d3d11DeviceContext->Flush();
 }
 
-
-void hlt_D2DResource::ReleaseResources(int swapChainBC, ComPtr<ID3D11Resource>* wrappedBackBuffers)
+void hlt_D2DResource::Draw()
 {
-	for (int i = 0; i < swapChainBC; i++)
-	{
-		wrappedBackBuffers[i].Reset();
-	}
-	if (m_d2dContext)
-	{
-		m_d2dContext->SetTarget(nullptr);
-	}
+	if (m_d2dContext == nullptr || m_d3d11On12Device == nullptr || m_d3d11DeviceContext == nullptr) return;
+
+	if (m_IsInitialized == false)
+		return;
+
+	//D2D1_RECT_F layoutRect = D2D1::RectF(WindowWidthMiddle - 50, 50.0f, WindowWidthMiddle + 50, 300.0f);
+
+	/*m_d2dContext->DrawText(
+		stats.c_str(),
+		(UINT32)stats.length(),
+		m_textFormatBody.Get(),
+		layoutRect,
+		m_textBrush.Get()
+	);*/
+
+	//DrawRect(0, 0, WindowWidthMiddle * 2, WindowHightMiddle * 2, D2D1::ColorF(D2D1::ColorF::DarkRed), D2D1::ColorF(D2D1::ColorF::DarkRed));
+
+	if(m_pRect != nullptr) m_d2dContext->DrawRectangle(m_pRect, m_RectColor.Get(), 2.0f);
+
+	/*D2D1_RECT_F rect = DrawRect(WindowWidthMiddle - 150, WindowHightMiddle - 50, WindowWidthMiddle + 150, WindowHightMiddle + 50, D2D1::ColorF(D2D1::ColorF::Coral), D2D1::ColorF(D2D1::ColorF::White));
+	std::wstring label = L"FPS: ";*/
+
+	/*m_textFormatBody->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	m_textFormatBody->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);*/
+
+	m_textBrush->SetOpacity(m_TextOpacity);
+
+	m_d2dContext->DrawText(
+		m_Text.c_str(),
+		(UINT32)m_Text.length(),
+		m_textFormatBody.Get(),
+		m_TextArea,
+		m_textBrush.Get()
+	);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+D2D1_RECT_F hlt_D2DResource::MakeRectangle(float left, float top, float right, float bottom, D2D1::ColorF colorBrush, D2D1::ColorF colorRectEdge, float textOpacity)
+{
+	D2D1_RECT_F rect = D2D1::RectF(
+		left, top, right, bottom
+	);
+	ComPtr<ID2D1SolidColorBrush> RectangleColor;
+
+	auto color = colorBrush;
+	m_d2dContext->CreateSolidColorBrush(color, &RectangleColor);
+
+	RectangleColor->SetOpacity(textOpacity);
+
+	m_d2dContext->FillRectangle(rect, RectangleColor.Get());
+
+	RectangleColor->SetColor(colorRectEdge);
+
+	RectangleColor->SetOpacity(textOpacity);
+
+	m_d2dContext->DrawRectangle(rect, RectangleColor.Get(), 2.0f);
+
+	return rect;
 }
