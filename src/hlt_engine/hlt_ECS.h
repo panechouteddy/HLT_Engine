@@ -14,6 +14,9 @@ private:
 	{
 		virtual ~CPool() = default;
 		virtual void Recycle(int entityID, hlt_ECS* ecs) = 0;
+		virtual void SetActive(int ID, bool active, hlt_ECS* ecs) = 0;
+
+		friend hlt_ECS;
 	};
 
 	template <typename T>
@@ -21,7 +24,8 @@ private:
 	{
 		std::vector<T*> wastedComponents;
 
-		void Recycle(int entityID, hlt_ECS* ecs) override;
+		void Recycle(int entityID, hlt_ECS* ecs) override { ; }
+		void SetActive(int ID, bool active, hlt_ECS* ecs) override { ; }
 	};
 
 public:
@@ -44,6 +48,7 @@ public:
 		T* Remove(int ID, bool toDelete = false);
 
 		void Recycle(int entityID, hlt_ECS* ecs) override;
+		void SetActive(int ID, bool active, hlt_ECS* ecs) override;
 	};
 
 private:
@@ -59,6 +64,9 @@ public:
 	void Destroy();
 
 	void Update();
+
+	// Set active all components of the entity
+	void SetActive(int ID, bool active);
 
 	// TO COMPLETELY REMOVE AN ENTITY
 	void RemoveEntity(int ID);
@@ -102,4 +110,6 @@ public:
 private:
 	template <typename T>
 	T* MoveComponent(int ID, std::unordered_map<int, CPool*>* from, std::unordered_map<int, CPool*>* to);
+
+	void Test() { ; }
 };

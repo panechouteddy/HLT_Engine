@@ -41,6 +41,16 @@ void hlt_ECS::Destroy()
 	}
 }
 
+void hlt_ECS::SetActive(int ID, bool active)
+{
+	std::unordered_map<int, CPool*>& fromPool = active == true ? m_InactiveComponents : m_ActiveComponents;
+
+	for (auto& poolPair : fromPool)
+	{
+		poolPair.second->SetActive(ID, active, this);
+	}
+}
+
 void hlt_ECS::RemoveEntity(int ID)
 {
 	for (auto& compPool : m_ActiveComponents)

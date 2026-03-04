@@ -46,6 +46,7 @@ void hlt_SceneManager::LoadScene(int sceneID, hlt_ECS* pECS)
 
     for (int& eID : pScene->activeEntityID)
     {
+        pECS->SetActive(eID, true);
         // ENTITY->SETACTIVE(TRUE)
     }
 }
@@ -56,6 +57,7 @@ void hlt_SceneManager::LoadScene(hlt_Scene* scene, hlt_ECS* pECS)
 
     for (int& eID : scene->activeEntityID)
     {
+        pECS->SetActive(eID, true);
         // ENTITY->SETACTIVE(TRUE)
     }
 }
@@ -68,6 +70,7 @@ void hlt_SceneManager::UnloadScene(int sceneID, hlt_ECS* pECS)
 
     for (int& eID : pScene->activeEntityID)
     {
+        pECS->SetActive(eID, false);
         // ENTITY->SETACTIVE(FALSE)
     }
 }
@@ -78,6 +81,7 @@ void hlt_SceneManager::UnloadScene(hlt_Scene* scene, hlt_ECS* pECS)
 
     for (int& eID : scene->activeEntityID)
     {
+        pECS->SetActive(eID, false);
         // ENTITY->SETACTIVE(FALSE)
     }
 }
