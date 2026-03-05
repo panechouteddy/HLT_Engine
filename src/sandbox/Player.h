@@ -11,6 +11,8 @@ public:
 
 	void TakeDamage();
 
+	bool HaveCollidedWith(int eID);
+
 	int GetHP() { return m_HP; }
 	void SetHP(int hp) { m_HP = hp; }
 

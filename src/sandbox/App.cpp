@@ -46,6 +46,11 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 
+	m_WarpID = HLT_GAMEMANAGER.CreateEntity();
+	ecs->AddComponent<hlt_Component::Transform3D>(m_WarpID);
+	hlt_Component::BoxCollider3D* warpBox = ecs->AddComponent < hlt_Component::BoxCollider3D>(m_WarpID);
+	warpBox->boxType = warpBox->AABB;
+
 	CreateMap();
 
 	m_vEnemys = GenerateWave(m_Difficulty);
@@ -57,13 +62,15 @@ void App::OnUpdate()
 {
 	m_TimeSinceLastHit += HLT_TIME.GetDeltaTime();
 
+	CheckPlayerExit();
+
 	UpdateDifficulty();
 	UpdateEnemies();
 
 	PlayerDied();
 	PlayerShoot();
 
-	UpdateShot();	
+	UpdateShot();
 }
 
 void App::OnExit()
@@ -72,60 +79,61 @@ void App::OnExit()
 
 void App::CreateMap()
 {
-		for (const auto& entry : std::filesystem::directory_iterator(L"..\\..\\res\\Levels"))
+	for (const auto& entry : std::filesystem::directory_iterator(L"..\\..\\res\\Levels"))
+	{
+		std::ifstream file(entry.path());
+		std::string line;
+
+
+		Level* currentLevel = new Level;
+		int x = 0;
+		int y = 0;
+
+		std::vector<char> linevalue;
+
+		while (std::getline(file, line))
 		{
-			std::ifstream file(entry.path());
-			std::string line;
-
-
-			Level* currentLevel = new Level;
-			int x = 0;
-			int y = 0;
-
-			std::vector<char> linevalue;
-
-			while (std::getline(file, line))
+			if (!linevalue.empty())
+				currentLevel->grid.push_back(linevalue);
+			linevalue.clear();
+			y = 0;
+			for (char c : line)
 			{
-				if (!linevalue.empty())
-					currentLevel->grid.push_back(linevalue);
-				linevalue.clear();
-				y = 0;
-				for (char c : line)
+				if (c == '-')
 				{
-					if (c == '-')
-					{
-						x++;
-						m_Levels.push_back(*currentLevel);
-						currentLevel = new Level;
-					}
-					else if (c == ' ')
-					{
-
-
-						continue;
-					}
-					else
-					{
-						linevalue.push_back(c);
-						y++;
-					}
-					if (c == 'B')
-					{
-						currentLevel->spawnPos = { float(x),float(y) };
-						;
-					}
+					x++;
+					m_Levels.push_back(*currentLevel);
+					currentLevel = new Level;
 				}
+				else if (c == ' ')
+				{
 
+
+					continue;
+				}
+				else
+				{
+					linevalue.push_back(c);
+					y++;
+				}
+				if (c == 'B')
+				{
+					currentLevel->spawnPos = { float(x),float(y) };
+					;
+				}
 			}
+
 		}
-		GenerateMap();
+	}
+	GenerateMap();
 }
 
 void App::GenerateMap()
 {
-	int level = 2;
+	int level = 5;
 
 	Map_Mesh* map = new Map_Mesh;
+
 
 	for (int x = 0; x < m_Levels[level].grid.size(); x++)
 	{
@@ -133,34 +141,65 @@ void App::GenerateMap()
 		{
 			if (m_Levels[level].grid[x][y] == 'W')
 			{
-				int eID = hlt_Prefab::GameObject::CreateCube();
+				std::pair<Mesh*, hlt_Transform3D> object;
 
-				hlt_Component::Mesh* eMesh = ecs->GetComponent<hlt_Component::Mesh>(eID);
-				eMesh->mesh.SetColor(hlt_Color::DarkGray);
-				eMesh->mesh.SetTexture("bricks2");
+				object.first = hlt_Prefab::MeshObject::CreateCube();
+				object.first->SetColor(hlt_Color::DarkGray);
+				object.first->SetTexture("bricks2");
 
-				float positionX = 1 * (x - m_Levels[level].spawnPos.x) - 4;
-				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) - 4;
-				hlt_Component::Transform3D* eTransform = ecs->GetComponent<hlt_Component::Transform3D>(eID);
-				eTransform->transform.pos = { positionX , 0 , positionZ };
+				float positionX = 1 * (x - m_Levels[level].spawnPos.x);
+				float positionZ = 1 * (y - m_Levels[level].spawnPos.y);
+
+				hlt_Transform3D transform = {};
+				transform.pos = { positionX,0,positionZ };
+				object.second = transform;
+
+				map->Meshs.push_back(object);
 			}
 			else
 			{
-				int eID = hlt_Prefab::GameObject::CreateCube();
+				std::pair<Mesh*, hlt_Transform3D> ground;
 
-				hlt_Component::Mesh* eMesh = ecs->GetComponent<hlt_Component::Mesh>(eID);
-				eMesh->mesh.SetColor(hlt_Color::DarkGray);
-				eMesh->mesh.SetTexture("grass");
+				ground.first = hlt_Prefab::MeshObject::CreateCube();
+				ground.first = hlt_Prefab::MeshObject::CreateCube();
+				ground.first->SetColor(hlt_Color::DarkGray);
+				ground.first->SetTexture("grass");
 
-				float positionX = 1 * (x - m_Levels[level].spawnPos.x) - 4;
+				float positionX = 1 * (x - m_Levels[level].spawnPos.x);
 				float groundPositionY = -1;
 				float RoofPositionY = 1;
-				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) - 4;
-				hlt_Component::Transform3D* eTransform = ecs->GetComponent<hlt_Component::Transform3D>(eID);
-				eTransform->transform.pos = { positionX,groundPositionY,positionZ };
+				float positionZ = 1 * (y - m_Levels[level].spawnPos.y);
+
+				hlt_Transform3D transform = {};
+				transform.pos = { positionX,groundPositionY,positionZ };
+
+				ground.second = transform;
+				map->Meshs.push_back(ground);
+
+				std::pair<Mesh*, hlt_Transform3D> roof;
+
+				roof.first = hlt_Prefab::MeshObject::CreateCube();
+				roof.first->SetColor(hlt_Color::DarkGray);
+				roof.first->SetTexture("stone");
+
+				transform.pos = { positionX,RoofPositionY,positionZ };
+				roof.second = transform;
+
+				map->Meshs.push_back(roof);
+
+				if (m_Levels[level].grid[x][y] == 'E')
+				{
+					hlt_Component::Transform3D* warpTransform = ecs->GetComponent<hlt_Component::Transform3D>(m_WarpID);
+					if (warpTransform == nullptr && DEBUG) std::cout << "WARP GENERATION ERROR" << std::endl;
+
+					warpTransform->transform.pos = { positionX, 0.f, positionZ };
+				}
 			}
 		}
 	}
+
+	ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos = { 100, 0, m_Levels[level].spawnPos.y };
+	HLT_GAMEMANAGER.CreateMap(map);
 }
 
 std::vector<Enemy*> App::GenerateWave(int count)
@@ -321,4 +360,10 @@ void App::PlayerShoot()
 
 		m_vProjs.push_back(newBullet);
 	}
+}
+
+void App::CheckPlayerExit()
+{
+	if (m_pPlayer->HaveCollidedWith(m_WarpID) == true)
+		GenerateMap();
 }

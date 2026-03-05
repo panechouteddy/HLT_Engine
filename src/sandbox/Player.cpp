@@ -26,3 +26,18 @@ void Player::TakeDamage()
 		m_TimeSinceLastHit = 0.0f;
 	}
 }
+
+bool Player::HaveCollidedWith(int eID)
+{
+	hlt_Component::BoxCollider3D* ownBox = m_pECS->GetComponent<hlt_Component::BoxCollider3D>(m_ID);
+
+	if (ownBox == nullptr) return false;
+
+	for (int i = 0; i < ownBox->collideWith.size(); i++)
+	{
+		if (ownBox->collideWith[i] == eID)
+			return true;
+	}
+
+	return false;
+}

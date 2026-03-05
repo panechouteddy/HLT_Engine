@@ -32,6 +32,7 @@ private:
 
 	void PlayerDied();
 	void PlayerShoot();
+	void CheckPlayerExit();
 
 public:
 	int m_Score = 0;
