@@ -1,6 +1,5 @@
 #include "pch.h"
-//#define constexpr float PI = 3.14f;
-//
+
 hlt_Camera::hlt_Camera()
 {
     m_Transform.pos.z = -5;

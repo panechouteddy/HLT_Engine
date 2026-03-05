@@ -113,8 +113,3 @@ private:
 
 	void Test() { ; }
 };
-
-template<typename T>
-inline void hlt_ECS::Pool<T>::Recycle(int entityID, hlt_ECS* ecs)
-{
-}
