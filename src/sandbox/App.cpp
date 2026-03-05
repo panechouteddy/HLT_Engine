@@ -143,24 +143,28 @@ void App::OnUpdate()
 		Projectile* newBullet = new Projectile();
 		m_EntityID.push_back(newBullet->m_ProjectileID);
 
-		XMFLOAT3 playerPos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
+		hlt_Component::Transform3D* playerTransform = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID);
+		if(playerTransform != nullptr)
+		{
+			XMFLOAT3 playerPos = playerTransform->transform.pos;
 
-		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
-		XMMATRIX invView = XMMatrixInverse(nullptr, view);
+			XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
+			XMMATRIX invView = XMMatrixInverse(nullptr, view);
 
-		XMFLOAT3 forward;
-		XMStoreFloat3(&forward, invView.r[2]);
+			XMFLOAT3 forward;
+			XMStoreFloat3(&forward, invView.r[2]);
 
-		float spawnOffset = 3.f;
-		newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
-		newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
-		newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
+			float spawnOffset = 3.f;
+			newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
+			newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
+			newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
 
-		newBullet->m_dir = forward;
+			newBullet->m_dir = forward;
 
-		newBullet->Move();
+			newBullet->Move();
 
-		m_vProjs.push_back(newBullet);
+			m_vProjs.push_back(newBullet);
+		}
 	}
 	for (int i = 0; i < m_vProjs.size(); i++)
 	{
