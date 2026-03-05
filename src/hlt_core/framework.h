@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <Ws2tcpip.h>
 #include <wrl.h>
+#include <filesystem>
 
 #include <stdlib.h>
 #include <malloc.h>
@@ -64,3 +65,9 @@ using namespace hlt_DebugTools;
 
 // CONST VALUE
 const float PI = 3.1415926535f;
+
+struct Level
+{
+	std::vector<std::vector<char>> grid;
+	XMFLOAT2 spawnPos{};
+};
