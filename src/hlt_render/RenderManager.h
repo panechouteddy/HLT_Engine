@@ -40,7 +40,7 @@ public:
 
     ConstantBuffer* AddConstantBuffer();
     ColorBuffer* AddColorBuffer();
-    void AddMapToRender(Map_Mesh* Map) { m_MapMesh = Map; }
+    void AddMapToRender(Map_Mesh* Map);
 
     void BuildDescriptorHeaps(ID3D12Device* device );
     void BuildRootSignature(ID3D12Device* device);

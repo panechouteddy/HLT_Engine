@@ -19,7 +19,7 @@ Mesh::Mesh()
 
 void Mesh::SetMesh(std::string meshName, XMFLOAT3 color)
 {
-	std::transform(meshName.begin(), meshName.end(), meshName.begin(), std::tolower);
+	//std::transform(meshName.begin(), meshName.end(), meshName.begin(), std::tolower);
 
 	m_pMesh = D3DApp::GetApp()->GetMeshBox()->GetMesh(meshName);
 	if (m_pMesh == nullptr)
@@ -31,7 +31,7 @@ void Mesh::SetMesh(std::string meshName, XMFLOAT3 color)
 
 void Mesh::SetTexture(std::string TextName)
 {
-	std::transform(TextName.begin(), TextName.end(), TextName.begin(), std::tolower);
+	//std::transform(TextName.begin(), TextName.end(), TextName.begin(), std::tolower);
 
 	m_pTexture = D3DApp::GetApp()->GetTextureBox()->GetTexture(TextName);
 }
@@ -285,4 +285,26 @@ void MeshBox::CreateRock(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 	boxGeomety->DrawArgs["rock"] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair("rock", boxGeomety));
+}
+
+Map_Mesh::~Map_Mesh()
+{
+
+	for (auto& m : Meshs)
+	{
+		delete m.first;
+	}
+	Meshs.clear();
+
+	for (auto& c : ColorBuffers)
+	{
+		delete c;
+	}
+	ColorBuffers.clear();
+
+	for (auto& cb : ConstantBuffers)
+	{
+		delete cb;
+	}
+	ConstantBuffers.clear();
 }

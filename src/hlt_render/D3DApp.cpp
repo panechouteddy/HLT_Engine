@@ -70,8 +70,8 @@ bool D3DApp::Initialize()
     hlt_D2DResource::m_d3d11DeviceContext = m_d3d11DeviceContext.Get();
     hlt_D2DResource::m_d3d11On12Device = m_d3d11On12Device.Get();
 
-    m_pSplashScreen = new hlt_SplashScreen(SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
-    m_pSplashScreen->Initialize((WCHAR*)L"Consolas", 20.f, (WCHAR*)L"en-us", D2D1::ColorF(D2D1::ColorF::Black));
+    //m_pSplashScreen = new hlt_SplashScreen(SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    //m_pSplashScreen->Initialize((WCHAR*)L"Consolas", 20.f, (WCHAR*)L"en-us", D2D1::ColorF(D2D1::ColorF::Black));
 
     m_TextureBox = new TextureBox;
     // Do the initial resize code.
@@ -147,12 +147,12 @@ void D3DApp::EndDraw3D()
 
 void D3DApp::StartDraw2D()
 {
-    hlt_D2DResource::StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    //hlt_D2DResource::StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 }
 
 void D3DApp::Draw2D()
 {
-    if (m_IsLoading)
+    /*if (m_IsLoading)
     {
         m_pSplashScreen->Draw();
     }
@@ -160,7 +160,7 @@ void D3DApp::Draw2D()
     {
         for (hlt_D2DResource* resource : m_pUI)
             resource->Draw();
-    }
+    }*/
 
     /*if ( m_SplashScreen->m_Opacity > 0)
         m_SplashScreen->m_Opacity -= 0.01f;
@@ -211,7 +211,7 @@ void D3DApp::OnResize()
     for (hlt_D2DResource* ui : m_pUI)
         ui->ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
 
-    m_pSplashScreen->ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
+    //m_pSplashScreen->ReleaseResources(SwapChainBufferCount, m_wrappedBackBuffers);
 
     assert(m_Device);
     assert(m_SwapChain);
@@ -297,14 +297,14 @@ void D3DApp::OnResize()
     hlt_D2DResource::m_d3d11DeviceContext = m_d3d11DeviceContext.Get();
     hlt_D2DResource::m_d3d11On12Device = m_d3d11On12Device.Get();
 
-    for (hlt_D2DResource* ui : m_pUI)
-    {
-        ui->Regenerate(SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
-        ui->Reinitialize();
-    }
+    //for (hlt_D2DResource* ui : m_pUI)
+    //{
+    //    ui->Regenerate(SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    //    ui->Reinitialize();
+    //}
 
-    m_pSplashScreen->Regenerate(SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
-    m_pSplashScreen->Initialize((WCHAR*)L"Consolas", 20.f, (WCHAR*)L"en-us", D2D1::ColorF(D2D1::ColorF::Black));
+  //  m_pSplashScreen->Regenerate(SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+   // m_pSplashScreen->Initialize((WCHAR*)L"Consolas", 20.f, (WCHAR*)L"en-us", D2D1::ColorF(D2D1::ColorF::Black));
 }
 
 bool D3DApp::InitDirect3D()
@@ -648,4 +648,5 @@ void D3DApp::CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexLis
 void D3DApp::AddMap(Map_Mesh* map)
 {
     m_RenderManager->AddMapToRender(map);
+
 }
