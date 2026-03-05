@@ -5,11 +5,9 @@ class App
 {
 private:
 	static App* s_pInstance;
-	std::vector<Level> m_levels;
 public:
 	App* GetInstance();
 
-		
 public:
 	App();
 	~App() = default;
@@ -18,7 +16,7 @@ public:
 	void OnUpdate();
 	void OnExit();
 	void CreateMap();
-	void GenerateMap();
+
 private:
 	std::vector<int> m_EntityID;
 	int m_PlayerID = -1;

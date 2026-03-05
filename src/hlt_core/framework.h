@@ -21,6 +21,9 @@
 #include <functional>
 #include <cmath>
 #include <emmintrin.h>
+#include <cstdio>
+#include <fcntl.h>
+#include <io.h>
 
 #ifdef _DEBUG
 #include <crtdbg.h>
@@ -61,9 +64,3 @@ using namespace hlt_DebugTools;
 
 // CONST VALUE
 const float PI = 3.1415926535f;
-
-struct Level
-{
-	XMFLOAT2 spawnPos{};
-	std::vector<std::vector<char>> grid;
-};
