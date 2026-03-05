@@ -64,23 +64,7 @@ void hlt_Camera::MouseRotation()
 
 void hlt_Camera::DebugMoveInput()
 {
-    hlt_Input::KeyboardInput& keyboardInput = HLT_KEYBOARD;
-
-    if (keyboardInput.IsKey(VK_Z) || keyboardInput.IsKey(VK_W))
-        m_Transform.Move(1.f * hlt_Time::GetInstance().GetDeltaTime());
-    if (keyboardInput.IsKey(VK_S))
-        m_Transform.Move(-1.f * hlt_Time::GetInstance().GetDeltaTime());
-    if (keyboardInput.IsKey(VK_Q) || keyboardInput.IsKey(VK_A))
-        m_Transform.Move(-1.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
-    if (keyboardInput.IsKey(VK_D))
-        m_Transform.Move(1.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
-    if (keyboardInput.IsKey(VK_SPACE))
-        m_Transform.pos.y += 1.f * hlt_Time::GetInstance().GetDeltaTime();
-    if (keyboardInput.IsKey(VK_LSHIFT))
-        m_Transform.pos.y -= 1.f * hlt_Time::GetInstance().GetDeltaTime();
-    
-    if (keyboardInput.IsKey(VK_A))
-        m_Transform.ResetRotation();
+   
 }
 
 float hlt_Camera::Clamp(float value, float min, float max)

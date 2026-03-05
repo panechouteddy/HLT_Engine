@@ -46,13 +46,11 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 
-	m_WarpID = HLT_GAMEMANAGER.CreateEntity();
-	ecs->AddComponent<hlt_Component::Transform3D>(m_WarpID);
+	m_WarpID = hlt_Prefab::GameObject::CreateCube();
 	hlt_Component::BoxCollider3D* warpBox = ecs->AddComponent < hlt_Component::BoxCollider3D>(m_WarpID);
 	warpBox->boxType = warpBox->AABB;
 
 	CreateMap();
-
 	m_vEnemys = GenerateWave(m_Difficulty);
 
 	m_LastFrameTime = std::chrono::high_resolution_clock::now();
@@ -71,6 +69,33 @@ void App::OnUpdate()
 	PlayerShoot();
 
 	UpdateShot();
+
+	UpdateInput();
+}
+
+void App::UpdateInput()
+{
+	hlt_Input::KeyboardInput& keyboardInput = HLT_KEYBOARD;
+
+	hlt_Transform3D* transform = &ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform;
+
+	if (keyboardInput.IsKey(VK_Z) || keyboardInput.IsKey(VK_W))
+		transform->Move(1.f * hlt_Time::GetInstance().GetDeltaTime());
+	if (keyboardInput.IsKey(VK_S))
+		transform->Move(-1.f * hlt_Time::GetInstance().GetDeltaTime());
+	if (keyboardInput.IsKey(VK_Q) || keyboardInput.IsKey(VK_A))
+		transform->Move(-1.f * hlt_Time::GetInstance().GetDeltaTime(), transform->right);
+	if (keyboardInput.IsKey(VK_D))
+		transform->Move(1.f * hlt_Time::GetInstance().GetDeltaTime(), transform->right);
+	if (keyboardInput.IsKey(VK_SPACE))
+		transform->pos.y += 1.f * hlt_Time::GetInstance().GetDeltaTime();
+	if (keyboardInput.IsKey(VK_LSHIFT))
+		transform->pos.y -= 1.f * hlt_Time::GetInstance().GetDeltaTime();
+
+	if (keyboardInput.IsKey(VK_A))
+		transform->ResetRotation();
+	HLT_GAMEMANAGER.GetCamera()->m_Transform.pos = transform->pos;
+
 }
 
 void App::OnExit()
@@ -193,12 +218,13 @@ void App::GenerateMap()
 					if (warpTransform == nullptr && DEBUG) std::cout << "WARP GENERATION ERROR" << std::endl;
 
 					warpTransform->transform.pos = { positionX, 0.f, positionZ };
+
 				}
 			}
 		}
 	}
 
-	ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos = { 100, 0, m_Levels[level].spawnPos.y };
+	ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos = { m_Levels[level].spawnPos.x, 0, m_Levels[level].spawnPos.y };
 	HLT_GAMEMANAGER.CreateMap(map);
 }
 

@@ -18,6 +18,7 @@ public:
 
 	void OnStart();
 	void OnUpdate();
+	void UpdateInput();
 	void OnExit();
 	void CreateMap();
 	void GenerateMap();
