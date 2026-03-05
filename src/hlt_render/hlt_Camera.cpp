@@ -1,5 +1,9 @@
 #include "pch.h"
 
+#define DEGREE_TO_RADIAN PI / 360.0f
+#define PITCH_MAX 89.0f * DEGREE_TO_RADIAN
+#define PITCH_MIN -89.0f * DEGREE_TO_RADIAN
+
 hlt_Camera::hlt_Camera()
 {
     m_Transform.pos.z = -5;
@@ -7,9 +11,12 @@ hlt_Camera::hlt_Camera()
 	m_width = 2.0f;
 	m_z = 0.0f;
 }
+
 void hlt_Camera::Update()
 {
     if (DEBUG) DebugInput();
+    
+    if (m_IsMouseCamera) MouseCamera();
 
     m_Transform.UpdateWorld();
     XMMATRIX view = XMLoadFloat4x4(&m_Transform.world);
@@ -25,22 +32,9 @@ void hlt_Camera::Update()
     DirectX::XMStoreFloat4x4(&m_Proj, proj);
 }
 
-void hlt_Camera::DebugInput()
+void hlt_Camera::MouseCamera()
 {
     hlt_Input::KeyboardInput& keyboardInput = HLT_KEYBOARD;
-
-    if (keyboardInput.IsKey(VK_Z) || keyboardInput.IsKey(VK_W))
-        m_Transform.Move(1.f * hlt_Time::GetInstance().GetDeltaTime());
-    if (keyboardInput.IsKey(VK_S))
-        m_Transform.Move(-1.f * hlt_Time::GetInstance().GetDeltaTime());
-    if (keyboardInput.IsKey(VK_Q) || keyboardInput.IsKey(VK_A))
-        m_Transform.Move(-1.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
-    if (keyboardInput.IsKey(VK_D))
-        m_Transform.Move(1.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
-    if (keyboardInput.IsKey(VK_SPACE))
-        m_Transform.pos.y += 1.f * hlt_Time::GetInstance().GetDeltaTime();
-    if (keyboardInput.IsKey(VK_LCONTROL))
-        m_Transform.pos.y -= 1.f * hlt_Time::GetInstance().GetDeltaTime();
 
     hlt_Input::MouseInput& mouse = hlt_Input::MouseInput::GetInstance();
 
@@ -51,9 +45,47 @@ void hlt_Camera::DebugInput()
         float yaw = static_cast<float>(delta.x) * CAMERA_SENSIBILITY;
         float pitch = static_cast<float>(delta.y) * CAMERA_SENSIBILITY;
 
-        m_Transform.AddYPR(yaw, pitch, 0.f);
+        float newPitch = m_currentPitch + pitch;
+
+        newPitch = Clamp(newPitch, PITCH_MIN, PITCH_MAX);
+
+        float allowedPitchDelta = newPitch - m_currentPitch;
+
+        m_currentPitch = newPitch;
+
+        m_Transform.AddYPR(yaw, allowedPitchDelta, 0.f);
+
+        if(DEBUG) m_Transform.AddYPR(yaw, pitch, 0.f);
     }
 
     if (keyboardInput.IsKey(VK_A))
         m_Transform.ResetRotation();
+}
+
+void hlt_Camera::DebugInput()
+{
+    hlt_Input::KeyboardInput& keyboardInput = HLT_KEYBOARD;
+
+    if (keyboardInput.IsKey(VK_Z) || keyboardInput.IsKey(VK_W))
+        m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime());
+    if (keyboardInput.IsKey(VK_S))
+        m_Transform.Move(-10.f * hlt_Time::GetInstance().GetDeltaTime());
+    if (keyboardInput.IsKey(VK_Q) || keyboardInput.IsKey(VK_A))
+        m_Transform.Move(-10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
+    if (keyboardInput.IsKey(VK_D))
+        m_Transform.Move(10.f * hlt_Time::GetInstance().GetDeltaTime(), m_Transform.right);
+    if (keyboardInput.IsKey(VK_SPACE))
+        m_Transform.pos.y += 10.f * hlt_Time::GetInstance().GetDeltaTime();
+    if (keyboardInput.IsKey(VK_LSHIFT))
+        m_Transform.pos.y -= 10.f * hlt_Time::GetInstance().GetDeltaTime();
+    
+    if (keyboardInput.IsKey(VK_A))
+        m_Transform.ResetRotation();
+}
+
+float hlt_Camera::Clamp(float value, float min, float max)
+{
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
 }

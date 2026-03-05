@@ -8,5 +8,10 @@ namespace hlt_Component
 		static const int ID = 5;
 
 		::Mesh mesh;
+
+		void Reset()
+		{
+			mesh = ::Mesh();
+		}
 	};
 }

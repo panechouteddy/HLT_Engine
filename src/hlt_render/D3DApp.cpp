@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include <WindowsX.h>
+#include <hlt_engine/framework.h>
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
@@ -75,6 +76,8 @@ bool D3DApp::Initialize()
     m_Camera = new hlt_Camera;
     //m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers, );
     //m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+
+    //ScreenSplash();
 
     InitDirect3DDraw();
 
@@ -163,15 +166,10 @@ void D3DApp::Draw2D()
 
     //    m_TextToDraw.clear();
 
-    //if (m_IsOpacity)
-    //{
-    //    m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-
-    //    m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
-
-    //    m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-    //}
-
+    /*if (m_IsOpacity)
+    {
+        ScreenSplash();
+    }*/
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));
     m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
@@ -611,6 +609,15 @@ void D3DApp::CreateMeshBox()
 {
     m_MeshBox = new MeshBox;
     m_MeshBox->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
+}
+
+void D3DApp::ScreenSplash()
+{
+    m_SplashScreen->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+
+    m_SplashScreen->Draw(m_pWindow->GetWndSize().x * 0.5f, m_pWindow->GetWndSize().y * 0.5f);
+
+    m_SplashScreen->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
 }
 
 void D3DApp::CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)

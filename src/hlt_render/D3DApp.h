@@ -70,6 +70,7 @@ public:
 	MeshBox* GetMeshBox() const;
 	TextureBox* GetTextureBox() const;
 	hlt_Camera* GetCamera() { return m_Camera; }
+	RenderManager* GetRenderManager() { return m_RenderManager; }
 
 	void AddMap(Map_Mesh* map);
 
@@ -108,6 +109,7 @@ protected:
 	void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 	void CreateMeshBox();
 	
+	void ScreenSplash();
 	
 protected:
 	static D3DApp* m_App;
