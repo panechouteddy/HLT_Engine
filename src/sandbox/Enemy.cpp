@@ -31,6 +31,7 @@ void Enemy::Update(int m_PlayerID, std::vector<Enemy*>* enemys)
 	oIsColliding = oBox->isColliding;
 
 	m_CollideOther = false;
+	m_CollidePlayer = false;
 
 	if (oIsColliding == true)
 	{
@@ -45,13 +46,14 @@ void Enemy::Update(int m_PlayerID, std::vector<Enemy*>* enemys)
 					collideEnemy = true;
 				}
 			}
+
 			if (m_vCollideWith[j] == m_PlayerID) //Player
 			{
-				m_CollideOther = true;
+				m_CollidePlayer = true;
 			}
 			else if (collideEnemy == false) m_CollideOther = false;
 		}
-		if(m_CollideOther == false)
+		if(m_CollideOther == false && m_CollidePlayer == false)
 			m_IsDead = true;
 	}
 

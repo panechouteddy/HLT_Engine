@@ -31,7 +31,6 @@ void App::OnStart()
 	m_EntityID.push_back(m_PlayerID);
 
 	ecs = HLT_GAMEMANAGER.GetECS();
-	ecs->AddComponent<hlt_Component::Transform3D>(m_PlayerID);
 	/*hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(m_PlayerID);
 	mesh->mesh.SetMesh("path", hlt_Color::White);*/
 
@@ -52,11 +51,45 @@ void App::OnStart()
 
 	CreateMap();
 
-	m_vEnemys = GenerateWave(m_Easy);
+	m_vEnemys = GenerateWave(m_Difficulty);
+
+	m_LastFrameTime = std::chrono::high_resolution_clock::now();
 }
 
 void App::OnUpdate()
 {
+	auto currentFrameTime = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> elapsed = currentFrameTime - m_LastFrameTime;
+	float deltaTime = elapsed.count();
+	m_LastFrameTime = currentFrameTime;
+
+	m_TimeSinceLastHit += deltaTime;
+
+	if (keyboardInput.IsKeyDown(VK_F1)) 
+	{
+		m_Difficulty = m_Easy;
+		if(m_GameEnd)
+		{
+			Reset();
+		}
+	}
+	else if (keyboardInput.IsKeyDown(VK_F2)) 
+	{
+		m_Difficulty = m_Medium;
+		if (m_GameEnd)
+		{
+			Reset();
+		}
+	}
+	else if (keyboardInput.IsKeyDown(VK_F3)) 
+	{
+		m_Difficulty = m_Hard;
+		if (m_GameEnd)
+		{
+			Reset();
+		}
+	}
+
 	for (int i = 0; i < m_vEnemys.size(); i++)
 	{
 		if (m_vEnemys[i]->m_IsDead)
@@ -70,11 +103,38 @@ void App::OnUpdate()
 		}
 		
 		m_vEnemys[i]->Update(m_PlayerID, &m_vEnemys);
+
+		if (m_TimeSinceLastHit >= m_DamageCooldown)
+		{
+			m_PlayerLife--;
+			m_TimeSinceLastHit = 0.0f;
+		}
 	}
 
-	if (m_vEnemys.empty())
+	if (m_vEnemys.empty() && m_GameEnd == false)
 	{
-		m_vEnemys = GenerateWave(m_Easy);
+		m_vEnemys = GenerateWave(m_Difficulty);
+	}
+
+	
+	if (m_PlayerLife <= 0)
+	{
+		ecs->RemoveEntity(m_PlayerID);
+		for (int i = 0; i < m_vEnemys.size(); i++)
+		{
+			m_vEnemys[i]->m_IsDead = true;
+			m_vEnemys[i]->Update(m_PlayerID, &m_vEnemys);
+			delete m_vEnemys[i];
+			m_vEnemys.erase(m_vEnemys.begin() + i);
+		}
+		for (int i = 0; i < m_vProjs.size(); i++)
+		{
+			m_vProjs[i]->m_IsDead = true;
+			m_vProjs[i]->Update();
+			delete m_vProjs[i];
+			m_vProjs.erase(m_vProjs.begin() + i);
+		}
+		m_GameEnd = true;
 	}
 
 	if (keyboardInput.IsKeyDown(VK_LBUTTON))
@@ -129,12 +189,35 @@ void App::CreateMap()
 	object1.first->SetColor(hlt_Color::Green);
 
 	hlt_Transform3D* transform1 = new hlt_Transform3D;
-	transform1->pos.y = -1;
+	transform1->pos.y = -4;
 	transform1->sca = { 9.5f, 1.5f,9.5f };
 	transform1->UpdateWorld();
 
 	object1.second = transform1;
 	map->Meshs.push_back(object1);
+
+	/*std::pair<Mesh*, hlt_Transform3D*> object2;
+	object2.first = hlt_Prefab::MeshObject::CreateRock();
+	object2.first->SetMeshVisibility(true);
+
+	hlt_Transform3D* transform2 = new hlt_Transform3D;
+	transform2->pos.x = 4;
+	transform2->pos.z = 1;
+	transform2->UpdateWorld();
+	object2.second = transform2;
+	map->Meshs.push_back(object2);
+
+	std::pair<Mesh*, hlt_Transform3D*> object3;
+	object3.first = hlt_Prefab::MeshObject::CreatePyramid();
+	object3.first->SetTexture("bricks3");
+	object3.first->SetMeshVisibility(true);
+
+	hlt_Transform3D* transform3 = new hlt_Transform3D;
+	transform3->pos.x = -2;
+	transform3->pos.z = 1;
+	transform3->UpdateWorld();
+	object3.second = transform3;
+	map->Meshs.push_back(object3);*/
 
 	HLT_GAMEMANAGER.CreateMap(map);
 }
@@ -170,4 +253,18 @@ std::vector<Enemy*> App::GenerateWave(int count)
 		count--;
 	}
 	return enemies;
+}
+
+void App::Reset()
+{
+	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
+	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { 0.0f, 0.5f, 0.f };
+	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
+	oBox->boxType = oBox->OBB;
+	oIsColliding = &oBox->isColliding;
+
+	m_PlayerLife = 10;
+	m_Score = 0;
+
+	m_GameEnd = false;
 }
