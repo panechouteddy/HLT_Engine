@@ -21,5 +21,13 @@ namespace hlt_Component
 		bool isColliding = false;
 
 		std::vector<int> collideWith;
+
+		void Reset()
+		{
+			boxType = BoxType::COUNT;
+			boxAABB = hlt_Box::Box3D_AABB();
+			boxOBB = hlt_Box::Box3D_OBB();
+			isColliding = false;
+		}
 	};
 }

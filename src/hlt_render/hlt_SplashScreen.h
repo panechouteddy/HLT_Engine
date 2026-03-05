@@ -12,4 +12,3 @@ public:
 	void Draw(float WindowWidthMiddle, float WindowHightMiddle);
 	D2D1_RECT_F DrawRect(float left, float top, float right, float bottom, D2D1::ColorF colorBrush, D2D1::ColorF colorRectEdge);
 };
-

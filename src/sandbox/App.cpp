@@ -1,5 +1,9 @@
 #include "pch.h"
 #include "App.h"
+#include "Projectile.h"
+#include "Enemy.h"
+
+#include <random>
 
 App* App::s_pInstance = nullptr;
 
@@ -19,67 +23,96 @@ App::App()
 
 void App::OnStart()
 {
-	std::string path = "../../res/test.obj";
-	hlt_ModelImporter::ImportOBJ(path);
+	/*std::string path = "../../res/test.obj";
+	hlt_ModelImporter::ImportOBJ(path);*/
 
-	hlt_ECS* ecs = HLT_GAMEMANAGER.GetECS();
-
-	m_PlayerID = HLT_GAMEMANAGER.CreateEntity();
+	//m_PlayerID = HLT_GAMEMANAGER.CreateEntity();
+	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
 	m_EntityID.push_back(m_PlayerID);
 
+	ecs = HLT_GAMEMANAGER.GetECS();
 	ecs->AddComponent<hlt_Component::Transform3D>(m_PlayerID);
-	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(m_PlayerID);
+	/*hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(m_PlayerID);
+	mesh->mesh.SetMesh("path", hlt_Color::White);*/
 
-	std::vector<Vertex> vertices =
-	{
-		Vertex({ -1.0f, -1.0f, -1.0f }, { 0.0f, 1.0f }),
-		Vertex({ -1.0f,  1.0f, -1.0f }, { 0.0f, 0.0f }),
-		Vertex({  1.0f,  1.0f, -1.0f }, { 1.0f, 0.0f }),
-		Vertex({  1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f }),
-		Vertex({ -1.0f, -1.0f,  1.0f }, { 1.0f, 1.0f }),
-		Vertex({  1.0f, -1.0f,  1.0f }, { 0.0f, 1.0f }),
-		Vertex({  1.0f,  1.0f,  1.0f }, { 0.0f, 0.0f }),
-		Vertex({ -1.0f,  1.0f,  1.0f }, { 1.0f, 0.0f }),
-		Vertex({ -1.0f,  1.0f, -1.0f }, { 0.0f, 1.0f }),
-		Vertex({ -1.0f,  1.0f,  1.0f }, { 0.0f, 0.0f }),
-		Vertex({  1.0f,  1.0f,  1.0f }, { 1.0f, 0.0f }),
-		Vertex({  1.0f,  1.0f, -1.0f }, { 1.0f, 1.0f }),
-		Vertex({ -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f }),
-		Vertex({  1.0f, -1.0f, -1.0f }, { 0.0f, 1.0f }),
-		Vertex({  1.0f, -1.0f,  1.0f }, { 0.0f, 0.0f }),
-		Vertex({ -1.0f, -1.0f,  1.0f }, { 1.0f, 0.0f }),
-		Vertex({ -1.0f, -1.0f,  1.0f }, { 0.0f, 1.0f }),
-		Vertex({ -1.0f,  1.0f,  1.0f }, { 0.0f, 0.0f }),
-		Vertex({ -1.0f,  1.0f, -1.0f }, { 1.0f, 0.0f }),
-		Vertex({ -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f }),
-		Vertex({  1.0f, -1.0f, -1.0f }, { 0.0f, 1.0f }),
-		Vertex({  1.0f,  1.0f, -1.0f }, { 0.0f, 0.0f }),
-		Vertex({  1.0f,  1.0f,  1.0f }, { 1.0f, 0.0f }),
-		Vertex({  1.0f, -1.0f,  1.0f }, { 1.0f, 1.0f }),
-	};
+	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { 0.0f, 0.5f, 0.f };
+	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
+	oBox->boxType = oBox->OBB;
+	oIsColliding = &oBox->isColliding;
 
-	std::vector<std::uint16_t> indices =
-	{
-		0,1,2,  0,2,3,
-		4,5,6,  4,6,7,
-		8,9,10, 8,10,11,
-		12,13,14, 12,14,15,
-		16,17,18, 16,18,19,
-		20,21,22, 20,22,23
-	};
+	m_pCamera = HLT_CAMERA;
 
-	D3DApp::GetApp()->CreateOriginalMesh("test", vertices, indices);
+	XMFLOAT3 pos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
+	m_pCamera->m_Transform.pos = pos;
+	m_pCamera->m_IsMouseCamera = true;
 
-	mesh->mesh.SetMesh("test", hlt_Color::LightGreen);
+	ecs->AddSystem<hlt_System::BoxCollider>();
+	ecs->AddSystem<hlt_System::ConstantMove>();
+	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 
 	CreateMap();
+
+	m_vEnemys = GenerateWave(m_Easy);
 }
 
 void App::OnUpdate()
 {
-	//if (*pIsColliding == true)
-	//	HLT_GAMEMANAGER.GetECS()->SetComponentActive<hlt_Component::Mesh>(m_TestID, false);
-	//	HLT_GAMEMANAGER.GetECS()->GetComponent<hlt_Component::ConstantMove>(m_TestID)->move = 0.f;
+	for (int i = 0; i < m_vEnemys.size(); i++)
+	{
+		if (m_vEnemys[i]->m_IsDead)
+		{
+			delete m_vEnemys[i];
+			m_vEnemys.erase(m_vEnemys.begin() + i);
+			i--;
+			m_Score++;
+
+			continue;
+		}
+		
+		m_vEnemys[i]->Update(m_PlayerID, &m_vEnemys);
+	}
+
+	if (m_vEnemys.empty())
+	{
+		m_vEnemys = GenerateWave(m_Easy);
+	}
+
+	if (keyboardInput.IsKeyDown(VK_LBUTTON))
+	{
+		Projectile* newBullet = new Projectile();
+		m_EntityID.push_back(newBullet->m_ProjectileID);
+
+		XMFLOAT3 playerPos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
+
+		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
+		XMMATRIX invView = XMMatrixInverse(nullptr, view);
+
+		XMFLOAT3 forward;
+		XMStoreFloat3(&forward, invView.r[2]);
+
+		float spawnOffset = 3.f;
+		newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
+		newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
+		newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
+
+		newBullet->m_dir = forward;
+
+		newBullet->Move();
+
+		m_vProjs.push_back(newBullet);
+	}
+	for (int i = 0; i < m_vProjs.size(); i++)
+	{
+		if (m_vProjs[i]->m_IsDead)
+		{
+			delete m_vProjs[i];
+			m_vProjs.erase(m_vProjs.begin() + i);
+			i--;
+			continue;
+		}
+
+		m_vProjs[i]->Update();
+	}
 }
 
 void App::OnExit()
@@ -97,13 +130,13 @@ void App::CreateMap()
 
 	hlt_Transform3D* transform1 = new hlt_Transform3D;
 	transform1->pos.y = -4;
-	transform1->sca = { 5.f, 1.5f,5.f };
+	transform1->sca = { 9.5f, 1.5f,9.5f };
 	transform1->UpdateWorld();
 
 	object1.second = transform1;
 	map->Meshs.push_back(object1);
 
-	std::pair<Mesh*, hlt_Transform3D*> object2;
+	/*std::pair<Mesh*, hlt_Transform3D*> object2;
 	object2.first = hlt_Prefab::MeshObject::CreateRock();
 	object2.first->SetMeshVisibility(true);
 
@@ -124,7 +157,40 @@ void App::CreateMap()
 	transform3->pos.z = 1;
 	transform3->UpdateWorld();
 	object3.second = transform3;
-	map->Meshs.push_back(object3);
+	map->Meshs.push_back(object3);*/
 
 	HLT_GAMEMANAGER.CreateMap(map);
+}
+
+std::vector<Enemy*> App::GenerateWave(int count) 
+{
+	std::vector<Enemy*> enemies(count);
+	int i = 0;
+
+	while (count != 0)
+	{
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<float> distXZ(-50.0f, 50.0f);
+
+		Enemy* enemy = new Enemy();
+		m_EntityID.push_back(enemy->m_EnemyID);
+
+		enemy->m_pos = { distXZ(gen), 0.5f, distXZ(gen) };
+
+		XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos);
+		XMVECTOR enemyPosVec = XMLoadFloat3(&enemy->m_pos);
+
+		XMVECTOR dirVec = XMVectorSubtract(playerPosVec, enemyPosVec);
+		dirVec = XMVector3Normalize(dirVec);
+
+		XMStoreFloat3(&enemy->m_dir, dirVec);
+
+		enemy->Move();
+
+		enemies[i] = enemy;
+		i++;
+		count--;
+	}
+	return enemies;
 }
