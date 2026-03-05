@@ -15,6 +15,7 @@ public:
 	int m_EnemyID = -1;
 	bool m_IsDead;
 	bool m_CollideOther = false;
+	bool m_CollidePlayer = false;
 
 	std::string m_Tag;
 
