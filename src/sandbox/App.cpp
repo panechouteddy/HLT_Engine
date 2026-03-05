@@ -23,16 +23,16 @@ App::App()
 
 void App::OnStart()
 {
-	std::string path = "../../res/test.obj";
-	hlt_ModelImporter::ImportOBJ(path);
+	/*std::string path = "../../res/test.obj";
+	hlt_ModelImporter::ImportOBJ(path);*/
 
 	m_PlayerID = HLT_GAMEMANAGER.CreateEntity();
 	m_EntityID.push_back(m_PlayerID);
 
 	ecs = HLT_GAMEMANAGER.GetECS();
 	ecs->AddComponent<hlt_Component::Transform3D>(m_PlayerID);
-	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(m_PlayerID);
-	mesh->mesh.SetMesh("path", hlt_Color::White);
+	/*hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(m_PlayerID);
+	mesh->mesh.SetMesh("path", hlt_Color::White);*/
 
 	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { 0.0f, 0.5f, 0.f };
 	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
@@ -41,7 +41,7 @@ void App::OnStart()
 
 	m_pCamera = HLT_CAMERA;
 
-	XMFLOAT3 pos = { 0,0.5f,0.f };
+	XMFLOAT3 pos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
 	m_pCamera->m_Transform.pos = pos;
 	m_pCamera->m_IsMouseCamera = true;
 
@@ -49,7 +49,7 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 
-	CreateMap();
+	//CreateMap();
 
 	m_vEnemys = GenerateWave(m_Easy);
 }
@@ -128,7 +128,7 @@ void App::CreateMap()
 	object1.second = transform1;
 	map->Meshs.push_back(object1);
 
-	std::pair<Mesh*, hlt_Transform3D*> object2;
+	/*std::pair<Mesh*, hlt_Transform3D*> object2;
 	object2.first = hlt_Prefab::MeshObject::CreateRock();
 	object2.first->SetMeshVisibility(true);
 
@@ -149,7 +149,7 @@ void App::CreateMap()
 	transform3->pos.z = 1;
 	transform3->UpdateWorld();
 	object3.second = transform3;
-	map->Meshs.push_back(object3);
+	map->Meshs.push_back(object3);*/
 
 	HLT_GAMEMANAGER.CreateMap(map);
 }
