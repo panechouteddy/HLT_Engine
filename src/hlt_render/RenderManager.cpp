@@ -78,6 +78,7 @@ void RenderManager::UpdateConstantBuffer(std::vector<Mesh*>& meshs, std::vector<
 				if (i >= m_MapMesh->ConstantBuffers.size())
 					m_MapMesh->ConstantBuffers.push_back(AddConstantBuffer());
 
+				m_MapMesh->Meshs[i].second.UpdateWorld();
 				m_MapMesh->ConstantBuffers[i]->m_World = m_MapMesh->Meshs[i].second.world;
 			}
 	}

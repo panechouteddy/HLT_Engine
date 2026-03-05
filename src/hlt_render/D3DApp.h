@@ -77,6 +77,8 @@ public:
 	void AddTextToDraw(std::wstring text, XMFLOAT2 position) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, position}); }
 	void AddTextToDraw(std::wstring text, float x, float y) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, XMFLOAT2{x,y}});}
 
+	void OpenCommandList();
+	void CloseCommandList();
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
@@ -158,7 +160,7 @@ protected:
 	hlt_Camera* m_Camera;
 	//Draw
 	RenderManager* m_RenderManager;
-	MeshBox* m_Box;
+	MeshBox* m_MeshBox;
 	TextureBox* m_TextureBox;
 
 	//Ui

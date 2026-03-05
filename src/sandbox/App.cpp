@@ -22,11 +22,7 @@ void App::OnStart()
 {
 	hlt_ECS* ecs = HLT_GAMEMANAGER.GetECS();
 
-			m_PlayerID = hlt_Prefab::GameObject::CreateCube();
-		m_EntityID.push_back(m_PlayerID);
-		m_PlayerID = hlt_Prefab::GameObject::CreatePyramid();
-		m_EntityID.push_back(m_PlayerID);
-	//CreateMap();
+	CreateMap();
 }
 
 void App::OnUpdate()
@@ -47,25 +43,32 @@ void App::CreateMap()
 		std::ifstream file(entry.path());
 		std::string line;
 		
-		Level currentLevel;
 
+		Level* currentLevel = new Level;
 		int x = 0;
 		int y = 0;
+
+		std::vector<char> linevalue;
+
 		while (std::getline(file, line))
 		{
-			std::vector<char> linevalue;
-
+			if (!linevalue.empty())
+				currentLevel->grid.push_back(linevalue);
+			linevalue.clear();
+			y = 0;
 			for (char c : line)
 			{
 				if (c == '-')
 				{
 					x++;
-					m_levels.push_back(currentLevel);
-					currentLevel.grid.clear();
+					m_levels.push_back(*currentLevel);
+					currentLevel = new Level;
 				}
 				else if (c == ' ')
 				{
-					currentLevel.grid.push_back(linevalue);
+					
+					
+					continue;
 				}
 				else
 				{
@@ -74,7 +77,7 @@ void App::CreateMap()
 				}
 				if (c == 'B')
 				{
-					currentLevel.spawnPos = { float(x),float(y) };
+					currentLevel->spawnPos = { float(x),float(y) };
 					;
 				}
 			}
@@ -86,7 +89,7 @@ void App::CreateMap()
 
 void App::GenerateMap()
 {
-	int level = 1;
+	int level = 2;
 
 	Map_Mesh* map = new Map_Mesh;
 
@@ -103,8 +106,8 @@ void App::GenerateMap()
 				object.first->SetColor(hlt_Color::DarkGray);
 				object.first->SetTexture("bricks2");
 
-				float positionX = 4 * (x - m_levels[level].spawnPos.x);
-				float positionZ = 4 * (y - m_levels[level].spawnPos.y);
+				float positionX = 1 * (x - m_levels[level].spawnPos.x) - 4;
+				float positionZ = 1 * (y - m_levels[level].spawnPos.y) - 4;
 
 				hlt_Transform3D transform = {};
 				transform.pos = { positionX,0,positionZ };
@@ -121,8 +124,8 @@ void App::GenerateMap()
 				ground.first->SetTexture("grass");
 
 				float positionX = 4 * (x - m_levels[level].spawnPos.x);
-				float groundPositionY = -4;
-				float RoofPositionY = 4;
+				float groundPositionY = -1;
+				float RoofPositionY = 1;
 				float positionZ = 4 * (y - m_levels[level].spawnPos.y);
 
 				hlt_Transform3D transform = {};
