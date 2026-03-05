@@ -126,7 +126,7 @@ void D3DApp::StartDraw3D()
     m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
 
     D3D12_CPU_DESCRIPTOR_HANDLE currentBackBufferView = CurrentBackBufferView();
-    m_CommandList->ClearRenderTargetView(currentBackBufferView, Colors::LightSteelBlue, 0, nullptr);
+    m_CommandList->ClearRenderTargetView(currentBackBufferView, Colors::Black, 0, nullptr);
 
     D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = DepthStencilView();
     m_CommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
