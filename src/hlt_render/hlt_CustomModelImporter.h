@@ -92,6 +92,23 @@ namespace hlt_ModelImporter
                 vertices.push_back(vertex);
                 indices.push_back(vertices.size() - 1);
             }
+            /*face faceID = faces[i];
+
+            Vertex vertex;
+            vertex.Pos = vertexPos[faceID.vertexID[0] - 1];
+            vertex.TexC = uv[faceID.vertexID[0] - 1];
+            vertices.push_back(vertex);
+            indices.push_back(vertices.size() - 1);
+            vertex;
+            vertex.Pos = vertexPos[faceID.vertexID[2] - 1];
+            vertex.TexC = uv[faceID.vertexID[2] - 1];
+            vertices.push_back(vertex);
+            indices.push_back(vertices.size() - 1);
+            vertex;
+            vertex.Pos = vertexPos[faceID.vertexID[1] - 1];
+            vertex.TexC = uv[faceID.vertexID[1] - 1];
+            vertices.push_back(vertex);
+            indices.push_back(vertices.size() - 1);*/
         }
 
         // Utiliser GetApp() (avec parenthèses) pour récupérer le pointeur vers l'application.
