@@ -81,6 +81,7 @@ public:
 	void CloseCommandList();
 
 	std::wstring m_TextToDraw;
+	std::wstring m_TextLife;
 
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();

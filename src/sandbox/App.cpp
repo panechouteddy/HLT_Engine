@@ -59,6 +59,8 @@ void App::OnStart()
 void App::OnUpdate()
 {
 	HLT_D3DAPP->m_TextToDraw = L"Score : " + std::to_wstring(m_Score);
+	HLT_D3DAPP->m_TextLife = L"PV : " + std::to_wstring(m_PlayerLife);
+
 	auto currentFrameTime = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsed = currentFrameTime - m_LastFrameTime;
 	float deltaTime = elapsed.count();

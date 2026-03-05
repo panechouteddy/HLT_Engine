@@ -77,6 +77,7 @@ bool D3DApp::Initialize()
     m_Camera = new hlt_Camera;
 
     m_TextToDraw = L"Score : ";
+    m_TextToDraw = L"PV : ";
 
     m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
         SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers, const_cast<WCHAR*>(m_FontFamily), 20.f, const_cast<WCHAR*>(m_LocalName), D2D1::ColorF(D2D1::ColorF::White));
@@ -168,6 +169,7 @@ void D3DApp::Draw2D()
     {
         m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
         m_UI->Draw(m_pWindow->GetWndSize().x * 0.5f, m_TextToDraw);
+        m_UI->Draw((m_pWindow->GetWndSize().x * 0.5f) * 0.5f, m_TextLife);
         m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
     }
 
