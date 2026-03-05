@@ -70,6 +70,7 @@ void hlt_Transform3D::AddYPR(FXMVECTOR ypr)
 
 	XMVECTOR axisDir = XMLoadFloat3(&front);
 	XMVECTOR axisRight = XMLoadFloat3(&right);
+	//XMVECTOR axisUp = XMLoadFloat3(&up);
 	XMVECTOR axisUp = XMVectorSet(0, 1, 0, 0);
 
 	XMVECTOR qRot = XMLoadFloat4(&quaternion);

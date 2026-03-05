@@ -19,7 +19,7 @@ Mesh::Mesh()
 
 void Mesh::SetMesh(std::string meshName, XMFLOAT3 color)
 {
-	std::transform(meshName.begin(), meshName.end(), meshName.begin(), std::tolower);
+	//std::transform(meshName.begin(), meshName.end(), meshName.begin(), std::tolower);
 
 	m_pMesh = D3DApp::GetApp()->GetMeshBox()->GetMesh(meshName);
 	if (m_pMesh == nullptr)
@@ -31,7 +31,7 @@ void Mesh::SetMesh(std::string meshName, XMFLOAT3 color)
 
 void Mesh::SetTexture(std::string TextName)
 {
-	std::transform(TextName.begin(), TextName.end(), TextName.begin(), std::tolower);
+	//std::transform(TextName.begin(), TextName.end(), TextName.begin(), std::tolower);
 
 	m_pTexture = D3DApp::GetApp()->GetTextureBox()->GetTexture(TextName);
 }
@@ -46,7 +46,7 @@ MeshGeometry* Mesh::GetGeometry()
 void MeshBox::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	CreatePyramid(device,commandList);
-	CreateCube(device,commandList);
+	//CreateCube(device,commandList);
 	CreateRock(device, commandList);
 }
 
@@ -54,6 +54,8 @@ void MeshBox::CreateMesh(std::string name ,std::vector<Vertex>& vertexList, std:
 {
 	if (IsAllreadyCreated(name))
 		return;
+
+	D3DApp::GetApp()->OpenCommandList();
 
 	const UINT vbByteSize = (UINT)vertexList.size() * sizeof(Vertex);
 	const UINT ibByteSize = (UINT)indexList.size() * sizeof(std::uint16_t);
@@ -80,6 +82,8 @@ void MeshBox::CreateMesh(std::string name ,std::vector<Vertex>& vertexList, std:
 	boxGeomety->DrawArgs[name] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair(name, boxGeomety));
+
+	D3DApp::GetApp()->CloseCommandList();
 }
 
 void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
@@ -282,4 +286,26 @@ void MeshBox::CreateRock(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 	boxGeomety->DrawArgs["rock"] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair("rock", boxGeomety));
+}
+
+Map_Mesh::~Map_Mesh()
+{
+
+	for (auto& m : Meshs)
+	{
+		delete m.first;
+	}
+	Meshs.clear();
+
+	for (auto& c : ColorBuffers)
+	{
+		delete c;
+	}
+	ColorBuffers.clear();
+
+	for (auto& cb : ConstantBuffers)
+	{
+		delete cb;
+	}
+	ConstantBuffers.clear();
 }
