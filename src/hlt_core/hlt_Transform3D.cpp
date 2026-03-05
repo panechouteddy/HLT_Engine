@@ -63,14 +63,14 @@ void hlt_Transform3D::SetRotationFromQuaternion()
 	front.z = rotation._33;
 }
 
-void hlt_Transform3D::AddYPR(FXMVECTOR ypr)
+void hlt_Transform3D::AddYPR(FXMVECTOR ypr, bool onWorldUp)
 {
 	XMFLOAT3 yprVector;
 	XMStoreFloat3(&yprVector, ypr);
 
 	XMVECTOR axisDir = XMLoadFloat3(&front);
 	XMVECTOR axisRight = XMLoadFloat3(&right);
-	XMVECTOR axisUp = XMVectorSet(0, 1, 0, 0);
+	XMVECTOR axisUp = onWorldUp ? XMVectorSet(0, 1, 0, 0) : XMLoadFloat3(&up);
 
 	XMVECTOR qRot = XMLoadFloat4(&quaternion);
 	if (yprVector.z)
@@ -86,16 +86,16 @@ void hlt_Transform3D::AddYPR(FXMVECTOR ypr)
 	SetRotationFromQuaternion();
 }
 
-void hlt_Transform3D::AddYPR(float yaw, float pitch, float raw)
+void hlt_Transform3D::AddYPR(float yaw, float pitch, float raw, bool onWorldUp)
 {
 	XMFLOAT3 ypr{ yaw, pitch, raw };
-	AddYPR(XMLoadFloat3(&ypr));
+	AddYPR(XMLoadFloat3(&ypr), onWorldUp);
 }
 
 void hlt_Transform3D::SetYPR(FXMVECTOR ypr)
 {
 	ResetRotation();
-	AddYPR(ypr);
+	AddYPR(ypr, true);
 }
 
 void hlt_Transform3D::OrbitAround()

@@ -22,10 +22,10 @@ public:
 	hlt_Camera();
 
 	void Update();
-	void MouseCamera();
+	void MouseRotation();
 
 private:
-	void DebugInput();
+	void DebugMoveInput();
 
 	static float Clamp(float value, float min = 0.0f, float max = 1.0f);
 };

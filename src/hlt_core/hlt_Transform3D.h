@@ -46,8 +46,8 @@ public:
 	void Identity();
 	void SetRotation(hlt_Transform3D& transform);
 	void SetRotationFromQuaternion();
-	void AddYPR(FXMVECTOR ypr);
-	void AddYPR(float yaw, float pitch, float raw);
+	void AddYPR(FXMVECTOR ypr, bool onWorldUp = false);
+	void AddYPR(float yaw, float pitch, float raw, bool onWorldUp = false);
 	void SetYPR(FXMVECTOR ypr);
 
 	void OrbitAround();
