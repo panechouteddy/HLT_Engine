@@ -122,7 +122,7 @@ void App::CreateMap()
 
 	hlt_Transform3D* transform1 = new hlt_Transform3D;
 	transform1->pos.y = -4;
-	transform1->sca = { 5.f, 0.1f,5.f };
+	transform1->sca = { 5.f, 1.5f,5.f };
 	transform1->UpdateWorld();
 
 	object1.second = transform1;

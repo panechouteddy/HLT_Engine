@@ -187,6 +187,7 @@ void MeshBox::CreateCube(ID3D12Device* device, ID3D12GraphicsCommandList* comman
 	MeshGeometry* boxGeomety = new MeshGeometry;
 	boxGeomety->Name = "cube";
 
+
 	boxGeomety->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(device, commandList, vertices.data(), vbByteSize, boxGeomety->VertexBufferUploader);
 
 	boxGeomety->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(device, commandList, indices.data(), ibByteSize, boxGeomety->IndexBufferUploader);
