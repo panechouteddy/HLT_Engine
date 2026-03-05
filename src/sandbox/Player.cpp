@@ -7,6 +7,8 @@ Player::Player(hlt_ECS* ecs)
 	m_pECS = ecs;
 	m_ID = hlt_Prefab::GameObject::CreateCube();
 	m_pTransform = ecs->GetComponent<hlt_Component::Transform3D>(m_ID);
+	m_pTransform->transform.SetScale(0.5f);
+	m_pTransform->transform.pos.y = -0.5f;
 
 	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_ID);
 	oBox->boxType = oBox->OBB;

@@ -49,6 +49,7 @@ bool hlt_Box::Box3D_AABB::Contains(Box3D_OBB obb)
 hlt_Box::Box3D_AABB hlt_Box::Box3D_AABB::operator+(hlt_Transform3D boxPos)
 {
 	m_Box.Center = boxPos.pos;
+	m_Box.Extents = { boxPos.pos.x / 2.f, boxPos.pos.y / 2.f, boxPos.pos.z / 2.f };
 	return *this;
 }
 
@@ -91,6 +92,7 @@ bool hlt_Box::Box3D_OBB::Contains(Box3D_AABB aabb)
 hlt_Box::Box3D_OBB hlt_Box::Box3D_OBB::operator+(hlt_Transform3D boxPos)
 {
 	m_Box.Center = boxPos.pos;
+	m_Box.Extents = { boxPos.pos.x / 2.f, boxPos.pos.y / 2.f, boxPos.pos.z / 2.f };
 	return *this;
 }
 
