@@ -80,6 +80,8 @@ public:
 	void OpenCommandList();
 	void CloseCommandList();
 
+	std::wstring m_TextToDraw;
+
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
 	
@@ -171,8 +173,6 @@ protected:
 	//Ui
 	std::vector<hlt_D2DResource*> m_pUI;
 	hlt_SplashScreen* m_pSplashScreen = nullptr;
-
-	std::wstring m_TextToDraw;
 
 	const WCHAR* m_FontFamily = L"Consolas";
 	const WCHAR* m_LocalName = L"en-us";
