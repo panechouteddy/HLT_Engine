@@ -11,7 +11,7 @@ Player::Player(hlt_ECS* ecs)
 	m_pTransform->transform.pos.y = -0.5f;
 
 	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_ID);
-	oBox->boxType = oBox->OBB;
+	oBox->boxType = oBox->AABB;
 	m_IsColliding = &oBox->isColliding;
 }
 

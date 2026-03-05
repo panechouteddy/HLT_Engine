@@ -4,6 +4,7 @@
 class Projectile;
 class Enemy;
 class Player;
+class SwitchDirectionObject;
 
 class App
 {
@@ -19,13 +20,14 @@ public:
 	void OnStart();
 	void OnUpdate();
 	void OnExit();
+
+private:
 	void CreateMap();
 	void GenerateMap();
 
 	std::vector<Enemy*> GenerateWave(int count);
 	void Reset();
 
-private:
 	void UpdateEnemies();
 	void UpdateShot();
 	void UpdateDifficulty();
@@ -42,6 +44,7 @@ private:
 	std::vector<Projectile*> m_vProjs;
 	std::vector<Enemy*> m_vEnemys;
 	std::vector<Level> m_Levels;
+	std::vector<SwitchDirectionObject> switchs;
 
 	std::vector<int> m_EntityID;
 	Player* m_pPlayer = nullptr;

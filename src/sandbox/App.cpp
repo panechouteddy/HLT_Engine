@@ -3,6 +3,7 @@
 #include "Projectile.h"
 #include "Enemy.h"
 #include "Player.h"
+#include "SwitchDirectionObject.h"
 
 #include <random>
 
@@ -31,6 +32,9 @@ void App::OnStart()
 	ecs = HLT_GAMEMANAGER.GetECS();
 
 	m_pPlayer = new Player(ecs);
+	hlt_Component::ConstantMove* cMovePlayer = ecs->AddComponent<hlt_Component::ConstantMove>(m_pPlayer->m_ID);
+	cMovePlayer->dir = { 0, 0, -1 };
+	cMovePlayer->move = 1.f;
 
 	m_pCamera = HLT_CAMERA;
 
@@ -40,7 +44,7 @@ void App::OnStart()
 
 	ecs->AddSystem<hlt_System::BoxCollider>();
 	ecs->AddSystem<hlt_System::ConstantMove>();
-	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
+	//ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 
 	m_WarpID = HLT_GAMEMANAGER.CreateEntity();
 	ecs->AddComponent<hlt_Component::Transform3D>(m_WarpID);
@@ -68,6 +72,9 @@ void App::OnUpdate()
 	PlayerShoot();
 
 	UpdateShot();
+
+	for (SwitchDirectionObject& obj : switchs)
+		obj.Update();
 }
 
 void App::OnExit()
@@ -104,8 +111,6 @@ void App::CreateMap()
 				}
 				else if (c == ' ')
 				{
-
-
 					continue;
 				}
 				else
@@ -131,6 +136,7 @@ void App::GenerateMap()
 
 	Map_Mesh* map = new Map_Mesh;
 
+	switchs.clear();
 
 	for (int x = 0; x < m_Levels[level].grid.size(); x++)
 	{
@@ -157,7 +163,6 @@ void App::GenerateMap()
 			{
 				std::pair<Mesh*, hlt_Transform3D> ground;
 
-				ground.first = hlt_Prefab::MeshObject::CreateCube();
 				ground.first = hlt_Prefab::MeshObject::CreateCube();
 				ground.first->SetColor(hlt_Color::DarkGray);
 				ground.first->SetTexture("grass");
@@ -190,6 +195,33 @@ void App::GenerateMap()
 					if (warpTransform == nullptr && DEBUG) std::cout << "WARP GENERATION ERROR" << std::endl;
 
 					warpTransform->transform.pos = { positionX, 0.f, positionZ };
+					switchs.push_back(SwitchDirectionObject(ecs));
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 0, 0, -1 });
+					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
+				}
+				else if (m_Levels[level].grid[x][y] == '>')
+				{
+					switchs.push_back(SwitchDirectionObject(ecs));
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 0, 0, -1 });
+					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
+				}
+				else if (m_Levels[level].grid[x][y] == '<')
+				{
+					switchs.push_back(SwitchDirectionObject(ecs));
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 0, 0, 1 });
+					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
+				}
+				else if (m_Levels[level].grid[x][y] == 'v')
+				{
+					switchs.push_back(SwitchDirectionObject(ecs));
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ -1, 0, 0 });
+					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
+				}
+				else if (m_Levels[level].grid[x][y] == '^')
+				{
+					switchs.push_back(SwitchDirectionObject(ecs));
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 1, 0, 0 });
+					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
 				}
 			}
 		}
