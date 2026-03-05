@@ -6,7 +6,7 @@
 
 hlt_Camera::hlt_Camera()
 {
-    m_Transform.pos.z = -5;
+    m_Transform.pos.z = -0;
 	m_height = 5.0f;
 	m_width = 2.0f;
 	m_z = 0.0f;

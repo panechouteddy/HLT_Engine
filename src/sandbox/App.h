@@ -43,6 +43,7 @@ private:
 
 	std::vector<int> m_EntityID;
 	Player* m_pPlayer = nullptr;
+	int m_WarpID = -1;
 
 	hlt_ECS* ecs = nullptr;
 	hlt_Camera* m_pCamera = nullptr;
