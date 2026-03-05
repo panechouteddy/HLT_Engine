@@ -126,7 +126,7 @@ void D3DApp::StartDraw3D()
     m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
 
     D3D12_CPU_DESCRIPTOR_HANDLE currentBackBufferView = CurrentBackBufferView();
-    m_CommandList->ClearRenderTargetView(currentBackBufferView, Colors::LightSteelBlue, 0, nullptr);
+    m_CommandList->ClearRenderTargetView(currentBackBufferView, Colors::Black, 0, nullptr);
 
     D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = DepthStencilView();
     m_CommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
@@ -335,8 +335,7 @@ bool D3DApp::InitD3D11On12()
 
 void D3DApp::InitDirect3DDraw()
 {
-    ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
-    m_DirectCmdListAlloc->Reset();
+    OpenCommandList();
 
     m_RenderManager = new RenderManager(m_CommandList.Get(),m_DirectCmdListAlloc.Get());
     m_TextureBox->LoadAllTexture();
@@ -349,11 +348,7 @@ void D3DApp::InitDirect3DDraw()
     CreateMeshBox();
     m_TextureBox->CreateDefaultTexture();
 
-    ThrowIfFailed(m_CommandList->Close());
-    ID3D12CommandList* cmdsLists2[] = { m_CommandList.Get()};
-    m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists2), cmdsLists2);
-
-   FlushCommandQueue();
+    CloseCommandList();
 }
 
 void D3DApp::CreateCommandObjects()
@@ -391,6 +386,21 @@ void D3DApp::CreateSwapChain()
     sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     ThrowIfFailed(m_DxgiFactory->CreateSwapChain(m_CommandQueue.Get(), &sd, m_SwapChain.GetAddressOf()));
+}
+
+void D3DApp::OpenCommandList()
+{
+    ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
+    m_DirectCmdListAlloc->Reset();
+}
+
+void D3DApp::CloseCommandList()
+{
+    ThrowIfFailed(m_CommandList->Close());
+    ID3D12CommandList* cmdsLists2[] = { m_CommandList.Get() };
+    m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists2), cmdsLists2);
+
+    FlushCommandQueue();
 }
 
 void D3DApp::CreateRtvAndDsvDescriptorHeaps()
@@ -448,7 +458,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE D3DApp::DepthStencilView()const
 }
 MeshBox* D3DApp::GetMeshBox() const
 {
-    return m_Box;
+    return m_MeshBox;
 }
 TextureBox* D3DApp::GetTextureBox() const
 {
@@ -597,8 +607,8 @@ void D3DApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 
 void D3DApp::CreateMeshBox()
 {
-    m_Box = new MeshBox;
-    m_Box->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
+    m_MeshBox = new MeshBox;
+    m_MeshBox->CreateAllMesh(m_Device.Get(), m_CommandList.Get());
 }
 
 void D3DApp::ScreenSplash()
@@ -612,7 +622,7 @@ void D3DApp::ScreenSplash()
 
 void D3DApp::CreateOriginalMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
 {
-    m_Box->CreateMesh(name, vertexList, indexList);
+    m_MeshBox->CreateMesh(name, vertexList, indexList);
 }
 
 void D3DApp::AddMap(Map_Mesh* map)

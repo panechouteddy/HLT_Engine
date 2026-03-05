@@ -50,13 +50,12 @@ void MeshBox::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* com
 	CreateRock(device, commandList);
 }
 
-
-
-
 void MeshBox::CreateMesh(std::string name ,std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
 {
 	if (IsAllreadyCreated(name))
 		return;
+
+	D3DApp::GetApp()->OpenCommandList();
 
 	const UINT vbByteSize = (UINT)vertexList.size() * sizeof(Vertex);
 	const UINT ibByteSize = (UINT)indexList.size() * sizeof(std::uint16_t);
@@ -83,6 +82,8 @@ void MeshBox::CreateMesh(std::string name ,std::vector<Vertex>& vertexList, std:
 	boxGeomety->DrawArgs[name] = submesh;
 
 	m_BoxOfMesh.insert(std::make_pair(name, boxGeomety));
+
+	D3DApp::GetApp()->CloseCommandList();
 }
 
 void MeshBox::CreatePyramid(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)

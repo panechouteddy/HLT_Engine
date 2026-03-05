@@ -11,6 +11,7 @@ struct Vertex
 {
     XMFLOAT3 Pos;
     XMFLOAT2 TexC;
+    //XMFLOAT3 normal;
 };
 
 class Mesh
