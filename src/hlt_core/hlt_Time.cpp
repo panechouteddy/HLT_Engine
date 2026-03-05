@@ -30,8 +30,11 @@ void hlt_Time::Update()
     DWORD currentTime = timeGetTime();
 
     DWORD dt = m_SystemTime - currentTime;
-    if (dt > 30)
-        dt = 30;
+    if(m_MaxDeltaTime >= 0.f)
+    {
+        if (dt > m_MaxDeltaTime)
+            dt = m_MaxDeltaTime;
+    }
 
 	m_SystemTime = currentTime;
     m_DeltaTime = dt / 1000.f;

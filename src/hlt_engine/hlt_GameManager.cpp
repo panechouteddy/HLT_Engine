@@ -124,9 +124,12 @@ void hlt_GameManager::UpdateFps()
 	if (frameCnt >= 100)
 	{
 		int currentTime = HLT_TIME.GetTotalTime();
-		fps = frameCnt / (currentTime - lastTime) ;
-		lastTime = currentTime;
-		frameCnt = 0;
+		if(currentTime - lastTime != 0)
+		{
+			fps = frameCnt / (currentTime - lastTime);
+			lastTime = currentTime;
+			frameCnt = 0;
+		}
 	}
 	std::wstring text = L"FPS: " + std::to_wstring(fps);
 

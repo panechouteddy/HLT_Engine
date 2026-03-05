@@ -23,6 +23,7 @@ App::App()
 
 void App::OnStart()
 {
+	HLT_TIME.SetMaxDeltaTime(30.f);
 	/*std::string path = "../../res/test.obj";
 	hlt_ModelImporter::ImportOBJ(path);*/
 

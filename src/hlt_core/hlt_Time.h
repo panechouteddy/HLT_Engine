@@ -9,6 +9,7 @@ private:
 private:
 	DWORD m_SystemTime;
 	float  m_DeltaTime;
+	float m_MaxDeltaTime = -1.f;
 	float m_TotalTime;
 
 private:
@@ -22,6 +23,7 @@ public:
 
 	void Update();
 
+	void SetMaxDeltaTime(float maxDT) { m_MaxDeltaTime = maxDT; }
 	const float& GetDeltaTime() { return m_DeltaTime; }
 	const float& GetTotalTime() { return m_TotalTime; }
 };
