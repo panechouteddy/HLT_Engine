@@ -47,7 +47,7 @@ inline T* hlt_ECS::ComponentPool<T>::Add(int ID, T* pComponent)
 
 	if (ID >= entityID.size())
 	{
-		for (int i = entityID.size(); i < ID + 1; i++)
+		for (size_t i = entityID.size(); i < ID + 1; i++)
 			entityID.push_back(MISS_COMPONENT);
 	}
 

@@ -34,8 +34,8 @@ private:
 	int m_PlayerID = -1;
 	int m_PlayerLife = 10;
 
-	hlt_ECS* ecs;
-	hlt_Camera* m_pCamera;
+	hlt_ECS* ecs = nullptr;
+	hlt_Camera* m_pCamera = nullptr;
 
 	bool* pIsColliding = nullptr;
 	bool* oIsColliding = nullptr;
