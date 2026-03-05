@@ -18,6 +18,7 @@ public:
 
 	hlt_ToCall& GetAppMainMethods() { return m_AppToCall; }
 	hlt_ECS* GetECS() { return &m_ECS; }
+	hlt_Camera* GetCamera() { return m_pCamera; }
 
 	int CreateEntity() { return m_EntityManager.CreateEntity(); }
 	void DeleteEntity(int ID) { return m_EntityManager.DeleteEntity(ID); }
@@ -28,6 +29,7 @@ public:
 
 	void CreateMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
 	void CreateMap(Map_Mesh* map);
+	void UpdateFps();
 	
 private:
 	void Update();

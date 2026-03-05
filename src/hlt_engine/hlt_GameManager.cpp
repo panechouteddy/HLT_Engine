@@ -113,6 +113,26 @@ void hlt_GameManager::CreateMap(Map_Mesh* map)
 	m_pD3D12App->AddMap(map);
 }
 
+void hlt_GameManager::UpdateFps()
+{
+	static int fps = 0;
+	static int frameCnt = 0;
+	static int lastTime = HLT_TIME.GetTotalTime();
+
+	frameCnt++;
+
+	if (frameCnt >= 100)
+	{
+		int currentTime = HLT_TIME.GetTotalTime();
+		fps = frameCnt / (currentTime - lastTime) ;
+		lastTime = currentTime;
+		frameCnt = 0;
+	}
+	std::wstring text = L"FPS: " + std::to_wstring(fps);
+
+	m_pD3D12App->AddTextToDraw(text, m_pWindow->GetWndSize().x, 0);
+}
+
 void hlt_GameManager::Update()
 {
 	// ENGINE CORE UPDATE
@@ -128,6 +148,7 @@ void hlt_GameManager::Update()
 	m_pWindow->OnUpdate();
 
 	// DX12 UPDATES
+	UpdateFps();
 	RefreshTransformsMatrix();
 	m_EntityManager.UpdateMeshTransform();
 
@@ -139,7 +160,7 @@ void hlt_GameManager::Update()
 
 void hlt_GameManager::Render()
 {
-	m_pD3D12App->Draw(m_EntityManager.GetMeshs(), m_EntityManager.GetTransforms());
+	m_pD3D12App->DrawRender(m_EntityManager.GetMeshs());
 }
 
 void hlt_GameManager::Destroy()
@@ -197,7 +218,10 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 			m_pWindow->IsMini() = false;
 			m_pWindow->IsMaxi() = true;
 			if(m_pD3D12App != nullptr)
+			{
 				m_pD3D12App->OnResize();
+				m_pD3D12App->SetSize(m_pWindow->GetWndSize());
+			}
 		}
 		else if (wParam == SIZE_RESTORED)
 		{
@@ -207,7 +231,10 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 				m_pWindow->IsPaused() = false;
 				m_pWindow->IsMini() = false;
 				if (m_pD3D12App != nullptr)
+				{
 					m_pD3D12App->OnResize();
+					m_pD3D12App->SetSize(m_pWindow->GetWndSize());
+				}
 			}
 
 			// Restoring from maximized state?
@@ -216,7 +243,10 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 				m_pWindow->IsPaused() = false;
 				m_pWindow->IsMaxi() = false;
 				if (m_pD3D12App != nullptr)
+				{
 					m_pD3D12App->OnResize();
+					m_pD3D12App->SetSize(m_pWindow->GetWndSize());
+				}
 			}
 			else if (m_pWindow->IsResizing())
 			{
@@ -232,7 +262,10 @@ LRESULT hlt_GameManager::WndProc(HWND& hwnd, UINT& msg, WPARAM& wParam, LPARAM& 
 			else // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
 			{
 				if (m_pD3D12App != nullptr)
+				{
 					m_pD3D12App->OnResize();
+					m_pD3D12App->SetSize(m_pWindow->GetWndSize());
+				}
 			}
 		}
 		return 0;
@@ -290,6 +323,7 @@ void hlt_GameManager::RefreshCore()
 	HLT_KEYBOARD.Update();
 	HLT_MOUSE.Update();
 	HLT_TIME.Update();
+	
 }
 
 void hlt_GameManager::RefreshTransformsMatrix()

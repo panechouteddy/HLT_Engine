@@ -1,6 +1,7 @@
 #pragma once
 
 using Microsoft::WRL::ComPtr;
+struct hlt_PSO;
 class RenderManager
 {
 private:
@@ -9,39 +10,43 @@ private:
     /*std::vector<Mesh*> m_MeshToDrawList;
     std::vector<hlt_Transform3D*> m_MeshTransform;*/
 
-    std::vector<ConstantBuffer*> m_ConstantBufferList;
-    std::vector<ColorBuffer*> m_ColorBufferList;
+    std::vector<ConstantBuffer*> m_ConstantBuffers;
+    std::vector<ColorBuffer*> m_ColorBuffers;
+    Texture* m_pBasicTexture;
 protected:
 
     ID3D12GraphicsCommandList* m_CommandList;
     ID3D12CommandAllocator * m_DirectCmdListAlloc;
 
-    ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
-    ComPtr<ID3D12DescriptorHeap> m_CbvHeap = nullptr;
+    ComPtr<ID3D12DescriptorHeap> m_SrvDescriptorHeap = nullptr;
 
-    ComPtr<ID3DBlob> m_VsByteCode = nullptr;
-    ComPtr<ID3DBlob> m_PsByteCode = nullptr;
+    hlt_PSO* m_PsoManager = nullptr;
 
-    std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
-
-    ComPtr<ID3D12PipelineState> m_Pso = nullptr;
-
+    UINT m_CbvSrvDescriptorSize = 0;
 
 public:
     RenderManager(ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* directCmdListAlloc);
     ~RenderManager();
+
     void UpdateRender(hlt_Camera* camera, std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
     void UpdateColorBuffer(std::vector<Mesh*>& meshs);
     void UpdateConstantBuffer(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
-    void UpdateView(hlt_Camera* camera, std::vector<Mesh*>& meshs);
+
+    void UpdateRenderView(hlt_Camera* camera, std::vector<Mesh*>& meshs);
+    void UpdateView(hlt_Camera* camera, ConstantBuffer* cb);
+
     void Draw(std::vector<Mesh*>& meshs);
+    void DrawMesh(Mesh* mesh, ConstantBuffer* cb, ColorBuffer* colorb);
 
     ConstantBuffer* AddConstantBuffer();
     ColorBuffer* AddColorBuffer();
-    void BuildDescriptorHeaps(ID3D12Device* device);
+    void AddMapToRender(Map_Mesh* Map) { m_MapMesh = Map; }
+
+    void BuildDescriptorHeaps(ID3D12Device* device );
     void BuildRootSignature(ID3D12Device* device);
     void BuildShadersAndInputLayout();
-    void BuildPSO(ID3D12Device* device, bool _4xMsaaState, UINT _4xMsaaQuality);
-    void AddMapToRender(Map_Mesh* Map) { m_MapMesh = Map; }
+    void BuildPSO(DXGI_FORMAT BackBufferFormat ,ID3D12Device* device, bool _4xMsaaState, UINT _4xMsaaQuality , DXGI_FORMAT DepthStencilFormat);
+
+
 };
 
