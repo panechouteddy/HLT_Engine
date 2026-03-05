@@ -19,6 +19,7 @@ public:
 	void OnUpdate();
 	void OnExit();
 	void CreateMap();
+	void GenerateMap();
 
 	std::vector<Enemy*> GenerateWave(int count);
 	void Reset();
@@ -29,6 +30,7 @@ public:
 private:
 	std::vector<Projectile*> m_vProjs;
 	std::vector<Enemy*> m_vEnemys;
+	std::vector<Level> m_Levels;
 
 	std::vector<int> m_EntityID;
 	int m_PlayerID = -1;

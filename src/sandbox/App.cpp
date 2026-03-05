@@ -182,10 +182,105 @@ void App::OnExit()
 
 void App::CreateMap()
 {
+		for (const auto& entry : std::filesystem::directory_iterator(L"..\\..\\res\\Levels"))
+		{
+			std::ifstream file(entry.path());
+			std::string line;
 
+
+			Level* currentLevel = new Level;
+			int x = 0;
+			int y = 0;
+
+			std::vector<char> linevalue;
+
+			while (std::getline(file, line))
+			{
+				if (!linevalue.empty())
+					currentLevel->grid.push_back(linevalue);
+				linevalue.clear();
+				y = 0;
+				for (char c : line)
+				{
+					if (c == '-')
+					{
+						x++;
+						m_Levels.push_back(*currentLevel);
+						currentLevel = new Level;
+					}
+					else if (c == ' ')
+					{
+
+
+						continue;
+					}
+					else
+					{
+						linevalue.push_back(c);
+						y++;
+					}
+					if (c == 'B')
+					{
+						currentLevel->spawnPos = { float(x),float(y) };
+						;
+					}
+				}
+
+			}
+		}
+		GenerateMap();
 }
 
-std::vector<Enemy*> App::GenerateWave(int count) 
+void App::GenerateMap()
+{
+	int level = 2;
+
+	Map_Mesh* map = new Map_Mesh;
+
+
+	for (int x = 0; x < m_Levels[level].grid.size(); x++)
+	{
+		for (int y = 0; y < m_Levels[level].grid[x].size(); y++)
+		{
+			if (m_Levels[level].grid[x][y] == 'W')
+			{
+				std::pair<Mesh*, hlt_Transform3D> object;
+
+				object.first = hlt_Prefab::MeshObject::CreateCube();
+				object.first->SetColor(hlt_Color::DarkGray);
+				object.first->SetTexture("bricks2");
+
+				float positionX = 1 * (x - m_Levels[level].spawnPos.x) - 4;
+				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) - 4;
+
+				hlt_Transform3D transform = {};
+				transform.pos = { positionX,0,positionZ };
+				object.second = transform;
+
+				map->Meshs.push_back(object);
+			}
+			else
+			{
+				std::pair<Mesh*, hlt_Transform3D> ground;
+
+				ground.first = hlt_Prefab::MeshObject::CreateCube();
+				ground.first = hlt_Prefab::MeshObject::CreateCube();
+				ground.first->SetColor(hlt_Color::DarkGray);
+				ground.first->SetTexture("grass");
+
+				float positionX = 1 * (x - m_Levels[level].spawnPos.x) - 4;
+				float groundPositionY = -1;
+				float RoofPositionY = 1;
+				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) - 4;
+
+				hlt_Transform3D transform = {};
+				transform.pos = { positionX,groundPositionY,positionZ };
+			}
+		}
+	}
+}
+
+std::vector<Enemy*> App::GenerateWave(int count)
 {
 	std::vector<Enemy*> enemies(count);
 	int i = 0;

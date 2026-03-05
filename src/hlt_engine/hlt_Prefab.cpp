@@ -12,7 +12,7 @@ int hlt_Prefab::GameObject::CreateCube()
 	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
-	mesh->mesh.SetMesh("Cube", hlt_Color::Blue);
+	mesh->mesh.SetMesh("cube", hlt_Color::Blue);
 
 	return cubeID;
 }
