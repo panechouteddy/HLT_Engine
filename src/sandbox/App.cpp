@@ -129,35 +129,12 @@ void App::CreateMap()
 	object1.first->SetColor(hlt_Color::Green);
 
 	hlt_Transform3D* transform1 = new hlt_Transform3D;
-	transform1->pos.y = -4;
+	transform1->pos.y = -1;
 	transform1->sca = { 9.5f, 1.5f,9.5f };
 	transform1->UpdateWorld();
 
 	object1.second = transform1;
 	map->Meshs.push_back(object1);
-
-	/*std::pair<Mesh*, hlt_Transform3D*> object2;
-	object2.first = hlt_Prefab::MeshObject::CreateRock();
-	object2.first->SetMeshVisibility(true);
-
-	hlt_Transform3D* transform2 = new hlt_Transform3D;
-	transform2->pos.x = 4;
-	transform2->pos.z = 1;
-	transform2->UpdateWorld();
-	object2.second = transform2;
-	map->Meshs.push_back(object2);
-
-	std::pair<Mesh*, hlt_Transform3D*> object3;
-	object3.first = hlt_Prefab::MeshObject::CreatePyramid();
-	object3.first->SetTexture("bricks3");
-	object3.first->SetMeshVisibility(true);
-
-	hlt_Transform3D* transform3 = new hlt_Transform3D;
-	transform3->pos.x = -2;
-	transform3->pos.z = 1;
-	transform3->UpdateWorld();
-	object3.second = transform3;
-	map->Meshs.push_back(object3);*/
 
 	HLT_GAMEMANAGER.CreateMap(map);
 }
