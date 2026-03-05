@@ -77,7 +77,7 @@ bool D3DApp::Initialize()
     //m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers, );
     //m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
-    ScreenSplash();
+    //ScreenSplash();
 
     InitDirect3DDraw();
 
@@ -166,10 +166,10 @@ void D3DApp::Draw2D()
 
     //    m_TextToDraw.clear();
 
-    if (m_IsOpacity)
+    /*if (m_IsOpacity)
     {
         ScreenSplash();
-    }
+    }*/
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));
     m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;

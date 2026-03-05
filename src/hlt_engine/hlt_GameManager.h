@@ -25,8 +25,6 @@ public:
 
 	void Start();
 
-	hlt_Camera* GetCamera() { return m_pCamera; }
-
 	void CreateMesh(std::string name, std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList);
 	void CreateMap(Map_Mesh* map);
 	void UpdateFps();
