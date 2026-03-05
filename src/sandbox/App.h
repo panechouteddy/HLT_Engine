@@ -18,7 +18,6 @@ public:
 
 	void OnStart();
 	void OnUpdate();
-	void UpdateInput();
 	void OnExit();
 	void CreateMap();
 	void GenerateMap();
@@ -43,6 +42,7 @@ private:
 	std::vector<Projectile*> m_vProjs;
 	std::vector<Enemy*> m_vEnemys;
 	std::vector<Level> m_Levels;
+	std::vector<XMFLOAT2> m_MobSpawner;
 
 	std::vector<int> m_EntityID;
 	Player* m_pPlayer = nullptr;

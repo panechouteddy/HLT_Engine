@@ -25,8 +25,6 @@ App::App()
 void App::OnStart()
 {
 	HLT_TIME.SetMaxDeltaTime(30.f);
-	/*std::string path = "../../res/test.obj";
-	hlt_ModelImporter::ImportOBJ(path);*/
 
 	ecs = HLT_GAMEMANAGER.GetECS();
 
@@ -47,6 +45,7 @@ void App::OnStart()
 	warpBox->boxType = warpBox->AABB;
 
 	CreateMap();
+
 	m_vEnemys = GenerateWave(m_Difficulty);
 
 	m_LastFrameTime = std::chrono::high_resolution_clock::now();
@@ -66,32 +65,6 @@ void App::OnUpdate()
 	PlayerShoot();
 
 	UpdateShot();
-
-	UpdateInput();
-}
-
-void App::UpdateInput()
-{
-	hlt_Input::KeyboardInput& keyboardInput = HLT_KEYBOARD;
-
-	hlt_Transform3D* transform = &ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform;
-
-	if (keyboardInput.IsKey(VK_Z) || keyboardInput.IsKey(VK_W))
-		transform->Move(1.f * hlt_Time::GetInstance().GetDeltaTime());
-	if (keyboardInput.IsKey(VK_S))
-		transform->Move(-1.f * hlt_Time::GetInstance().GetDeltaTime());
-	if (keyboardInput.IsKey(VK_Q) || keyboardInput.IsKey(VK_A))
-		transform->Move(-1.f * hlt_Time::GetInstance().GetDeltaTime(), transform->right);
-	if (keyboardInput.IsKey(VK_D))
-		transform->Move(1.f * hlt_Time::GetInstance().GetDeltaTime(), transform->right);
-	if (keyboardInput.IsKey(VK_SPACE))
-		transform->pos.y += 1.f * hlt_Time::GetInstance().GetDeltaTime();
-	if (keyboardInput.IsKey(VK_LSHIFT))
-		transform->pos.y -= 1.f * hlt_Time::GetInstance().GetDeltaTime();
-
-	if (keyboardInput.IsKey(VK_A))
-		transform->ResetRotation();
-	HLT_GAMEMANAGER.GetCamera()->m_Transform.pos = transform->pos;
 
 }
 
@@ -152,10 +125,14 @@ void App::CreateMap()
 
 void App::GenerateMap()
 {
-	int level = 5;
+	std::uniform_int_distribution<int> dist(0, 5);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	int level = dist(gen);
 
 	Map_Mesh* map = new Map_Mesh;
 
+	m_MobSpawner.clear();
 
 	for (int x = 0; x < m_Levels[level].grid.size(); x++)
 	{
@@ -217,11 +194,13 @@ void App::GenerateMap()
 					warpTransform->transform.pos = { positionX, 0.f, positionZ };
 
 				}
+				if (m_Levels[level].grid[x][y] == 'B')
+					m_pPlayer->m_pTransform->transform.pos = { positionX,0,positionZ };
+				if (m_Levels[level].grid[x][y] == 'M')
+					m_MobSpawner.push_back(XMFLOAT2{ positionX,positionZ });
 			}
 		}
 	}
-
-	ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos = { m_Levels[level].spawnPos.x, 0, m_Levels[level].spawnPos.y };
 	HLT_GAMEMANAGER.CreateMap(map);
 }
 
@@ -234,12 +213,12 @@ std::vector<Enemy*> App::GenerateWave(int count)
 	{
 		std::random_device rd;
 		std::mt19937 gen(rd());
-		std::uniform_real_distribution<float> distXZ(-50.0f, 50.0f);
+		std::uniform_real_distribution<float> spawner(0,m_MobSpawner.size() -1);
 
 		Enemy* enemy = new Enemy();
 		m_EntityID.push_back(enemy->m_EnemyID);
 
-		enemy->m_pos = { distXZ(gen), 0.5f, distXZ(gen) };
+		enemy->m_pos = { m_MobSpawner[spawner(gen)].x, 0.5f, m_MobSpawner[spawner(gen)].y };
 
 		XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos);
 		XMVECTOR enemyPosVec = XMLoadFloat3(&enemy->m_pos);
@@ -395,6 +374,7 @@ void App::FollowPlayer()
 {
 	if(DEBUG == false)
 		m_pCamera->m_Transform.pos = m_pPlayer->m_pTransform->transform.pos;
+	//m_pCamera->m_Transform.UpdateWorld();
 	hlt_DebugTools::hlt_DebugConsole::PrintVector(m_pCamera->m_Transform.pos);
 	hlt_DebugConsole::PrintVector(m_pPlayer->m_pTransform->transform.pos);
 }

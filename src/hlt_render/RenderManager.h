@@ -7,9 +7,6 @@ class RenderManager
 private:
     Map_Mesh* m_MapMesh = nullptr;
 
-    /*std::vector<Mesh*> m_MeshToDrawList;
-    std::vector<hlt_Transform3D*> m_MeshTransform;*/
-
     std::vector<ConstantBuffer*> m_ConstantBuffers;
     std::vector<ColorBuffer*> m_ColorBuffers;
     Texture* m_pBasicTexture;

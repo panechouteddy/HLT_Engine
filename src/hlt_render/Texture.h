@@ -1,7 +1,6 @@
 #pragma once
 struct Texture
 {
-    // Unique material name for lookup.
     std::string Name;
 
     std::wstring Filename;
@@ -14,7 +13,6 @@ struct Texture
 
 struct TextureBox
 {
-    // Unique material name for lookup.
 protected:
     std::unordered_map<std::string, Texture*> m_TextureBox;
     int m_CurrentSrvIndex = 2;

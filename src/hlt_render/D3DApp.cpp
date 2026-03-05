@@ -12,7 +12,6 @@ D3DApp* D3DApp::m_App = nullptr;
 D3DApp::D3DApp(hlt_Window* window)
     : m_pWindow(window)
 {
-    // Only one D3DApp can be constructed.
     assert(m_App == nullptr);
     m_App = this;
 }
@@ -70,7 +69,7 @@ bool D3DApp::Initialize()
     m_UI = new hlt_UI;
     m_SplashScreen = new hlt_SplashScreen;
     m_TextureBox = new TextureBox;
-    // Do the initial resize code.
+
     OnResize();
 
     m_Camera = new hlt_Camera;
@@ -130,7 +129,7 @@ void D3DApp::StartDraw3D()
 
     D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = DepthStencilView();
     m_CommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-    // Specify the buffers we are going to render to.
+
     m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilView);
 }
 
@@ -140,10 +139,9 @@ void D3DApp::EndDraw3D()
     auto barrierToPresent = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
     m_CommandList->ResourceBarrier(1, &barrierToPresent);
 
-    // Done recording commands.
+
     ThrowIfFailed(m_CommandList->Close());
 
-    // Add the command list to the queue for execution.
     ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
     m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
@@ -475,7 +473,7 @@ void D3DApp::CalculateFrameStats()
     if ((hlt_Time::GetInstance().GetTotalTime() - timeElapsed) >= 1.0f)
     {
 
-        float fps = (float)frameCnt; // fps 
+        float fps = (float)frameCnt; 
         float mspf = 1000.0f / fps;
 
 
@@ -489,7 +487,6 @@ void D3DApp::CalculateFrameStats()
 
         SetWindowText(m_pWindow->GetWnd(), windowText.c_str());
 
-        // Reset for next average.
         frameCnt = 0;
         timeElapsed += 1.0f;
     }
@@ -515,18 +512,6 @@ float D3DApp::GetWindowRatio() const
     XMINT2 clientSize = m_pWindow->GetWndSize();
     return ((float)clientSize.x / (float)clientSize.y);
 }
-
-//float D3DApp::GetWindowWidth() const
-//{
-//    XMINT2 clientSize = m_pWindow->GetWndSize();
-//
-//    return (float)clientSize.x;
-//}
-//float D3DApp::GetWindowHeight() const
-//{
-//    XMINT2 clientSize = m_pWindow->GetWndSize();
-//    return (float)clientSize.y;
-//}
 
 
 void D3DApp::LogAdapters()
@@ -585,7 +570,6 @@ void D3DApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
     UINT count = 0;
     UINT flags = 0;
 
-    // Call with nullptr to get list count.
     output->GetDisplayModeList(format, flags, &count, nullptr);
 
     std::vector<DXGI_MODE_DESC> modeList(count);
