@@ -9,7 +9,7 @@ private:
 private:
 	DWORD m_SystemTime;
 	float  m_DeltaTime;
-	float m_MaxDeltaTime = -1.f;
+	float m_MaxDeltaTime = 30.f;
 	float m_TotalTime;
 
 private:
