@@ -31,10 +31,6 @@ void App::OnStart()
 	ecs = HLT_GAMEMANAGER.GetECS();
 
 	m_pPlayer = new Player(ecs);
-	m_pPlayer->m_pTransform->transform.pos = { 0.0f, 0.5f, 0.f };
-	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_pPlayer->m_ID);
-	oBox->boxType = oBox->OBB;
-	oIsColliding = &oBox->isColliding;
 
 	m_pCamera = HLT_CAMERA;
 
@@ -48,7 +44,7 @@ void App::OnStart()
 
 	m_WarpID = HLT_GAMEMANAGER.CreateEntity();
 	ecs->AddComponent<hlt_Component::Transform3D>(m_WarpID);
-	hlt_Component::BoxCollider3D* warpBox = ecs->AddComponent < hlt_Component::BoxCollider3D>(m_WarpID);
+	hlt_Component::BoxCollider3D* warpBox = ecs->AddComponent <hlt_Component::BoxCollider3D>(m_WarpID);
 	warpBox->boxType = warpBox->AABB;
 
 	CreateMap();
@@ -63,6 +59,7 @@ void App::OnUpdate()
 	m_TimeSinceLastHit += HLT_TIME.GetDeltaTime();
 
 	CheckPlayerExit();
+	FollowPlayer();
 
 	UpdateDifficulty();
 	UpdateEnemies();
@@ -198,7 +195,7 @@ void App::GenerateMap()
 		}
 	}
 
-	ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos = { 100, 0, m_Levels[level].spawnPos.y };
+	//ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos = { 100, 0, m_Levels[level].spawnPos.y };
 	HLT_GAMEMANAGER.CreateMap(map);
 }
 
@@ -263,7 +260,7 @@ void App::UpdateEnemies()
 
 	if (m_vEnemys.empty() && m_GameEnd == false)
 	{
-		m_vEnemys = GenerateWave(m_Difficulty);
+		//m_vEnemys = GenerateWave(m_Difficulty);
 	}
 }
 
@@ -366,4 +363,12 @@ void App::CheckPlayerExit()
 {
 	if (m_pPlayer->HaveCollidedWith(m_WarpID) == true)
 		GenerateMap();
+}
+
+void App::FollowPlayer()
+{
+	if(DEBUG == false)
+		m_pCamera->m_Transform.pos = m_pPlayer->m_pTransform->transform.pos;
+	hlt_DebugTools::hlt_DebugConsole::PrintVector(m_pCamera->m_Transform.pos);
+	hlt_DebugConsole::PrintVector(m_pPlayer->m_pTransform->transform.pos);
 }

@@ -24,7 +24,10 @@ int hlt_Prefab::GameObject::CreateCube(XMFLOAT3 pos, XMFLOAT3 sca)
 	int cubeID = gm.CreateEntity();
 	hlt_ECS* ecs = gm.GetECS();
 
-	ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	hlt_Component::Transform3D* transform = ecs->AddComponent<hlt_Component::Transform3D>(cubeID);
+	transform->transform.pos = pos;
+	transform->transform.sca = sca;
+
 	hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(cubeID);
 
 	mesh->mesh.SetMesh("cube", hlt_Color::Blue);
