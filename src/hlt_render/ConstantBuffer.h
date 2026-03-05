@@ -2,6 +2,7 @@
 #include "MathHelper.h"
 #include <DirectXMath.h>
 
+//#include "UploadBuffer.h"
 using namespace DirectX;
 
 struct ObjectConstant

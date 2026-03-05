@@ -3,6 +3,7 @@
 
 App* App::s_pInstance = nullptr;
 
+
 App* App::GetInstance()
 {
 	if (s_pInstance == nullptr)
@@ -88,43 +89,115 @@ void App::OnExit()
 
 void App::CreateMap()
 {
+	for (const auto& entry : std::filesystem::directory_iterator(L"..\\..\\res\\Levels"))
+	{
+		std::ifstream file(entry.path());
+		std::string line;
+		
+
+		Level* currentLevel = new Level;
+		int x = 0;
+		int y = 0;
+
+		std::vector<char> linevalue;
+
+		while (std::getline(file, line))
+		{
+			if (!linevalue.empty())
+				currentLevel->grid.push_back(linevalue);
+			linevalue.clear();
+			y = 0;
+			for (char c : line)
+			{
+				if (c == '-')
+				{
+					x++;
+					m_levels.push_back(*currentLevel);
+					currentLevel = new Level;
+				}
+				else if (c == ' ')
+				{
+					
+					
+					continue;
+				}
+				else
+				{
+					linevalue.push_back(c);
+					y++;
+				}
+				if (c == 'B')
+				{
+					currentLevel->spawnPos = { float(x),float(y) };
+					;
+				}
+			}
+
+		}
+	}
+	GenerateMap();
+}
+
+void App::GenerateMap()
+{
+	int level = 2;
+
 	Map_Mesh* map = new Map_Mesh;
-	std::pair<Mesh*,hlt_Transform3D*> object1;
-	object1.first = hlt_Prefab::MeshObject::CreateCube();
-	object1.first->SetTexture("grass");
-	object1.first->SetMeshVisibility(true);
-	object1.first->SetColor(hlt_Color::Green);
 
-	hlt_Transform3D* transform1 = new hlt_Transform3D;
-	transform1->pos.y = -4;
-	transform1->sca = { 5.f, 1.5f,5.f };
-	transform1->UpdateWorld();
 
-	object1.second = transform1;
-	map->Meshs.push_back(object1);
+	for (int x = 0;x < m_levels[level].grid.size(); x++)
+	{
+		for (int y = 0; y < m_levels[level].grid[x].size();y++)
+		{
+			if (m_levels[level].grid[x][y] == 'W')
+			{
+				std::pair<Mesh*, hlt_Transform3D> object;
 
-	std::pair<Mesh*, hlt_Transform3D*> object2;
-	object2.first = hlt_Prefab::MeshObject::CreateRock();
-	object2.first->SetMeshVisibility(true);
+				object.first = hlt_Prefab::MeshObject::CreateCube();
+				object.first->SetColor(hlt_Color::DarkGray);
+				object.first->SetTexture("bricks2");
 
-	hlt_Transform3D* transform2 = new hlt_Transform3D;
-	transform2->pos.x = 4;
-	transform2->pos.z = 1;
-	transform2->UpdateWorld();
-	object2.second = transform2;
-	map->Meshs.push_back(object2);
+				float positionX = 1 * (x - m_levels[level].spawnPos.x) - 4;
+				float positionZ = 1 * (y - m_levels[level].spawnPos.y) - 4;
 
-	std::pair<Mesh*, hlt_Transform3D*> object3;
-	object3.first = hlt_Prefab::MeshObject::CreatePyramid();
-	object3.first->SetTexture("bricks3");
-	object3.first->SetMeshVisibility(true);
+				hlt_Transform3D transform = {};
+				transform.pos = { positionX,0,positionZ };
+				object.second = transform;
 
-	hlt_Transform3D* transform3 = new hlt_Transform3D;
-	transform3->pos.x = -2;
-	transform3->pos.z = 1;
-	transform3->UpdateWorld();
-	object3.second = transform3;
-	map->Meshs.push_back(object3);
+				map->Meshs.push_back(object);
+			}
+			else
+			{
+				std::pair<Mesh*, hlt_Transform3D> ground;
+
+				ground.first = hlt_Prefab::MeshObject::CreateCube();
+				ground.first->SetColor(hlt_Color::DarkGray);
+				ground.first->SetTexture("grass");
+
+				float positionX = 4 * (x - m_levels[level].spawnPos.x);
+				float groundPositionY = -1;
+				float RoofPositionY = 1;
+				float positionZ = 4 * (y - m_levels[level].spawnPos.y);
+
+				hlt_Transform3D transform = {};
+				transform.pos = { positionX,groundPositionY,positionZ };
+				ground.second = transform;
+				map->Meshs.push_back(ground);
+
+				std::pair<Mesh*, hlt_Transform3D> roof;
+
+				roof.first = hlt_Prefab::MeshObject::CreateCube();
+				roof.first->SetColor(hlt_Color::DarkGray);
+				roof.first->SetTexture("stone");
+
+				transform.pos = { positionX,RoofPositionY,positionZ };
+				roof.second = transform;
+
+				map->Meshs.push_back(roof);
+			}
+		}
+	}
 
 	HLT_GAMEMANAGER.CreateMap(map);
+
 }

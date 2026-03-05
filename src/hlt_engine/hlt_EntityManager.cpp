@@ -41,6 +41,8 @@ void hlt_EntityManager::UpdateMeshTransform()
 	hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_pECS->GetComponent<hlt_Component::Transform3D>();
 	hlt_ECS::ComponentPool<hlt_Component::Mesh>* meshs = m_pECS->GetComponent<hlt_Component::Mesh>();
 
+	if (transforms == nullptr)
+		return;
 	for (int i = 0; i < transforms->componentOwnerID.size(); i++)
 	{
 		Mesh* mesh = &meshs->Get(transforms->componentOwnerID[i])->mesh;
