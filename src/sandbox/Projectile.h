@@ -6,7 +6,7 @@ public:
 	Projectile();
 	~Projectile();
 
-	void Update();
+	void Update(int PlayerID);
 	void Move();
 
 public:

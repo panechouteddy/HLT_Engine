@@ -25,7 +25,7 @@ Projectile::~Projectile()
 {
 }
 
-void Projectile::Update()
+void Projectile::Update(int PlayerID)
 {
 	m_vCollideWith = oBox->collideWith;
 

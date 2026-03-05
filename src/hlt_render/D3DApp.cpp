@@ -262,10 +262,10 @@ void D3DApp::OnResize()
 
     m_ScissorRect = { 0, 0, clientSize.x, clientSize.y };
 
-    //m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
-    //    SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
-    //m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
-    //    SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 }
 
 bool D3DApp::InitDirect3D()

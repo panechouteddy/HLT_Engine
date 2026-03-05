@@ -104,10 +104,13 @@ void App::OnUpdate()
 		
 		m_vEnemys[i]->Update(m_PlayerID, &m_vEnemys);
 
-		if (m_TimeSinceLastHit >= m_DamageCooldown)
+		if(m_vEnemys[i]->m_CollidePlayer)
 		{
-			m_PlayerLife--;
-			m_TimeSinceLastHit = 0.0f;
+			if (m_TimeSinceLastHit >= m_DamageCooldown)
+			{
+				m_PlayerLife--;
+				m_TimeSinceLastHit = 0.0f;
+			}
 		}
 	}
 
@@ -130,7 +133,7 @@ void App::OnUpdate()
 		for (int i = 0; i < m_vProjs.size(); i++)
 		{
 			m_vProjs[i]->m_IsDead = true;
-			m_vProjs[i]->Update();
+			m_vProjs[i]->Update(m_PlayerID);
 			delete m_vProjs[i];
 			m_vProjs.erase(m_vProjs.begin() + i);
 		}
@@ -139,27 +142,30 @@ void App::OnUpdate()
 
 	if (keyboardInput.IsKeyDown(VK_LBUTTON))
 	{
-		Projectile* newBullet = new Projectile();
-		m_EntityID.push_back(newBullet->m_ProjectileID);
+		if(!m_GameEnd)
+		{
+			Projectile* newBullet = new Projectile();
+			m_EntityID.push_back(newBullet->m_ProjectileID);
 
-		XMFLOAT3 playerPos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
+			XMFLOAT3 playerPos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
 
-		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
-		XMMATRIX invView = XMMatrixInverse(nullptr, view);
+			XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
+			XMMATRIX invView = XMMatrixInverse(nullptr, view);
 
-		XMFLOAT3 forward;
-		XMStoreFloat3(&forward, invView.r[2]);
+			XMFLOAT3 forward;
+			XMStoreFloat3(&forward, invView.r[2]);
 
-		float spawnOffset = 3.f;
-		newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
-		newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
-		newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
+			float spawnOffset = 3.f;
+			newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
+			newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
+			newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
 
-		newBullet->m_dir = forward;
+			newBullet->m_dir = forward;
 
-		newBullet->Move();
+			newBullet->Move();
 
-		m_vProjs.push_back(newBullet);
+			m_vProjs.push_back(newBullet);
+		}
 	}
 	for (int i = 0; i < m_vProjs.size(); i++)
 	{
@@ -171,7 +177,7 @@ void App::OnUpdate()
 			continue;
 		}
 
-		m_vProjs[i]->Update();
+		m_vProjs[i]->Update(m_PlayerID);
 	}
 }
 
