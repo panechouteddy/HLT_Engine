@@ -2,6 +2,7 @@
 
 #include <WindowsX.h>
 #include <hlt_engine/framework.h>
+#include <d2d1_3.h>
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
@@ -74,10 +75,16 @@ bool D3DApp::Initialize()
     OnResize();
 
     m_Camera = new hlt_Camera;
-    //m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers, );
-    //m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(), SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
 
-    //ScreenSplash();
+    m_TextToDraw = L"Score : ";
+    m_TextToDraw = L"PV : ";
+
+    m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers, const_cast<WCHAR*>(m_FontFamily), 20.f, const_cast<WCHAR*>(m_LocalName), D2D1::ColorF(D2D1::ColorF::White));
+    m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers, const_cast<WCHAR*>(m_FontFamily), 20.f, const_cast<WCHAR*>(m_LocalName), D2D1::ColorF(D2D1::ColorF::Black));
+
+    ScreenSplash();
 
     InitDirect3DDraw();
 
@@ -152,24 +159,24 @@ void D3DApp::EndDraw3D()
 
 void D3DApp::Draw2D()
 {
-    //if ( m_SplashScreen->m_Opacity > 0)
-    //    m_SplashScreen->m_Opacity -= 0.01f;
-    //else if (m_IsOpacity && m_SplashScreen->m_Opacity <= 0)
-    //    m_IsOpacity = false;
+    if ( m_SplashScreen->m_GlobalOpacity > 0)
+        m_SplashScreen->m_GlobalOpacity -= 0.01f;
 
-    //    m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
-    //    for (int i = 0; i < m_TextToDraw.size(); i++)
-    //    {
-    //        m_UI->Draw(m_TextToDraw[i]);
-    //    }
-    //    m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    else if (m_IsOpacity && m_SplashScreen->m_GlobalOpacity <= 0)
+        m_IsOpacity = false;
 
-    //    m_TextToDraw.clear();
+    if(!m_IsOpacity)
+    {
+        m_UI->StartDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+        m_UI->Draw(m_pWindow->GetWndSize().x * 0.5f, m_TextToDraw);
+        m_UI->Draw((m_pWindow->GetWndSize().x * 0.5f) * 0.5f, m_TextLife);
+        m_UI->EndDraw(m_CurrBackBuffer, m_wrappedBackBuffers);
+    }
 
-    /*if (m_IsOpacity)
+    if (m_IsOpacity)
     {
         ScreenSplash();
-    }*/
+    }
 
     ThrowIfFailed(m_SwapChain->Present(0, 0));
     m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
@@ -262,10 +269,10 @@ void D3DApp::OnResize()
 
     m_ScissorRect = { 0, 0, clientSize.x, clientSize.y };
 
-    //m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
-    //    SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
-    //m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
-    //    SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers);
+    m_UI->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers, const_cast<WCHAR*>(m_FontFamily), 20.f, const_cast<WCHAR*>(m_LocalName), D2D1::ColorF(D2D1::ColorF::White));
+    m_SplashScreen->Initialize(m_d3d11On12Device.Get(), m_d2dContext.Get(), m_d3d11DeviceContext.Get(),
+        SwapChainBufferCount, m_SwapChainBuffer, m_wrappedBackBuffers, const_cast<WCHAR*>(m_FontFamily), 20.f, const_cast<WCHAR*>(m_LocalName), D2D1::ColorF(D2D1::ColorF::Black));
 }
 
 bool D3DApp::InitDirect3D()

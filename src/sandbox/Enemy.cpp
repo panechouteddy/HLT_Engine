@@ -50,7 +50,11 @@ void Enemy::Update(int m_PlayerID, std::vector<Enemy*>* enemys)
 			{
 				m_CollidePlayer = true;
 			}
-			else if (collideEnemy == false) m_CollideOther = false;
+			else if (collideEnemy == false) 
+			{
+				m_CollideOther = false;
+				m_CollidePlayer = false;
+			}
 		}
 		if(m_CollideOther == false && m_CollidePlayer == false)
 			m_IsDead = true;
