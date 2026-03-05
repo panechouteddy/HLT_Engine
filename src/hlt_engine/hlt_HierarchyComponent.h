@@ -10,8 +10,15 @@ namespace hlt_Component
 	{
 		static const int ID = 7;
 
-		int parentID = -1;
+		int parentID = NO_PARENT;
 		int hierarchyDepth = 0;
 		bool isRefreshed = false;
+
+		void Reset()
+		{
+			parentID = NO_PARENT;
+			hierarchyDepth = 0;
+			isRefreshed = false;
+		}
 	};
 }

@@ -12,5 +12,12 @@ namespace hlt_Component
 		float move;
 		float saveMove;
 		XMFLOAT3 dir;
+
+		void Reset()
+		{
+			move = 0.f;
+			saveMove = 0.f;
+			dir = XMFLOAT3(0, 0, 0);
+		}
 	};
 }

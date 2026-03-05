@@ -135,7 +135,7 @@ void RenderManager::Draw(std::vector<Mesh*>& meshs)
 		if (meshs.size() > m_ColorBuffers.size() && meshs.size() > m_ConstantBuffers.size())
 			continue;
 
-		DrawMesh(meshs[i], m_ConstantBuffers[i], m_ColorBuffers[i]);
+		DrawMesh(meshs[i], m_ConstantBuffers[i], m_ColorBuffers[i]); ///Bug ici
 	}
 	if (m_MapMesh == nullptr)
 		return;

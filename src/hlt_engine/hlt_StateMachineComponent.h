@@ -8,5 +8,10 @@ namespace hlt_Component
 		static const int ID = 6;
 
 		hlt_StateMachine m_StateMachine;
+
+		void Reset()
+		{
+			m_StateMachine = hlt_StateMachine();
+		}
 	};
 }
