@@ -26,8 +26,6 @@ App::App()
 void App::OnStart()
 {
 	HLT_TIME.SetMaxDeltaTime(30.f);
-	/*std::string path = "../../res/test.obj";
-	hlt_ModelImporter::ImportOBJ(path);*/
 
 	ecs = HLT_GAMEMANAGER.GetECS();
 
@@ -46,9 +44,8 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	//ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 
-	m_WarpID = HLT_GAMEMANAGER.CreateEntity();
-	ecs->AddComponent<hlt_Component::Transform3D>(m_WarpID);
-	hlt_Component::BoxCollider3D* warpBox = ecs->AddComponent <hlt_Component::BoxCollider3D>(m_WarpID);
+	m_WarpID = hlt_Prefab::GameObject::CreateCube();
+	hlt_Component::BoxCollider3D* warpBox = ecs->AddComponent < hlt_Component::BoxCollider3D>(m_WarpID);
 	warpBox->boxType = warpBox->AABB;
 
 	CreateMap();
@@ -61,6 +58,14 @@ void App::OnStart()
 void App::OnUpdate()
 {
 	m_TimeSinceLastHit += HLT_TIME.GetDeltaTime();
+
+	HLT_D3DAPP->m_TextToDraw = L"Score : " + std::to_wstring(m_pPlayer->GetScore());
+	HLT_D3DAPP->m_TextLife = L"PV : " + std::to_wstring(m_pPlayer->GetHP());
+
+	auto currentFrameTime = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> elapsed = currentFrameTime - m_LastFrameTime;
+	float deltaTime = elapsed.count();
+	m_LastFrameTime = currentFrameTime;
 
 	CheckPlayerExit();
 	FollowPlayer();
@@ -132,11 +137,15 @@ void App::CreateMap()
 
 void App::GenerateMap()
 {
-	int level = 5;
+	std::uniform_int_distribution<int> dist(0, 5);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	int level = dist(gen);
 
 	Map_Mesh* map = new Map_Mesh;
 
 	switchs.clear();
+	m_MobSpawner.clear();
 
 	for (int x = 0; x < m_Levels[level].grid.size(); x++)
 	{
@@ -223,11 +232,13 @@ void App::GenerateMap()
 					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 1, 0, 0 });
 					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
 				}
+				if (m_Levels[level].grid[x][y] == 'B')
+					m_pPlayer->m_pTransform->transform.pos = { positionX,-0.5f,positionZ };
+				if (m_Levels[level].grid[x][y] == 'M')
+					m_MobSpawner.push_back(XMFLOAT2{ positionX,positionZ });
 			}
 		}
 	}
-
-	//ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos = { 100, 0, m_Levels[level].spawnPos.y };
 	HLT_GAMEMANAGER.CreateMap(map);
 }
 
@@ -240,12 +251,12 @@ std::vector<Enemy*> App::GenerateWave(int count)
 	{
 		std::random_device rd;
 		std::mt19937 gen(rd());
-		std::uniform_real_distribution<float> distXZ(-50.0f, 50.0f);
+		std::uniform_real_distribution<float> spawner(0,m_MobSpawner.size() -1);
 
 		Enemy* enemy = new Enemy();
 		m_EntityID.push_back(enemy->m_EnemyID);
 
-		enemy->m_pos = { distXZ(gen), 0.5f, distXZ(gen) };
+		enemy->m_pos = { m_MobSpawner[spawner(gen)].x, 0.5f, m_MobSpawner[spawner(gen)].y };
 
 		XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos);
 		XMVECTOR enemyPosVec = XMLoadFloat3(&enemy->m_pos);
@@ -280,19 +291,21 @@ void App::UpdateEnemies()
 			delete m_vEnemys[i];
 			m_vEnemys.erase(m_vEnemys.begin() + i);
 			i--;
-			m_Score++;
+			m_pPlayer->SetScore(m_pPlayer->GetScore() + 1);
 
 			continue;
 		}
-
 		m_vEnemys[i]->Update(m_pPlayer->m_ID, &m_vEnemys);
 
-		if (m_vEnemys[i]->m_CollidePlayer) m_pPlayer->TakeDamage();
+		if(m_vEnemys[i]->m_CollidePlayer)
+		{
+			m_pPlayer->TakeDamage();
+		}
 	}
 
 	if (m_vEnemys.empty() && m_GameEnd == false)
 	{
-		//m_vEnemys = GenerateWave(m_Difficulty);
+		m_vEnemys = GenerateWave(m_Difficulty);
 	}
 }
 
@@ -367,27 +380,42 @@ void App::PlayerShoot()
 {
 	if (keyboardInput.IsKeyDown(VK_LBUTTON))
 	{
-		Projectile* newBullet = new Projectile();
-		m_EntityID.push_back(newBullet->m_ProjectileID);
+		if(!m_GameEnd)
+		{
+			Projectile* newBullet = new Projectile();
+			m_EntityID.push_back(newBullet->m_ProjectileID);
 
-		XMFLOAT3 playerPos = m_pPlayer->m_pTransform->transform.pos;
+			XMFLOAT3 playerPos = ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos;
 
-		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
-		XMMATRIX invView = XMMatrixInverse(nullptr, view);
+			XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
+			XMMATRIX invView = XMMatrixInverse(nullptr, view);
 
-		XMFLOAT3 forward;
-		XMStoreFloat3(&forward, invView.r[2]);
+			XMFLOAT3 forward;
+			XMStoreFloat3(&forward, invView.r[2]);
 
-		float spawnOffset = 3.f;
-		newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
-		newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
-		newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
+			float spawnOffset = 3.f;
+			newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
+			newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
+			newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
 
-		newBullet->m_dir = forward;
+			newBullet->m_dir = forward;
 
-		newBullet->Move();
+			newBullet->Move();
 
-		m_vProjs.push_back(newBullet);
+			m_vProjs.push_back(newBullet);
+		}
+	}
+	for (int i = 0; i < m_vProjs.size(); i++)
+	{
+		if (m_vProjs[i]->m_IsDead)
+		{
+			delete m_vProjs[i];
+			m_vProjs.erase(m_vProjs.begin() + i);
+			i--;
+			continue;
+		}
+
+		m_vProjs[i]->Update();
 	}
 }
 
@@ -401,6 +429,7 @@ void App::FollowPlayer()
 {
 	if(DEBUG == false)
 		m_pCamera->m_Transform.pos = m_pPlayer->m_pTransform->transform.pos;
+	//m_pCamera->m_Transform.UpdateWorld();
 	hlt_DebugTools::hlt_DebugConsole::PrintVector(m_pCamera->m_Transform.pos);
 	hlt_DebugConsole::PrintVector(m_pPlayer->m_pTransform->transform.pos);
 }

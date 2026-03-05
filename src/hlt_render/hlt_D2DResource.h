@@ -22,7 +22,7 @@ public:
 		WCHAR* fontFamilyName,
 		float fontSize,
 		WCHAR* localName,
-		D2D1_COLOR_F& fontColor);
+		const D2D1_COLOR_F& fontColor);
 
 	ABI::Windows::Foundation::Size GetLogicalSize() const { return m_logicalSize; }
 
@@ -50,7 +50,7 @@ public:
 	ComPtr<IDWriteTextFormat> m_textFormatBody;
 	ComPtr<ID2D1SolidColorBrush> m_textBrush;
 
-	float m_TextOpacity = 1.f;
+	float m_GlobalOpacity = 1.f;
 
 	XMINT2 m_Pos = { 0, 0 };
 	std::wstring m_Text;

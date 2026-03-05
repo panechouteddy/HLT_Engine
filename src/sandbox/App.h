@@ -45,6 +45,7 @@ private:
 	std::vector<Enemy*> m_vEnemys;
 	std::vector<Level> m_Levels;
 	std::vector<SwitchDirectionObject> switchs;
+	std::vector<XMFLOAT2> m_MobSpawner;
 
 	std::vector<int> m_EntityID;
 	Player* m_pPlayer = nullptr;

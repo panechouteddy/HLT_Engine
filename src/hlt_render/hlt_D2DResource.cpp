@@ -1,6 +1,7 @@
 #include "pch.h"
 
-void hlt_D2DResource::Initialize(ID3D11On12Device* d11On12, ID2D1DeviceContext2* d2dCtx, ID3D11DeviceContext* d11Ctx, int swapChainBC, ComPtr<ID3D12Resource>* swapChainBuffer, ComPtr<ID3D11Resource>* wrappedBackBuffers, WCHAR* fontFamilyName, float fontSize, WCHAR* localName, D2D1_COLOR_F& fontColor)
+void hlt_D2DResource::Initialize(ID3D11On12Device* d11On12, ID2D1DeviceContext2* d2dCtx, ID3D11DeviceContext* d11Ctx, int swapChainBC, ComPtr<ID3D12Resource>* swapChainBuffer, 
+	ComPtr<ID3D11Resource>* wrappedBackBuffers, WCHAR* fontFamilyName, float fontSize, WCHAR* localName, const D2D1_COLOR_F& fontColor)
 {
 	m_d3d11On12Device = d11On12;
 	m_d2dContext = d2dCtx;
@@ -97,7 +98,7 @@ void hlt_D2DResource::Draw()
 
 	//DrawRect(0, 0, WindowWidthMiddle * 2, WindowHightMiddle * 2, D2D1::ColorF(D2D1::ColorF::DarkRed), D2D1::ColorF(D2D1::ColorF::DarkRed));
 
-	if(m_pRect != nullptr) m_d2dContext->DrawRectangle(m_pRect, m_RectColor.Get(), 2.0f);
+	//if(m_pRect != nullptr) m_d2dContext->DrawRectangle(m_pRect, m_RectColor.Get(), 2.0f);
 
 	/*D2D1_RECT_F rect = DrawRect(WindowWidthMiddle - 150, WindowHightMiddle - 50, WindowWidthMiddle + 150, WindowHightMiddle + 50, D2D1::ColorF(D2D1::ColorF::Coral), D2D1::ColorF(D2D1::ColorF::White));
 	std::wstring label = L"FPS: ";*/
@@ -105,7 +106,7 @@ void hlt_D2DResource::Draw()
 	/*m_textFormatBody->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 	m_textFormatBody->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);*/
 
-	m_textBrush->SetOpacity(m_TextOpacity);
+	/*m_textBrush->SetOpacity(m_GlobalOpacity);
 
 	m_d2dContext->DrawText(
 		m_Text.c_str(),
@@ -113,7 +114,7 @@ void hlt_D2DResource::Draw()
 		m_textFormatBody.Get(),
 		m_TextArea,
 		m_textBrush.Get()
-	);
+	);*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
