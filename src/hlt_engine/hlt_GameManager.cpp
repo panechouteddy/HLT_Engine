@@ -123,7 +123,7 @@ void hlt_GameManager::UpdateFps()
 
 	if (frameCnt >= 100)
 	{
-		int currentTime = HLT_TIME.GetTotalTime();
+		float currentTime = HLT_TIME.GetTotalTime();
 		fps = frameCnt / (currentTime - lastTime) ;
 		lastTime = currentTime;
 		frameCnt = 0;
