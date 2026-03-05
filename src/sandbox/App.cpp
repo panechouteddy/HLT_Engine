@@ -56,8 +56,8 @@ void App::OnUpdate()
 {
 	m_TimeSinceLastHit += HLT_TIME.GetDeltaTime();
 
-	HLT_D3DAPP->m_TextToDraw = L"Score : " + std::to_wstring(m_Score);
-	HLT_D3DAPP->m_TextLife = L"PV : " + std::to_wstring(m_PlayerLife);
+	HLT_D3DAPP->m_TextToDraw = L"Score : " + std::to_wstring(m_pPlayer->GetScore());
+	HLT_D3DAPP->m_TextLife = L"PV : " + std::to_wstring(m_pPlayer->GetHP());
 
 	auto currentFrameTime = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> elapsed = currentFrameTime - m_LastFrameTime;
@@ -282,7 +282,7 @@ void App::UpdateEnemies()
 			delete m_vEnemys[i];
 			m_vEnemys.erase(m_vEnemys.begin() + i);
 			i--;
-			m_Score++;
+			m_pPlayer->SetScore(m_pPlayer->GetScore() + 1);
 
 			continue;
 		}
@@ -290,17 +290,13 @@ void App::UpdateEnemies()
 
 		if(m_vEnemys[i]->m_CollidePlayer)
 		{
-			if (m_TimeSinceLastHit >= m_DamageCooldown)
-			{
-				m_PlayerLife--;
-				m_TimeSinceLastHit = 0.0f;
-			}
+			m_pPlayer->TakeDamage();
 		}
 	}
 
 	if (m_vEnemys.empty() && m_GameEnd == false)
 	{
-		//m_vEnemys = GenerateWave(m_Difficulty);
+		m_vEnemys = GenerateWave(m_Difficulty);
 	}
 }
 
@@ -363,7 +359,7 @@ void App::PlayerDied()
 		for (int i = 0; i < m_vProjs.size(); i++)
 		{
 			m_vProjs[i]->m_IsDead = true;
-			m_vProjs[i]->Update(m_PlayerID);
+			m_vProjs[i]->Update();
 			delete m_vProjs[i];
 			m_vProjs.erase(m_vProjs.begin() + i);
 		}
@@ -380,7 +376,7 @@ void App::PlayerShoot()
 			Projectile* newBullet = new Projectile();
 			m_EntityID.push_back(newBullet->m_ProjectileID);
 
-			XMFLOAT3 playerPos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
+			XMFLOAT3 playerPos = ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos;
 
 			XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
 			XMMATRIX invView = XMMatrixInverse(nullptr, view);
@@ -410,7 +406,7 @@ void App::PlayerShoot()
 			continue;
 		}
 
-		m_vProjs[i]->Update(m_PlayerID);
+		m_vProjs[i]->Update();
 	}
 }
 
