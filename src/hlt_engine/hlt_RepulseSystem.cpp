@@ -4,7 +4,10 @@
 void hlt_System::hlt_RepulseSystem::Update()
 {
 	hlt_ECS::ComponentPool<hlt_Component::ConstantMove>* cMoves = m_pECS->GetComponent<hlt_Component::ConstantMove>();
+	if (cMoves == nullptr) return;
+
 	hlt_ECS::ComponentPool<hlt_Component::BoxCollider3D>* boxs = m_pECS->GetComponent<hlt_Component::BoxCollider3D>();
+	if (boxs == nullptr) return;
 
 	for (int i = 0; i < cMoves->componentOwnerID.size(); i++)
 	{

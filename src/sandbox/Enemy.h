@@ -6,7 +6,7 @@ public:
 	~Enemy();
 
 	void Update(int m_PlayerID, std::vector<Enemy*>* enemys);
-	void Move();
+	/*void Move();*/
 
 public:
 	XMFLOAT3 m_pos;
@@ -23,8 +23,6 @@ public:
 
 private:
 	hlt_ECS* ecs;
-
-	hlt_Component::ConstantMove* oCMove;
 	hlt_Component::BoxCollider3D* oBox;
 
 	bool oIsColliding = false;

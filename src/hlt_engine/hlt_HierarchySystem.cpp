@@ -3,6 +3,7 @@
 void hlt_System::Hierarchy::Update()
 {
 	hlt_ECS::ComponentPool<hlt_Component::Hierarchy>* hierarchys = m_pECS->GetComponent<hlt_Component::Hierarchy>();
+	if (hierarchys == nullptr) return;
 	std::vector<std::vector<int>> sortedHierarchys = SparseHierarchyDepth(hierarchys);
 
 	int currentSlot = 0;

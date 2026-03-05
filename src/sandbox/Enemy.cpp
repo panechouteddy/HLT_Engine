@@ -16,7 +16,6 @@ Enemy::Enemy()
 
 	ecs->GetComponent<hlt_Component::Mesh>(m_EnemyID)->mesh.SetColor(hlt_Color::Crimson);
 
-	oCMove = ecs->AddComponent<hlt_Component::ConstantMove>(m_EnemyID);
 	oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_EnemyID);
 }
 
@@ -59,14 +58,4 @@ void Enemy::Update(int m_PlayerID, std::vector<Enemy*>* enemys)
 
 	if (m_IsDead)
 		ecs->RemoveEntity(m_EnemyID);
-}
-
-void Enemy::Move()
-{
-	ecs->GetComponent<hlt_Component::Transform3D>(m_EnemyID)->transform.pos = m_pos;
-
-	oCMove->dir = m_dir;
-	oCMove->move = 2.f;
-
-	oBox->boxType = oBox->OBB;
 }

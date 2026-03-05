@@ -3,7 +3,10 @@
 void hlt_System::BoxCollider::Update()
 {
 	hlt_ECS::ComponentPool<hlt_Component::BoxCollider3D>* boxCollider = m_pECS->GetComponent<hlt_Component::BoxCollider3D>();
+	if (boxCollider == nullptr) return;
+
 	hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transfrom3D = m_pECS->GetComponent<hlt_Component::Transform3D>();
+	if (transfrom3D == nullptr) return;
 
 	for (int i = 0; i < boxCollider->componentOwnerID.size(); i++)
 	{

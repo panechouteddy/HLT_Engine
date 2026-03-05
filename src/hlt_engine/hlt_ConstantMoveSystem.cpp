@@ -6,9 +6,11 @@
 
 void hlt_System::ConstantMove::Update()
 {
-    {
-        hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_pECS->GetComponent<hlt_Component::Transform3D>();
         hlt_ECS::ComponentPool<hlt_Component::ConstantMove>* cMoves = m_pECS->GetComponent<hlt_Component::ConstantMove>();
+        if (cMoves == nullptr) return;
+
+        hlt_ECS::ComponentPool<hlt_Component::Transform3D>* transforms = m_pECS->GetComponent<hlt_Component::Transform3D>();
+        if (transforms == nullptr) return;
 
         std::vector<int>& cMovesOwners = cMoves->GetComponentOwnersID();
         
@@ -29,5 +31,4 @@ void hlt_System::ConstantMove::Update()
 
             transforms->component[transforms->entityID[entityID]]->transform.pos = newPos;
         }
-    }
 }

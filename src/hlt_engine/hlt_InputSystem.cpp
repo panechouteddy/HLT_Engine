@@ -6,6 +6,7 @@ void hlt_System::hlt_Input::hlt_Keyboard::Update()
 	::hlt_Input::KeyboardInput& keyboard = ::HLT_KEYBOARD;
 
 	hlt_ECS::ComponentPool<hlt_Component::hlt_Input::hlt_Keyboard>* pKeyboardCPool = m_pECS->GetComponent<hlt_Component::hlt_Input::hlt_Keyboard>();
+	if (pKeyboardCPool == nullptr) return;
 
 	for (auto& comp : pKeyboardCPool->component)
 	{
@@ -43,8 +44,35 @@ void hlt_System::hlt_Input::hlt_Keyboard::SyncKeySize(hlt_Component::hlt_Input::
 void hlt_System::hlt_Input::hlt_Mouse::Update()
 {
 	::hlt_Input::MouseInput& mouse = ::HLT_MOUSE;
+
+	hlt_ECS::ComponentPool<hlt_Component::hlt_Input::hlt_Mouse>* pMouseCPool = m_pECS->GetComponent<hlt_Component::hlt_Input::hlt_Mouse>();
+	if (pMouseCPool == nullptr) return;
+
+	for (auto& comp : pMouseCPool->component)
+	{
+		SyncKeySize(*comp);
+		for (int i = 0; i < comp->keys.size(); i++)
+		{
+			comp->isKey[i] = mouse.IsKey(comp->keys[i]);
+			comp->isDown[i] = mouse.IsKeyDown(comp->keys[i]);
+			comp->isUp[i] = mouse.IsKeyUp(comp->keys[i]);
+		}
+	}
 }
 
 void hlt_System::hlt_Input::hlt_Mouse::SyncKeySize(hlt_Component::hlt_Input::hlt_Mouse& comp)
 {
+	size_t maxSize = (std::max)({
+		comp.isKey.size(),
+		comp.isDown.size(),
+		comp.isUp.size()
+		});
+	size_t keysSize = comp.keys.size();
+
+	if (maxSize != keysSize)
+	{
+		comp.isKey.resize(keysSize);
+		comp.isDown.resize(keysSize);
+		comp.isUp.resize(keysSize);
+	}
 }

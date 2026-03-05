@@ -209,7 +209,6 @@ std::vector<Enemy*> App::GenerateWave(int count)
 
 		XMStoreFloat3(&enemy->m_dir, dirVec);
 
-		enemy->Move();
 
 		enemies[i] = enemy;
 		i++;
