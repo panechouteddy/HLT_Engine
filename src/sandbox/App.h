@@ -21,6 +21,9 @@ public:
 
 	std::vector<Enemy*> GenerateWave(int count);
 
+public:
+	int m_Score = 0;
+
 private:
 	std::vector<Projectile*> m_vProjs;
 	std::vector<Enemy*> m_vEnemys;

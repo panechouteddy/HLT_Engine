@@ -36,18 +36,20 @@ void Enemy::Update(int m_PlayerID, std::vector<Enemy*>* enemys)
 	{
 		for (int j = 0; j < m_vCollideWith.size(); j++) //Collide with
 		{
-			if (m_vCollideWith[j] == m_PlayerID) //Player
-			{
-				m_CollideOther = true;
-				break;
-			}
+			bool collideEnemy = false;
 			for (int i = 0; i < enemys->size(); i++)
 			{
 				if (m_vCollideWith[j] == (*enemys)[i]->m_EnemyID) //Other Enemy
 				{
 					m_CollideOther = true;
+					collideEnemy = true;
 				}
 			}
+			if (m_vCollideWith[j] == m_PlayerID) //Player
+			{
+				m_CollideOther = true;
+			}
+			else if (collideEnemy == false) m_CollideOther = false;
 		}
 		if(m_CollideOther == false)
 			m_IsDead = true;

@@ -26,7 +26,8 @@ void App::OnStart()
 	/*std::string path = "../../res/test.obj";
 	hlt_ModelImporter::ImportOBJ(path);*/
 
-	m_PlayerID = HLT_GAMEMANAGER.CreateEntity();
+	//m_PlayerID = HLT_GAMEMANAGER.CreateEntity();
+	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
 	m_EntityID.push_back(m_PlayerID);
 
 	ecs = HLT_GAMEMANAGER.GetECS();
@@ -49,7 +50,7 @@ void App::OnStart()
 	ecs->AddSystem<hlt_System::ConstantMove>();
 	ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 
-	//CreateMap();
+	CreateMap();
 
 	m_vEnemys = GenerateWave(m_Easy);
 }
@@ -63,10 +64,17 @@ void App::OnUpdate()
 			delete m_vEnemys[i];
 			m_vEnemys.erase(m_vEnemys.begin() + i);
 			i--;
+			m_Score++;
+
 			continue;
 		}
-
+		
 		m_vEnemys[i]->Update(m_PlayerID, &m_vEnemys);
+	}
+
+	if (m_vEnemys.empty())
+	{
+		m_vEnemys = GenerateWave(m_Easy);
 	}
 
 	if (keyboardInput.IsKeyDown(VK_LBUTTON))
@@ -82,7 +90,7 @@ void App::OnUpdate()
 		XMFLOAT3 forward;
 		XMStoreFloat3(&forward, invView.r[2]);
 
-		float spawnOffset = 3.0f;
+		float spawnOffset = 3.f;
 		newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
 		newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
 		newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
@@ -122,7 +130,7 @@ void App::CreateMap()
 
 	hlt_Transform3D* transform1 = new hlt_Transform3D;
 	transform1->pos.y = -4;
-	transform1->sca = { 5.f, 1.5f,5.f };
+	transform1->sca = { 9.5f, 1.5f,9.5f };
 	transform1->UpdateWorld();
 
 	object1.second = transform1;
