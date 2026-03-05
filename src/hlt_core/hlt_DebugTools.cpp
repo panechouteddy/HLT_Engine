@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "hlt_DebugTools.h"
 
 #ifdef NDEBUG
 void hlt_DebugTools::hlt_DebugConsole::CreateDebugConsole() {}

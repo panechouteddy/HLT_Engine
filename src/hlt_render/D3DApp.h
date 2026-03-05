@@ -1,13 +1,21 @@
 #pragma once
 
-//#if defined(DEBUG) || defined(_DEBUG)
-//#define _CRTDBG_MAP_ALLOC
-//#include <crtdbg.h>
-//#include <d3d11on12.h>
-//#include <d2d1_3.h>
-//#include <windows.foundation.h>
-//#include <dwrite.h>
-//#endif
+#if defined(DEBUG) || defined(_DEBUG)
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#include <d3d11on12.h>
+#include <d2d1_3.h>
+#include <windows.foundation.h>
+#include <dwrite.h>
+#endif
+
+//#include "d3dUtil.h"
+//#include "GameTimer.h"
+
+//#include "ConstantBuffer.h"
+//#include "Mesh.h"
+//#include "hlt_Camera.h"
+//#include "RenderManager.h"
 
 // Link necessary d3d12 libraries.
 #pragma comment(lib,"d3dcompiler.lib")
@@ -22,13 +30,6 @@ class RenderManager;
 class hlt_Window;
 class hlt_UI;
 class hlt_SplashScreen;
-class hlt_D2DResource;
-
-class ID3D11On12Device;
-class ID2D1DeviceContext2;
-class ID3D11Device;
-class ID3D11DeviceContext;
-class ID3D11Resource;
 
 class D3DApp
 {
@@ -46,25 +47,15 @@ public:
 
 	bool Get4xMsaaState()const;
 	void Set4xMsaaState(bool value);
-	void SetSize(XMINT2 newSize) { m_WindowSize = newSize; }
-	XMINT2 GetSize() { return m_WindowSize; }
-
-	void SetLoading(bool newStatus) { m_IsLoading = newStatus; }
-	hlt_SplashScreen* GetSplashScreen() { return m_pSplashScreen; }
-	hlt_D2DResource* CreateResource2D();
 
 	virtual void OnResize();
 
-	virtual void StartDraw3D();
+	virtual void DrawRender(std::vector<Mesh*>& meshs);
 	virtual void Draw3D(std::vector<Mesh*>& meshs);
+	virtual void StartDraw3D();
 	virtual void EndDraw3D();
-
-	virtual void StartDraw2D();
 	virtual void Draw2D();
-	virtual void EndDraw2D();
-
 	virtual void Update(std::vector<Mesh*>& meshs, std::vector<hlt_Transform3D*>& transforms);
-
 	ID3D12GraphicsCommandList* GetCommandList() { return m_CommandList.Get();}
 	ID3D12Device* GetDevice() { return m_Device.Get(); }
 	virtual bool Initialize();
@@ -79,7 +70,12 @@ public:
 	TextureBox* GetTextureBox() const;
 	hlt_Camera* GetCamera() { return m_Camera; }
 
+	/*void AddMeshPosition(hlt_Transform3D* pos) const;
+	void AddMesh(Mesh* pos) const;*/
 	void AddMap(Map_Mesh* map);
+
+	void AddTextToDraw(std::wstring text, XMFLOAT2 position) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, position}); }
+	void AddTextToDraw(std::wstring text, float x, float y) { m_TextToDraw.push_back(std::pair<std::wstring, XMFLOAT2>{text, XMFLOAT2{x,y}});}
 
 
 protected:
@@ -155,23 +151,23 @@ protected:
 	D3D12_VIEWPORT m_ScreenViewport ;
 	D3D12_RECT m_ScissorRect;
 
+	//Mesh
+	
+
 	//Camera
 	hlt_Camera* m_Camera;
-
-	// WINDOW DIMENSIONS
-	XMINT2 m_WindowSize;
-
 	//Draw
 	RenderManager* m_RenderManager;
 	MeshBox* m_Box;
 	TextureBox* m_TextureBox;
-	 
-	//Ui
-	std::vector<hlt_D2DResource*> m_pUI;
-	hlt_SplashScreen* m_pSplashScreen = nullptr;
 
-	/*hlt_UI* m_UI;
-	hlt_SplashScreen* m_SplashScreen;*/
+	//Ui
+	std::vector<std::pair<std::wstring, XMFLOAT2>> m_TextToDraw;
+	hlt_UI* m_UI;
+	hlt_SplashScreen* m_SplashScreen;
+
+	//int m_ClientWidth = 1280;
+	//int m_ClientHeight = 720;
 
 	//4XMAA
 	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;

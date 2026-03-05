@@ -21,9 +21,6 @@
 #include <functional>
 #include <cmath>
 #include <emmintrin.h>
-#include <cstdio>
-#include <fcntl.h>
-#include <io.h>
 
 #ifdef _DEBUG
 #include <crtdbg.h>

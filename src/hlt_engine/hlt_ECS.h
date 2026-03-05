@@ -103,3 +103,8 @@ private:
 	template <typename T>
 	T* MoveComponent(int ID, std::unordered_map<int, CPool*>* from, std::unordered_map<int, CPool*>* to);
 };
+
+template<typename T>
+inline void hlt_ECS::Pool<T>::Recycle(int entityID, hlt_ECS* ecs)
+{
+}
