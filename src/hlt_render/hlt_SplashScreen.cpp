@@ -5,12 +5,12 @@ void hlt_SplashScreen::Draw(float WindowWidthMiddle, float WindowHightMiddle)
 	DrawRect(0, 0, WindowWidthMiddle * 2, WindowHightMiddle * 2, D2D1::ColorF(D2D1::ColorF::DarkRed), D2D1::ColorF(D2D1::ColorF::DarkRed));
 	
 	D2D1_RECT_F rect = DrawRect(WindowWidthMiddle - 150, WindowHightMiddle - 50, WindowWidthMiddle + 150, WindowHightMiddle + 50, D2D1::ColorF(D2D1::ColorF::Coral), D2D1::ColorF(D2D1::ColorF::White));
-	std::wstring label = L"FPS: ";
+	std::wstring label = L"Jeu";
 
 	m_textFormatBody->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 	m_textFormatBody->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	
-	m_textBrush->SetOpacity(m_TextOpacity);
+	m_textBrush->SetOpacity(m_GlobalOpacity);
 
 	m_d2dContext->DrawText(
 		label.c_str(),
@@ -31,13 +31,13 @@ D2D1_RECT_F hlt_SplashScreen::DrawRect(float left, float top, float right, float
 	auto color = colorBrush;
 	m_d2dContext->CreateSolidColorBrush(color, &RectangleColor);
 
-	RectangleColor->SetOpacity(m_TextOpacity);
+	RectangleColor->SetOpacity(m_GlobalOpacity);
 
 	m_d2dContext->FillRectangle(rect, RectangleColor.Get());
 
 	RectangleColor->SetColor(colorRectEdge);
 
-	RectangleColor->SetOpacity(m_TextOpacity);
+	RectangleColor->SetOpacity(m_GlobalOpacity);
 
 	m_d2dContext->DrawRectangle(rect, RectangleColor.Get(), 2.0f);
 

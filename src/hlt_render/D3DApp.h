@@ -72,6 +72,9 @@ public:
 	void OpenCommandList();
 	void CloseCommandList();
 
+	std::wstring m_TextToDraw;
+	std::wstring m_TextLife;
+
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();
 	
@@ -150,6 +153,9 @@ protected:
 	 
 	std::vector<hlt_D2DResource*> m_pUI;
 	hlt_SplashScreen* m_pSplashScreen = nullptr;
+
+	const WCHAR* m_FontFamily = L"Consolas";
+	const WCHAR* m_LocalName = L"en-us";
 
 	hlt_UI* m_UI;
 	hlt_SplashScreen* m_SplashScreen;

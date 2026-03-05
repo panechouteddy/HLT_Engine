@@ -16,6 +16,9 @@ public:
 	int GetHP() { return m_HP; }
 	void SetHP(int hp) { m_HP = hp; }
 
+	int GetScore() { return m_Score; }
+	void SetScore(int score) { m_Score = score; }
+
 private:
 	int m_HP = 10;
 	int m_Score = 0;
