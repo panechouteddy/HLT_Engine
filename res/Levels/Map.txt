@@ -1,9 +1,9 @@
 
 WWWWWWWWWWWW 
 W**********W  
-W**W*****W*W 
-***W*****W*E 
-WB*WWWWWWWWW 
+W**W*****W*W
+w**W*****W*E
+WB*WWWWWWWWW
 -
 WWWWWWWWWWEW
 W*******WW*W
@@ -11,10 +11,10 @@ W***W****W*W
 B**********W
 WWWW**WWWWWW
 -
-WWWWWWWWWWww
-WW*W*W*W*W*W
+WWWWWWWWWWWW
+WW*********W
 B**********W
-WW*W*W*W*W*W
+WW*********W
 WWWWWWWWWWEW
 -
 WWWWWWWWWWBW  

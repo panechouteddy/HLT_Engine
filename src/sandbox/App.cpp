@@ -119,14 +119,14 @@ void App::GenerateMap()
 			{
 				std::pair<Mesh*, hlt_Transform3D> ground;
 
-				ground.first = hlt_Prefab::MeshObject::CreateCube();
+				ground.first = hlt_Prefab::MeshObject::CreateCube() ;
 				ground.first->SetColor(hlt_Color::DarkGray);
 				ground.first->SetTexture("grass");
 
-				float positionX = 4 * (x - m_levels[level].spawnPos.x);
+				float positionX = 1 * (x - m_levels[level].spawnPos.x) -4 ;
 				float groundPositionY = -1;
 				float RoofPositionY = 1;
-				float positionZ = 4 * (y - m_levels[level].spawnPos.y);
+				float positionZ = 1 * (y - m_levels[level].spawnPos.y) - 4;
 
 				hlt_Transform3D transform = {};
 				transform.pos = { positionX,groundPositionY,positionZ };
