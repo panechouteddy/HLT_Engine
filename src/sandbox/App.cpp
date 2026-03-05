@@ -72,7 +72,7 @@ void App::OnStart()
 
 	mesh->mesh.SetMesh("test", hlt_Color::LightGreen);
 
-	//CreateMap();
+	CreateMap();
 }
 
 void App::OnUpdate()

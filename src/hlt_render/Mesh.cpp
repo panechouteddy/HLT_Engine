@@ -50,9 +50,6 @@ void MeshBox::CreateAllMesh(ID3D12Device* device, ID3D12GraphicsCommandList* com
 	CreateRock(device, commandList);
 }
 
-
-
-
 void MeshBox::CreateMesh(std::string name ,std::vector<Vertex>& vertexList, std::vector<uint16_t>& indexList)
 {
 	if (IsAllreadyCreated(name))
