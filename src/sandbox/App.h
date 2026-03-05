@@ -34,6 +34,7 @@ private:
 
 	std::vector<int> m_EntityID;
 	int m_PlayerID = -1;
+	int m_WarpID = -1;
 	int m_PlayerLife = 10;
 
 	hlt_ECS* ecs;

@@ -31,12 +31,16 @@ void App::OnStart()
 	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
 	m_EntityID.push_back(m_PlayerID);
 
+	m_WarpID = HLT_GAMEMANAGER.CreateEntity();
+
 	ecs = HLT_GAMEMANAGER.GetECS();
 	/*hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(m_PlayerID);
 	mesh->mesh.SetMesh("path", hlt_Color::White);*/
 
+	
 	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { 0.0f, 0.5f, 0.f };
 	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
+	hlt_Component::BoxCollider3D* WarpBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_WarpID);
 	oBox->boxType = oBox->OBB;
 	oIsColliding = &oBox->isColliding;
 
@@ -237,7 +241,7 @@ void App::CreateMap()
 
 void App::GenerateMap()
 {
-	int level = 2;
+	int level = 5;
 
 	Map_Mesh* map = new Map_Mesh;
 
@@ -254,8 +258,8 @@ void App::GenerateMap()
 				object.first->SetColor(hlt_Color::DarkGray);
 				object.first->SetTexture("bricks2");
 
-				float positionX = 1 * (x - m_Levels[level].spawnPos.x) - 4;
-				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) - 4;
+				float positionX = 1 * (x - m_Levels[level].spawnPos.x) ;
+				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) ;
 
 				hlt_Transform3D transform = {};
 				transform.pos = { positionX,0,positionZ };
@@ -272,10 +276,10 @@ void App::GenerateMap()
 				ground.first->SetColor(hlt_Color::DarkGray);
 				ground.first->SetTexture("grass");
 
-				float positionX = 1 * (x - m_Levels[level].spawnPos.x) - 4;
+				float positionX = 1 * (x - m_Levels[level].spawnPos.x) ;
 				float groundPositionY = -1;
 				float RoofPositionY = 1;
-				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) - 4;
+				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) ;
 
 				hlt_Transform3D transform = {};
 				transform.pos = { positionX,groundPositionY,positionZ };
@@ -293,10 +297,13 @@ void App::GenerateMap()
 				roof.second = transform;
 
 				map->Meshs.push_back(roof);
+
+				if (m_Levels[level].grid[x][y] == 'E')
 			}
 		}
 	}
 
+	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { 100, 0, m_Levels[level].spawnPos.y };
 	HLT_GAMEMANAGER.CreateMap(map);
 }
 

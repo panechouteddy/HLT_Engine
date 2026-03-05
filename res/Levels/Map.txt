@@ -12,26 +12,29 @@ WW***W****W*WWW
 WWWWWWWWWWWWWWW
 -
  WWWWWWWWWWWW
- WW*********W
+WWW*********W
 *B**********W
 WWW*********W
  WWWWWWWWWWEW
 -
-WWWWWWWWWWBW  
-W**********W   
-W**WW**WW**W   
-W**********E  
-WWWWWWWWWWWW   
+WWWWWWWWWWWWW  
+*B***W******W   
+WW**WW**WW**WW   
+ W*******W**E* 
+ WWWWWWWWWWWWW  
 -
-WWWWBWWWWWWW
-WWW***WWW**E 
-WW******WW*W
-WW*W*W*****W
-WWWWWWW*WWWW 
+ WWWWWWWWWWWW
+ WWW***WWW**E 
+WWW******WW*W
+*BW*W*W*****W
+WWWWWWWW*WWWW
+        W
 -
-WWWWWWWWWWBW
-W**********W
-W*WWWWWWWWWW
-W**********W
-WWWWWWWWWWEW
+WWWWWWWWWWWWW
+*B**********W
+WWWWWWWWWWW*W
+W***********W
+W*WWWWWWWWWWWW
+W**********E**
+WWWWWWWWWWWWWW
 -
