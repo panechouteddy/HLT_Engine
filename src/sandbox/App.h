@@ -3,6 +3,7 @@
 
 class Projectile;
 class Enemy;
+class Player;
 
 class App
 {
@@ -24,6 +25,14 @@ public:
 	std::vector<Enemy*> GenerateWave(int count);
 	void Reset();
 
+private:
+	void UpdateEnemies();
+	void UpdateShot();
+	void UpdateDifficulty();
+
+	void PlayerDied();
+	void PlayerShoot();
+
 public:
 	int m_Score = 0;
 
@@ -33,8 +42,7 @@ private:
 	std::vector<Level> m_Levels;
 
 	std::vector<int> m_EntityID;
-	int m_PlayerID = -1;
-	int m_PlayerLife = 10;
+	Player* m_pPlayer = nullptr;
 
 	hlt_ECS* ecs = nullptr;
 	hlt_Camera* m_pCamera = nullptr;

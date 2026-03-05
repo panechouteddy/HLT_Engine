@@ -2,6 +2,7 @@
 #include "App.h"
 #include "Projectile.h"
 #include "Enemy.h"
+#include "Player.h"
 
 #include <random>
 
@@ -27,22 +28,17 @@ void App::OnStart()
 	/*std::string path = "../../res/test.obj";
 	hlt_ModelImporter::ImportOBJ(path);*/
 
-	//m_PlayerID = HLT_GAMEMANAGER.CreateEntity();
-	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
-	m_EntityID.push_back(m_PlayerID);
-
 	ecs = HLT_GAMEMANAGER.GetECS();
-	/*hlt_Component::Mesh* mesh = ecs->AddComponent<hlt_Component::Mesh>(m_PlayerID);
-	mesh->mesh.SetMesh("path", hlt_Color::White);*/
 
-	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { 0.0f, 0.5f, 0.f };
-	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
+	m_pPlayer = new Player(ecs);
+	m_pPlayer->m_pTransform->transform.pos = { 0.0f, 0.5f, 0.f };
+	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_pPlayer->m_ID);
 	oBox->boxType = oBox->OBB;
 	oIsColliding = &oBox->isColliding;
 
 	m_pCamera = HLT_CAMERA;
 
-	XMFLOAT3 pos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
+	XMFLOAT3 pos = ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos;
 	m_pCamera->m_Transform.pos = pos;
 	m_pCamera->m_IsMouseCamera = true;
 
@@ -59,121 +55,15 @@ void App::OnStart()
 
 void App::OnUpdate()
 {
-	auto currentFrameTime = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsed = currentFrameTime - m_LastFrameTime;
-	float deltaTime = elapsed.count();
-	m_LastFrameTime = currentFrameTime;
+	m_TimeSinceLastHit += HLT_TIME.GetDeltaTime();
 
-	m_TimeSinceLastHit += deltaTime;
+	UpdateDifficulty();
+	UpdateEnemies();
 
-	if (keyboardInput.IsKeyDown(VK_F1)) 
-	{
-		m_Difficulty = m_Easy;
-		if(m_GameEnd)
-		{
-			Reset();
-		}
-	}
-	else if (keyboardInput.IsKeyDown(VK_F2)) 
-	{
-		m_Difficulty = m_Medium;
-		if (m_GameEnd)
-		{
-			Reset();
-		}
-	}
-	else if (keyboardInput.IsKeyDown(VK_F3)) 
-	{
-		m_Difficulty = m_Hard;
-		if (m_GameEnd)
-		{
-			Reset();
-		}
-	}
+	PlayerDied();
+	PlayerShoot();
 
-	for (int i = 0; i < m_vEnemys.size(); i++)
-	{
-		if (m_vEnemys[i]->m_IsDead)
-		{
-			delete m_vEnemys[i];
-			m_vEnemys.erase(m_vEnemys.begin() + i);
-			i--;
-			m_Score++;
-
-			continue;
-		}
-		
-		m_vEnemys[i]->Update(m_PlayerID, &m_vEnemys);
-
-		if (m_TimeSinceLastHit >= m_DamageCooldown)
-		{
-			m_PlayerLife--;
-			m_TimeSinceLastHit = 0.0f;
-		}
-	}
-
-	if (m_vEnemys.empty() && m_GameEnd == false)
-	{
-		m_vEnemys = GenerateWave(m_Difficulty);
-	}
-
-	
-	if (m_PlayerLife <= 0)
-	{
-		ecs->RemoveEntity(m_PlayerID);
-		for (int i = 0; i < m_vEnemys.size(); i++)
-		{
-			m_vEnemys[i]->m_IsDead = true;
-			m_vEnemys[i]->Update(m_PlayerID, &m_vEnemys);
-			delete m_vEnemys[i];
-			m_vEnemys.erase(m_vEnemys.begin() + i);
-		}
-		for (int i = 0; i < m_vProjs.size(); i++)
-		{
-			m_vProjs[i]->m_IsDead = true;
-			m_vProjs[i]->Update();
-			delete m_vProjs[i];
-			m_vProjs.erase(m_vProjs.begin() + i);
-		}
-		m_GameEnd = true;
-	}
-
-	if (keyboardInput.IsKeyDown(VK_LBUTTON))
-	{
-		Projectile* newBullet = new Projectile();
-		m_EntityID.push_back(newBullet->m_ProjectileID);
-
-		XMFLOAT3 playerPos = ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos;
-
-		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
-		XMMATRIX invView = XMMatrixInverse(nullptr, view);
-
-		XMFLOAT3 forward;
-		XMStoreFloat3(&forward, invView.r[2]);
-
-		float spawnOffset = 3.f;
-		newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
-		newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
-		newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
-
-		newBullet->m_dir = forward;
-
-		newBullet->Move();
-
-		m_vProjs.push_back(newBullet);
-	}
-	for (int i = 0; i < m_vProjs.size(); i++)
-	{
-		if (m_vProjs[i]->m_IsDead)
-		{
-			delete m_vProjs[i];
-			m_vProjs.erase(m_vProjs.begin() + i);
-			i--;
-			continue;
-		}
-
-		m_vProjs[i]->Update();
-	}
+	UpdateShot();	
 }
 
 void App::OnExit()
@@ -237,44 +127,37 @@ void App::GenerateMap()
 
 	Map_Mesh* map = new Map_Mesh;
 
-
 	for (int x = 0; x < m_Levels[level].grid.size(); x++)
 	{
 		for (int y = 0; y < m_Levels[level].grid[x].size(); y++)
 		{
 			if (m_Levels[level].grid[x][y] == 'W')
 			{
-				std::pair<Mesh*, hlt_Transform3D> object;
+				int eID = hlt_Prefab::GameObject::CreateCube();
 
-				object.first = hlt_Prefab::MeshObject::CreateCube();
-				object.first->SetColor(hlt_Color::DarkGray);
-				object.first->SetTexture("bricks2");
+				hlt_Component::Mesh* eMesh = ecs->GetComponent<hlt_Component::Mesh>(eID);
+				eMesh->mesh.SetColor(hlt_Color::DarkGray);
+				eMesh->mesh.SetTexture("bricks2");
 
 				float positionX = 1 * (x - m_Levels[level].spawnPos.x) - 4;
 				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) - 4;
-
-				hlt_Transform3D transform = {};
-				transform.pos = { positionX,0,positionZ };
-				object.second = transform;
-
-				map->Meshs.push_back(object);
+				hlt_Component::Transform3D* eTransform = ecs->GetComponent<hlt_Component::Transform3D>(eID);
+				eTransform->transform.pos = { positionX , 0 , positionZ };
 			}
 			else
 			{
-				std::pair<Mesh*, hlt_Transform3D> ground;
+				int eID = hlt_Prefab::GameObject::CreateCube();
 
-				ground.first = hlt_Prefab::MeshObject::CreateCube();
-				ground.first = hlt_Prefab::MeshObject::CreateCube();
-				ground.first->SetColor(hlt_Color::DarkGray);
-				ground.first->SetTexture("grass");
+				hlt_Component::Mesh* eMesh = ecs->GetComponent<hlt_Component::Mesh>(eID);
+				eMesh->mesh.SetColor(hlt_Color::DarkGray);
+				eMesh->mesh.SetTexture("grass");
 
 				float positionX = 1 * (x - m_Levels[level].spawnPos.x) - 4;
 				float groundPositionY = -1;
 				float RoofPositionY = 1;
 				float positionZ = 1 * (y - m_Levels[level].spawnPos.y) - 4;
-
-				hlt_Transform3D transform = {};
-				transform.pos = { positionX,groundPositionY,positionZ };
+				hlt_Component::Transform3D* eTransform = ecs->GetComponent<hlt_Component::Transform3D>(eID);
+				eTransform->transform.pos = { positionX,groundPositionY,positionZ };
 			}
 		}
 	}
@@ -296,7 +179,7 @@ std::vector<Enemy*> App::GenerateWave(int count)
 
 		enemy->m_pos = { distXZ(gen), 0.5f, distXZ(gen) };
 
-		XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos);
+		XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos);
 		XMVECTOR enemyPosVec = XMLoadFloat3(&enemy->m_pos);
 
 		XMVECTOR dirVec = XMVectorSubtract(playerPosVec, enemyPosVec);
@@ -314,14 +197,128 @@ std::vector<Enemy*> App::GenerateWave(int count)
 
 void App::Reset()
 {
-	m_PlayerID = hlt_Prefab::GameObject::CreateCube();
-	ecs->GetComponent<hlt_Component::Transform3D>(m_PlayerID)->transform.pos = { 0.0f, 0.5f, 0.f };
-	hlt_Component::BoxCollider3D* oBox = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_PlayerID);
-	oBox->boxType = oBox->OBB;
-	oIsColliding = &oBox->isColliding;
-
-	m_PlayerLife = 10;
-	m_Score = 0;
+	delete m_pPlayer;
+	m_pPlayer = new Player(ecs);
 
 	m_GameEnd = false;
+}
+
+void App::UpdateEnemies()
+{
+	for (int i = 0; i < m_vEnemys.size(); i++)
+	{
+		if (m_vEnemys[i]->m_IsDead)
+		{
+			delete m_vEnemys[i];
+			m_vEnemys.erase(m_vEnemys.begin() + i);
+			i--;
+			m_Score++;
+
+			continue;
+		}
+
+		m_vEnemys[i]->Update(m_pPlayer->m_ID, &m_vEnemys);
+
+		if (m_vEnemys[i]->m_CollidePlayer) m_pPlayer->TakeDamage();
+	}
+
+	if (m_vEnemys.empty() && m_GameEnd == false)
+	{
+		m_vEnemys = GenerateWave(m_Difficulty);
+	}
+}
+
+void App::UpdateShot()
+{
+	for (int i = 0; i < m_vProjs.size(); i++)
+	{
+		if (m_vProjs[i]->m_IsDead)
+		{
+			delete m_vProjs[i];
+			m_vProjs.erase(m_vProjs.begin() + i);
+			i--;
+			continue;
+		}
+
+		m_vProjs[i]->Update();
+	}
+}
+
+void App::UpdateDifficulty()
+{
+	if (keyboardInput.IsKeyDown(VK_F1))
+	{
+		m_Difficulty = m_Easy;
+		if (m_GameEnd)
+		{
+			Reset();
+		}
+	}
+	else if (keyboardInput.IsKeyDown(VK_F2))
+	{
+		m_Difficulty = m_Medium;
+		if (m_GameEnd)
+		{
+			Reset();
+		}
+	}
+	else if (keyboardInput.IsKeyDown(VK_F3))
+	{
+		m_Difficulty = m_Hard;
+		if (m_GameEnd)
+		{
+			Reset();
+		}
+	}
+}
+
+void App::PlayerDied()
+{
+	if (m_pPlayer->GetHP() <= 0)
+	{
+		ecs->RemoveEntity(m_pPlayer->m_ID);
+		for (int i = 0; i < m_vEnemys.size(); i++)
+		{
+			m_vEnemys[i]->m_IsDead = true;
+			m_vEnemys[i]->Update(m_pPlayer->m_ID, &m_vEnemys);
+			delete m_vEnemys[i];
+			m_vEnemys.erase(m_vEnemys.begin() + i);
+		}
+		for (int i = 0; i < m_vProjs.size(); i++)
+		{
+			m_vProjs[i]->m_IsDead = true;
+			m_vProjs[i]->Update();
+			delete m_vProjs[i];
+			m_vProjs.erase(m_vProjs.begin() + i);
+		}
+		m_GameEnd = true;
+	}
+}
+
+void App::PlayerShoot()
+{
+	if (keyboardInput.IsKeyDown(VK_LBUTTON))
+	{
+		Projectile* newBullet = new Projectile();
+		m_EntityID.push_back(newBullet->m_ProjectileID);
+
+		XMFLOAT3 playerPos = m_pPlayer->m_pTransform->transform.pos;
+
+		XMMATRIX view = XMLoadFloat4x4(&m_pCamera->m_View);
+		XMMATRIX invView = XMMatrixInverse(nullptr, view);
+
+		XMFLOAT3 forward;
+		XMStoreFloat3(&forward, invView.r[2]);
+
+		float spawnOffset = 3.f;
+		newBullet->m_pos.x = playerPos.x + (forward.x * spawnOffset);
+		newBullet->m_pos.y = playerPos.y + (forward.y * spawnOffset);
+		newBullet->m_pos.z = playerPos.z + (forward.z * spawnOffset);
+
+		newBullet->m_dir = forward;
+
+		newBullet->Move();
+
+		m_vProjs.push_back(newBullet);
+	}
 }
