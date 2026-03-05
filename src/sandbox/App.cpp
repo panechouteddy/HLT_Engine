@@ -274,9 +274,25 @@ void App::GenerateMap()
 
 				hlt_Transform3D transform = {};
 				transform.pos = { positionX,groundPositionY,positionZ };
+
+				ground.second = transform;
+				map->Meshs.push_back(ground);
+
+				std::pair<Mesh*, hlt_Transform3D> roof;
+
+				roof.first = hlt_Prefab::MeshObject::CreateCube();
+				roof.first->SetColor(hlt_Color::DarkGray);
+				roof.first->SetTexture("stone");
+
+				transform.pos = { positionX,RoofPositionY,positionZ };
+				roof.second = transform;
+
+				map->Meshs.push_back(roof);
 			}
 		}
 	}
+
+	HLT_GAMEMANAGER.CreateMap(map);
 }
 
 std::vector<Enemy*> App::GenerateWave(int count)
