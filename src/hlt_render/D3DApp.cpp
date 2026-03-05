@@ -351,7 +351,6 @@ void D3DApp::InitDirect3DDraw()
     m_RenderManager->BuildPSO(m_BackBufferFormat,m_Device.Get(),m_4xMsaaState,m_4xMsaaQuality, m_DepthStencilFormat);
 
     CreateMeshBox();
-    m_TextureBox->CreateDefaultTexture();
 
     CloseCommandList();
 }
