@@ -24,6 +24,5 @@ public:
     void LoadAllTexture();
     std::unordered_map<std::string, Texture*>& GetAllTexture() { return m_TextureBox; }
     void CreateTexture(std::string name, std::wstring fileName);
-    void CreateDefaultTexture();
 };
 
