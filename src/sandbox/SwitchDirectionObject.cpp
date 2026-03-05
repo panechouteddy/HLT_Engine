@@ -13,6 +13,8 @@ SwitchDirectionObject::SwitchDirectionObject(hlt_ECS* ecs)
 
 	m_pCollider = ecs->AddComponent<hlt_Component::BoxCollider3D>(m_ID);
 	m_pCollider->boxType = m_pCollider->AABB;
+	m_pCollider->boxAABB.Size() = m_pTransform->transform.sca;
+	m_pCollider->boxAABB.m_Box.Center = m_pTransform->transform.pos;
 }
 
 void SwitchDirectionObject::Update()

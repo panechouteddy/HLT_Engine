@@ -31,7 +31,7 @@ void App::OnStart()
 
 	m_pPlayer = new Player(ecs);
 	hlt_Component::ConstantMove* cMovePlayer = ecs->AddComponent<hlt_Component::ConstantMove>(m_pPlayer->m_ID);
-	cMovePlayer->dir = { 0, 0, -1 };
+	cMovePlayer->dir = { 0, 0, 1 };
 	cMovePlayer->move = 1.f;
 
 	m_pCamera = HLT_CAMERA;
@@ -42,7 +42,6 @@ void App::OnStart()
 
 	ecs->AddSystem<hlt_System::BoxCollider>();
 	ecs->AddSystem<hlt_System::ConstantMove>();
-	//ecs->AddSystem<hlt_System::hlt_RepulseSystem>();
 
 	m_WarpID = hlt_Prefab::GameObject::CreateCube();
 	hlt_Component::BoxCollider3D* warpBox = ecs->AddComponent < hlt_Component::BoxCollider3D>(m_WarpID);
@@ -61,11 +60,6 @@ void App::OnUpdate()
 
 	HLT_D3DAPP->m_TextToDraw = L"Score : " + std::to_wstring(m_pPlayer->GetScore());
 	HLT_D3DAPP->m_TextLife = L"PV : " + std::to_wstring(m_pPlayer->GetHP());
-
-	auto currentFrameTime = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> elapsed = currentFrameTime - m_LastFrameTime;
-	float deltaTime = elapsed.count();
-	m_LastFrameTime = currentFrameTime;
 
 	CheckPlayerExit();
 	FollowPlayer();
@@ -205,31 +199,31 @@ void App::GenerateMap()
 
 					warpTransform->transform.pos = { positionX, 0.f, positionZ };
 					switchs.push_back(SwitchDirectionObject(ecs));
-					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 0, 0, -1 });
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 0, 0, 1 });
 					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
 				}
 				else if (m_Levels[level].grid[x][y] == '>')
 				{
 					switchs.push_back(SwitchDirectionObject(ecs));
-					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 0, 0, -1 });
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 0, 0, 1 });
 					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
 				}
 				else if (m_Levels[level].grid[x][y] == '<')
 				{
 					switchs.push_back(SwitchDirectionObject(ecs));
-					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 0, 0, 1 });
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 0, 0, -1 });
 					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
 				}
 				else if (m_Levels[level].grid[x][y] == 'v')
 				{
 					switchs.push_back(SwitchDirectionObject(ecs));
-					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ -1, 0, 0 });
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 1, 0, 0 });
 					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
 				}
 				else if (m_Levels[level].grid[x][y] == '^')
 				{
 					switchs.push_back(SwitchDirectionObject(ecs));
-					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ 1, 0, 0 });
+					switchs[switchs.size() - 1].SetNewDirection(XMFLOAT3{ -1, 0, 0 });
 					switchs[switchs.size() - 1].m_pTransform->transform.pos = { positionX, 0.f, positionZ };
 				}
 				if (m_Levels[level].grid[x][y] == 'B')
@@ -256,7 +250,7 @@ std::vector<Enemy*> App::GenerateWave(int count)
 		Enemy* enemy = new Enemy();
 		m_EntityID.push_back(enemy->m_EnemyID);
 
-		enemy->m_pos = { m_MobSpawner[spawner(gen)].x, 0.5f, m_MobSpawner[spawner(gen)].y };
+		//enemy->m_pos = { m_MobSpawner[spawner(gen)].x, 0.5f, m_MobSpawner[spawner(gen)].y };
 
 		XMVECTOR playerPosVec = XMLoadFloat3(&ecs->GetComponent<hlt_Component::Transform3D>(m_pPlayer->m_ID)->transform.pos);
 		XMVECTOR enemyPosVec = XMLoadFloat3(&enemy->m_pos);
@@ -429,7 +423,6 @@ void App::FollowPlayer()
 {
 	if(DEBUG == false)
 		m_pCamera->m_Transform.pos = m_pPlayer->m_pTransform->transform.pos;
-	//m_pCamera->m_Transform.UpdateWorld();
 	hlt_DebugTools::hlt_DebugConsole::PrintVector(m_pCamera->m_Transform.pos);
 	hlt_DebugConsole::PrintVector(m_pPlayer->m_pTransform->transform.pos);
 }
