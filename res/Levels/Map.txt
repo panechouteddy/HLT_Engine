@@ -1,21 +1,21 @@
 
-WWWWWWWWWWWW 
-W**********W  
-W**W*****W*W
-w**W*****W*E
-WB*WWWWWWWWW
+ WWWWWWWWWWWW 
+ W**********W  
+WW**W****W**WWW
+*B*W****W**E***
+WWWWWWWWWWWWWWW
 -
-WWWWWWWWWWEW
-W*******WW*W
-W***W****W*W
-B**********W
-WWWW**WWWWWW
+ WWWWWWWWWWwW
+ W*******WW*W
+WW***W****W*WWW
+*B***W******E**
+WWWWWWWWWWWWWWW
 -
-WWWWWWWWWWWW
-WW*********W
-B**********W
-WW*********W
-WWWWWWWWWWEW
+ WWWWWWWWWWWW
+ WW*********W
+*B**********W
+WWW*********W
+ WWWWWWWWWWEW
 -
 WWWWWWWWWWBW  
 W**********W   
