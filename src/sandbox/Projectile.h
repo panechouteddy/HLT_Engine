@@ -1,0 +1,31 @@
+#pragma once
+
+class Projectile
+{
+public:
+	Projectile();
+	~Projectile();
+
+	void Update(int PlayerID);
+	void Move();
+
+public:
+	XMFLOAT3 m_pos;
+	XMFLOAT3 m_dir;
+
+	int m_ProjectileID = -1;
+	bool m_IsDead;
+
+	std::string m_Tag;
+	
+private:
+	hlt_ECS* ecs;
+
+	hlt_Component::ConstantMove* oCMove;
+	hlt_Component::BoxCollider3D* oBox;
+
+	std::vector<int> m_vCollideWith;
+
+	bool oIsColliding = false;
+	bool m_IsActive = false;
+};
